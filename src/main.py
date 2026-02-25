@@ -49,7 +49,14 @@ class aclient(discord.Client):
     async def on_ready(self):
         await self.wait_until_ready()
         if not self.synced:
-            await tree.sync(guild = discord.Object(id=config['discord_guild_id']))
+            guild_id = config['discord_guild_id']
+            logger.info(f"Syncing commands to guild {guild_id}...")
+            # Clear stale global commands
+            tree.clear_commands(guild=None)
+            await tree.sync()
+            # Sync guild commands
+            synced_commands = await tree.sync(guild=discord.Object(id=guild_id))
+            logger.info(f"Synced {len(synced_commands)} commands: {[c.name for c in synced_commands]}")
             self.synced = True
         print(f"Logged into bot account: {self.user}.")
         self.checkPendingPayments.start()
