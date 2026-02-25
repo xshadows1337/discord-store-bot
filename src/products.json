@@ -1,0 +1,77 @@
+[
+  {
+    "name": "[ ᴇxᴛᴇʀɴᴀʟ ] ʙʟᴀᴄᴋ ᴏᴘs ᴠɪ - ᴅᴀʏ",
+    "description": "ᴀɪᴍʙᴏᴛ, ᴘʀᴇᴅɪᴄᴛɪᴏɴ, ᴇsᴘ, ғᴜʟʟ sᴜᴘᴘᴏʀᴛ ғᴏʀ ᴢᴏᴍʙɪᴇs, ᴀɴᴛɪ-ʀᴇᴄᴏʀᴅ",
+    "requirements": "ᴡɪɴᴅᴏᴡs 10 | ᴡɪɴᴅᴏᴡs ɪɪ",
+    "price": 4.99,
+    "min_order_amount": 1,
+    "product_file": "products/ᴇxᴛᴇʀɴᴀʟ ᴅᴀʏ ᴋᴇʏs.txt",
+    "thread_id": 1401869772676792380,
+    "payment_methods": [
+      "CRYPTO",
+      "CREDITCARD"
+    ],
+    "stripe_priceident": "price_1RhdJsEGjqRefUzyzrO26Bn7",
+    "thumbnail_url": "https://cdn-icons-png.flaticon.com/512/1170/1170678.png"
+  },
+  {
+    "name": "[ ᴇxᴛᴇʀɴᴀʟ ] ʙʟᴀᴄᴋ ᴏᴘs ᴠɪ - ᴍᴏɴᴛʜ",
+    "description": "ᴀɪᴍʙᴏᴛ, ᴘʀᴇᴅɪᴄᴛɪᴏɴ, ᴇsᴘ, ғᴜʟʟ sᴜᴘᴘᴏʀᴛ ғᴏʀ ᴢᴏᴍʙɪᴇs, ᴀɴᴛɪ-ʀᴇᴄᴏʀᴅ",
+    "requirements": "ᴡɪɴᴅᴏᴡs 10 | ᴡɪɴᴅᴏᴡs 11",
+    "price": 24.99,
+    "min_order_amount": 1,
+    "product_file": "products/ᴇxᴛᴇʀɴᴀʟ ᴍᴏɴᴛʜ ᴋᴇʏs.txt",
+    "thread_id": 1401869774513766441,
+    "payment_methods": [
+      "CRYPTO",
+      "CREDITCARD"
+    ],
+    "stripe_priceident": "price_1RhdawEGjqRefUzyGfvdxMUv",
+    "thumbnail_url": "https://cdn-icons-png.flaticon.com/512/1170/1170678.png"
+  },
+  {
+    "name": "[ ɴᴏʀᴍᴀʟ ] xʙᴏx ɢᴀᴍᴇᴘᴀss - ᴍᴏɴᴛʜ",
+    "requirements": "xʙᴏx ᴀᴘᴘ | xʙᴏx ᴏɴʟʏ",
+    "description": "ʏᴏᴜ ᴄᴀɴ ʀᴇᴅᴇᴇᴍ ᴛʜᴇ ᴄᴏᴅᴇ ᴛʜᴀᴛ ɪs sᴇɴᴛ ᴛᴏ ʏᴏᴜ ᴠɪᴀ ᴅᴍs ɪɴ ᴛʜᴇ xʙᴏx ᴀᴘᴘ ᴏʀ ᴏɴ ᴀ ʀᴇᴀʟ xʙᴏx ᴠɪᴀ https://xbox.com/redeem",
+    "price": 6.99,
+    "min_order_amount": 1,
+    "product_file": "products/xʙᴏx ɢᴀᴍᴇᴘᴀss ᴄᴏᴅᴇs.txt",
+    "thread_id": 1401869775117877268,
+    "payment_methods": [
+      "CRYPTO",
+      "CREDITCARD"
+    ],
+    "stripe_priceident": "price_1RrkyOEGjqRefUzyP0UaTURp",
+    "thumbnail_url": "https://cdn-icons-png.flaticon.com/512/5968/5968705.png"
+  },
+  {
+    "name": "[ sᴛᴇᴀᴍ ] ғᴀ ᴀᴄᴄᴏᴜɴᴛ - ғʀᴇsʜ",
+    "description": "sᴍs ᴀᴛᴛᴀᴄʜᴇᴅ, sᴛᴇᴀᴍ ᴜsᴇʀɴᴀᴍᴇ:sᴛᴇᴀᴍ ᴘᴀss",
+    "requirements": "ᴏɴʟʏ sᴛᴇᴀᴍ",
+    "price": 0.2,
+    "min_order_amount": 50,
+    "product_file": "products/sᴛᴇᴀᴍ ᴀᴄᴄᴏᴜɴᴛs.txt",
+    "thread_id": 1401869775755411458,
+    "payment_methods": [
+      "CRYPTO",
+      "CREDITCARD"
+    ],
+    "stripe_priceident": "price_1RhfugEGjqRefUzyI45oJHzb",
+    "thumbnail_url": "https://cdn-icons-png.flaticon.com/512/5968/5968703.png"
+  },
+  {
+    "name": "[ ᴛʀᴀᴅᴀʙʟᴇ ] ɢᴀᴍᴇ ᴄᴏɪɴs - ɢᴀᴍʙʟᴇ",
+    "description": "ᴀғᴛᴇʀ ᴘᴜʀᴄʜᴀsᴇᴅ ᴘʟᴇᴀsᴇ ɢᴏ ᴛᴏ ᴛʜᴇ ʀᴇᴅᴇᴇᴍ ᴄʜᴀɴɴᴇʟ ᴜɴᴅᴇʀ ɢᴀᴍʙʟɪɴɢ ᴀɴᴅ ʀᴇᴅᴇᴇᴍ ʏᴏᴜʀ ᴋᴇʏ ᴛʜᴇʀᴇ ɪɴ ᴏʀᴅᴇʀ ᴛᴏ ᴜsᴇ ʏᴏᴜʀ ɢᴀᴍᴇ ᴄᴏɪɴs ᴛᴏ ɢᴀᴍʙʟᴇ ᴡɪᴛʜ sᴏ ʏᴏᴜ'ʟʟ ʙᴇ ᴀʙʟᴇ ᴛᴏ ᴇᴀʀɴ ᴀ ᴋᴇʏ",
+    "requirements": "ᴏɴʟʏ ᴘsɴ",
+    "price": 0.01,
+    "min_order_amount": 1,
+    "product_file": "products/ɢᴀᴍʙʟɪɴɢ ʀᴇᴅᴇᴇᴍs.txt",
+    "thread_id": 1401869776348238091,
+    "payment_methods": [
+      "CRYPTO",
+      "CREDITCARD"
+    ],
+    "stripe_priceident": "price_1RhdxHEGjqRefUzyXH3oKX1D",
+    "thumbnail_url": "https://cdn-icons-png.flaticon.com/512/5968/5968706.png"
+  }
+]

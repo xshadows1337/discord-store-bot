@@ -1,0 +1,7 @@
+discord.py==2.5.2
+readsettings==3.4.5
+requests==2.32.4
+stripe==12.3.0
+discord-webhook==1.4.1
+loguru==0.7.3
+PyYAML==5.3.1

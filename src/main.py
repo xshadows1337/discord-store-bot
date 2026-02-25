@@ -1,0 +1,250 @@
+import os
+import discord
+from discord import app_commands
+from readsettings import ReadSettings
+from command_handler import CommandHander
+import time
+from datetime import datetime
+from discord.ext import tasks
+from commands.setup_channels.setup_channels_command import PaymentButtonView
+from utils.crypto_api import getOrderById, sendProductToCustomer
+from utils.db_functions import getAllNewOrders, setOrderStatusById, getOutOfStockOrders
+from utils.product_manager import getAccounts, linesInFile
+from utils.cardpayment_utils import get10LastInvoices, getInvoiceById
+from utils.env_config import Config
+
+from loguru import logger
+
+logger.add("output.log")
+
+commandHandler = None
+
+config = Config()
+products = ReadSettings('products.json')
+lastStock = {}
+
+def sendOrderWebhook(orderid, quantity, amount, method, user):
+    from discord_webhook import DiscordWebhook, DiscordEmbed
+
+    webhook = DiscordWebhook(url=os.environ.get('ORDER_WEBHOOK_URL', 'https://discordapp.com/api/webhooks/1391143167738249379/Hd0UQZzUMzPYiqkp4xsbNzJsyZa78mYFya2CgEBLaQjmrxn0ZIHD9OG8JqmUvWZqtm6W'), username="ANY.XYZ Orders")
+
+    embed = DiscordEmbed(title="Invoice Paid!", color="00ff00")
+    embed.set_footer(text="ANY.XYZ Store Notifications")
+    embed.set_timestamp()
+    embed.add_embed_field(name="Order ID", value=orderid, inline=False)
+    embed.add_embed_field(name="Quantity", value=quantity, inline=False)
+    embed.add_embed_field(name="Amount", value=amount, inline=False)
+    embed.add_embed_field(name="Method", value=method, inline=False)
+    embed.add_embed_field(name="User", value=f"<@{user}>", inline=False)
+
+    webhook.add_embed(embed)
+    response = webhook.execute()
+
+class aclient(discord.Client):
+    def __init__(self):
+        super().__init__(intents = discord.Intents.all())
+        self.synced = False
+        self.started = False
+
+    async def on_ready(self):
+        await self.wait_until_ready()
+        if not self.synced:
+            await tree.sync(guild = discord.Object(id=config['discord_guild_id']))
+            self.synced = True
+        print(f"Logged into bot account: {self.user}.")
+        self.checkPendingPayments.start()
+        logger.success('All threads running.')
+        
+    async def setup_hook(self) -> None:
+        for product in products:
+            self.add_view(PaymentButtonView(product))
+        
+    @tasks.loop(seconds=10.0, reconnect=True)
+    @logger.catch(onerror=lambda _: logger.exception(_))
+    async def checkPendingPayments(self):
+        try:
+            products = ReadSettings('products.json')
+            for product in products.json():
+                foundThread = False
+                for thread in client.get_channel(config['store_channel_id']).threads:
+                    if(thread.id == product['thread_id']):
+                        foundThread = True
+                if(not foundThread):
+                    continue
+                filePath = product['product_file']
+                if(product['name'] not in lastStock):
+                    lastStock[product['name']] = linesInFile(filePath)
+                    msg = client.get_channel(config['store_channel_id']).get_thread(product['thread_id']).get_partial_message(product['thread_id'])
+                    await msg.edit(content=f"Stock: {linesInFile(filePath)}")
+                else:
+                    if(lastStock[product['name']] != linesInFile(filePath)):
+                        lastStock[product['name']] = linesInFile(filePath)
+                        
+                        msg = client.get_channel(config['store_channel_id']).get_thread(product['thread_id']).get_partial_message(product['thread_id'])
+                        await msg.edit(content=f"Stock: {linesInFile(filePath)}")
+        
+            for order in getOutOfStockOrders():
+                productName = ' '.join(order[7].split(' ')[1:])
+                for prod in products.json():
+                    if(prod['name'] == productName):
+                        product = prod
+                accountsForOrder = getAccounts(product['product_file'], int(order[8]))
+                if(len(accountsForOrder) >= int(order[8])):
+                    logger.info(f'Sending product for out of stock order {order[2]}')
+                    deliveryFIle = f"delivered_orders/{order[2]}.txt"
+                    with open(deliveryFIle, 'w') as file:
+                        file.writelines(accountsForOrder)
+                    try:
+                        await client.get_user(order[10]).send(file=discord.File(deliveryFIle))
+                    except Exception as e:
+                        logger.error(f'Failed to DM User {e}')
+                        pass
+                    sendProductToCustomer(order[9], order[2], "".join(accountsForOrder))
+                    logger.success(f'Order {order[2]} has been settled')
+                    setOrderStatusById(order[1],'Settled')
+            
+            for order in getAllNewOrders():
+                if(order[11] == 'crypto'):
+                    orderDetails = getOrderById(order[1])
+                    if(orderDetails['status'] == "New"):
+                        continue
+                    else:
+                        setOrderStatusById(orderDetails['id'],orderDetails['status'])
+                        if(orderDetails['status'] == "Settled"):
+                            logger.warning(f'Order {orderDetails["metadata"]["orderId"]} is being settled')
+                            embed = discord.Embed(title="ANY.XYZ Order Completed",
+                            url=orderDetails['checkoutLink'],
+                            colour=0x7a00f5,
+                            timestamp=datetime.now())
+
+                            embed.add_field(name="Order ID",
+                                            value=f"```{orderDetails['metadata']['orderId']}```",
+                                            inline=False)
+                            embed.add_field(name="Product",
+                                            value=f"```{orderDetails['metadata']['itemDesc']}```",
+                                            inline=False)
+                            embed.add_field(name="Quantity",
+                                            value=f"```{orderDetails['metadata']['orderQuantity']}```",
+                                            inline=False)
+                            embed.add_field(name="Amount",
+                                            value=f"```${orderDetails['amount']}```",
+                                            inline=False)
+                            embed.add_field(name="Payment Expiration",
+                                            value=f"<t:{orderDetails['expirationTime']}:R>",
+                                            inline=False)
+                            embed.add_field(name="Payment Link",
+                                            value=orderDetails['checkoutLink'],
+                                            inline=False)
+
+                            try:
+                                await client.get_user(order[10]).send(embed=embed)
+                            except:
+                                pass
+                            productName = ' '.join(order[7].split(' ')[1:])
+                            for prod in products.json():
+                                if(prod['name'] == productName):
+                                    product = prod
+                            accountsForOrder = getAccounts(product['product_file'], int(orderDetails['metadata']['orderQuantity']))
+                            if(len(accountsForOrder) == 0):
+                                embed = discord.Embed(title="Out Of Stock", description="We are currenty out of stock for this product. Please wait for a restock.",
+                                        colour=0xde2a2a,
+                                        timestamp=datetime.now())
+
+                                try:
+                                    await client.get_user(order[10]).send(embed=embed)
+                                except:
+                                    pass
+                                setOrderStatusById(order[1],'OOS')
+                                sendProductToCustomer(order[9], order[2], "Ran out of stock while processing your order. Please contact the shop owner.")
+                                return
+                            
+                            deliveryFIle = f"delivered_orders/{orderDetails['metadata']['orderId']}.txt"
+                            with open(deliveryFIle, 'w') as file:
+                                file.writelines(accountsForOrder)
+                            try:
+                                await client.get_user(order[10]).send(file=discord.File(deliveryFIle))
+                            except Exception as e:
+                                logger.error(f'Failed to DM User {e}')
+                                pass
+                            sendProductToCustomer(order[9], order[2], "".join(accountsForOrder))
+                            logger.success(f'Order {orderDetails["metadata"]["orderId"]} has been settled')
+                            sendOrderWebhook(f'{orderDetails["metadata"]["orderId"]}', order[8], f"${order[3]} ({order[8]} @ ${product['price']} Each)", "Crypto", order[10])
+                elif(order[11] == "creditcard"):
+                    invoices = get10LastInvoices()
+                    for invoice in invoices:
+                        if(invoice['payment_link'] == order[1]):
+                            if(invoice['payment_status'] == 'paid'):
+                                try:
+                                    receipt = getInvoiceById(invoice['invoice'])['hosted_invoice_url']
+                                except:
+                                    logger.error(f'Failed to get invoice. Invoice was none')
+                                    continue
+                                setOrderStatusById(order[1],'Settled')
+                                logger.warning(f'Order {order[2]} is being settled')
+                                embed = discord.Embed(title="ANY.XYZ Order Completed",
+                                url=order[4],
+                                colour=0x7a00f5,
+                                timestamp=datetime.now())
+                                orderId = order[2]
+                                plink = order[1]
+                                embed.add_field(name="Order ID",
+                                                value=f'```{orderId} ({plink.split("_")[1]})```',
+                                                inline=False)
+                                embed.add_field(name="Product",
+                                                value=f"```{order[7]}```",
+                                                inline=False)
+                                embed.add_field(name="Quantity",
+                                                value=f"```{order[8]}```",
+                                                inline=False)
+                                embed.add_field(name="Amount",
+                                                value=f"```${order[3]}```",
+                                                inline=False)
+                                embed.add_field(name="Receipt",
+                                                value=receipt,
+                                                inline=False)
+
+                                try:
+                                    await client.get_user(order[10]).send(embed=embed)
+                                except:
+                                    pass
+                                productName = ' '.join(order[7].split(' ')[1:])
+                                for prod in products.json():
+                                    if(prod['name'] == productName):
+                                        product = prod
+                                accountsForOrder = getAccounts(product['product_file'], int(order[8]))
+                                if(len(accountsForOrder) == 0):
+                                    embed = discord.Embed(title="Out Of Stock", description="We are currenty out of stock for this product. Please wait for a restock.",
+                                            colour=0xde2a2a,
+                                            timestamp=datetime.now())
+
+                                    try:
+                                        await client.get_user(order[10]).send(embed=embed)
+                                    except:
+                                        pass
+                                    setOrderStatusById(order[1],'OOS')
+                                    sendProductToCustomer(order[9], order[2], "Ran out of stock while processing your order. Please contact the shop owner.")
+                                    return
+                                
+                                deliveryFIle = f"delivered_orders/{order[2]}.txt"
+                                with open(deliveryFIle, 'w') as file:
+                                    file.writelines(accountsForOrder)
+                                try:
+                                    await client.get_user(order[10]).send(file=discord.File(deliveryFIle))
+                                except Exception as e:
+                                    print('Failed to DM User {e}')
+                                    pass
+                                sendProductToCustomer(order[9], order[2], "".join(accountsForOrder))
+                                logger.success(f'Order {order[2]} has been settled')
+                                sendOrderWebhook(f'{orderId} ({plink.split("_")[1]})', order[8], f"${order[3]} ({order[8]} @ ${product['price']} Each)", "Stripe", order[10])
+                            else:
+                                if(int(time.time() > order[6])):
+                                    logger.info(f"Invoice {order[1]} has expired.")
+                                    setOrderStatusById(order[1],'Expired')
+        except Exception as e:
+            logger.exception(e)
+        
+client = aclient()
+tree = app_commands.CommandTree(client)
+commandHandler = CommandHander(
+    client, tree, config)
+client.run(config['bot_token'])
