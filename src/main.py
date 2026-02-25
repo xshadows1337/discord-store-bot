@@ -88,6 +88,11 @@ class aclient(discord.Client):
         
     async def setup_hook(self) -> None:
         self.add_view(StoreView())
+        # Register persistent ticket views so buttons survive restarts
+        from commands.tickets.views.ticket_panel_view import TicketPanelView
+        from commands.tickets.views.ticket_channel_view import TicketChannelView
+        self.add_view(TicketPanelView())
+        self.add_view(TicketChannelView())
         # Start the live-push API server
         api_secret = os.environ.get('BOT_API_SECRET') or config.get('bot_api_secret', '')
         api_port = int(os.environ.get('PORT', 8080))
