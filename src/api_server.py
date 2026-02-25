@@ -82,20 +82,24 @@ async def start_api_server(secret: str, port: int = 8080):
             return web.json_response({'error': f'Minimum order quantity is {min_qty}'}, status=422)
 
         try:
+            import asyncio
+            loop = asyncio.get_running_loop()
             if method == 'CRYPTO':
                 from utils.crypto_api import createOrder
-                import asyncio
-                order = await asyncio.get_event_loop().run_in_executor(
+                order = await loop.run_in_executor(
                     None, lambda: createOrder(product['price'], quantity, email, product['name'])
                 )
                 if not order:
                     return web.Response(status=502, text="Failed to create crypto invoice")
-                return web.json_response({'redirect_url': order['checkoutLink']})
+                checkout_link = order.get('checkoutLink') or order.get('checkoutLinkWithCustomCSS')
+                if not checkout_link:
+                    logger.error(f"BTCPay response missing checkoutLink: {order}")
+                    return web.Response(status=502, text="Failed to get payment link")
+                return web.json_response({'redirect_url': checkout_link})
 
             elif method == 'CREDITCARD':
                 from utils.cardpayment_utils import createPayment
-                import asyncio
-                result = await asyncio.get_event_loop().run_in_executor(
+                result = await loop.run_in_executor(
                     None, lambda: createPayment(quantity, product['stripe_priceident'])
                 )
                 if not result:
