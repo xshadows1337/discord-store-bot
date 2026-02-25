@@ -6,7 +6,8 @@ from command_handler import CommandHander
 import time
 from datetime import datetime
 from discord.ext import tasks
-from commands.setup_channels.setup_channels_command import PaymentButtonView
+from commands.setup_channels.setup_channels_command import SetupCommand
+from commands.setup_channels.views.purchase_button_view import StoreView
 from utils.crypto_api import getOrderById, sendProductToCustomer
 from utils.db_functions import getAllNewOrders, setOrderStatusById, getOutOfStockOrders
 from utils.product_manager import getAccounts, linesInFile
@@ -64,8 +65,7 @@ class aclient(discord.Client):
         logger.success('All threads running.')
         
     async def setup_hook(self) -> None:
-        for product in products:
-            self.add_view(PaymentButtonView(product))
+        self.add_view(StoreView())
         
     @tasks.loop(seconds=10.0, reconnect=True)
     @logger.catch(onerror=lambda _: logger.exception(_))
@@ -76,27 +76,59 @@ class aclient(discord.Client):
             if store_channel is None:
                 logger.warning(f"Store channel {config['store_channel_id']} not found in cache, skipping...")
                 return
+
+            # Check if any stock changed — if so, rebuild the store embed
+            stock_changed = False
             for product in products.json():
-                message_id = product.get('message_id')
-                if not message_id:
-                    continue
                 filePath = product['product_file']
                 currentStock = linesInFile(filePath)
                 if product['name'] not in lastStock:
                     lastStock[product['name']] = currentStock
+                    stock_changed = True
+                elif lastStock[product['name']] != currentStock:
+                    lastStock[product['name']] = currentStock
+                    stock_changed = True
+
+            if stock_changed:
+                # All products share the same store message — use first non-zero message_id
+                message_id = None
+                for product in products.json():
+                    mid = product.get('message_id')
+                    if mid and mid != 0:
+                        message_id = mid
+                        break
+
+                if message_id:
                     try:
+                        embed = discord.Embed(
+                            title="🛒 Store",
+                            description="Browse our products below and select one from the dropdown to purchase.",
+                            colour=0x4900f5,
+                            timestamp=datetime.now()
+                        )
+                        for product in products.json():
+                            stock = linesInFile(product['product_file'])
+                            paymentMethods = []
+                            for method in product['payment_methods']:
+                                if method == 'CRYPTO':
+                                    paymentMethods.append('💰 Crypto')
+                                elif method == 'CREDITCARD':
+                                    paymentMethods.append('💳 Card')
+                            methods_str = ' • '.join(paymentMethods)
+                            embed.add_field(
+                                name=f"🎁 {product['name']}",
+                                value=(
+                                    f"{product['description']}\n"
+                                    f"**Price:** ${product['price']} • **Min:** {product['min_order_amount']} • **Stock:** {stock}\n"
+                                    f"**Payments:** {methods_str}"
+                                ),
+                                inline=False
+                            )
+                        embed.set_footer(text="🛒 Powered by ᴘᴏɪsᴏɴ.xʏᴢ")
                         msg = store_channel.get_partial_message(message_id)
-                        await msg.edit(content=f"Stock: {currentStock}")
+                        await msg.edit(embed=embed, view=StoreView())
                     except Exception as e:
-                        logger.error(f'Failed to update stock message: {e}')
-                else:
-                    if lastStock[product['name']] != currentStock:
-                        lastStock[product['name']] = currentStock
-                        try:
-                            msg = store_channel.get_partial_message(message_id)
-                            await msg.edit(content=f"Stock: {currentStock}")
-                        except Exception as e:
-                            logger.error(f'Failed to update stock message: {e}')
+                        logger.error(f'Failed to update store embed: {e}')
         
             for order in (getOutOfStockOrders() or []):
                 productName = ' '.join(order[7].split(' ')[1:])

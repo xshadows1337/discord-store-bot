@@ -1,55 +1,99 @@
 import discord
 from datetime import datetime
+from readsettings import ReadSettings
 from utils.product_manager import linesInFile
 from ..modals.payment_modal import PaymentModal
 
-class Dropdown(discord.ui.Select):
+
+class PaymentMethodDropdown(discord.ui.Select):
+    """Second dropdown: pick payment method for the selected product."""
     def __init__(self, productInfo):
         self.productInfo = productInfo
         options = []
-        
         for method in productInfo['payment_methods']:
-            if(method == 'CRYPTO'):
-                options.append(discord.SelectOption(label="Crypto (LTC, BTC)", value=str("Crypto")))
-            elif(method == 'CREDITCARD'):
-                options.append(discord.SelectOption(label="Credit Cards", value=str("CreditCard")))
+            if method == 'CRYPTO':
+                options.append(discord.SelectOption(label="Crypto (LTC, BTC)", value="Crypto", emoji="💰"))
+            elif method == 'CREDITCARD':
+                options.append(discord.SelectOption(label="Credit Cards (Stripe)", value="CreditCard", emoji="💳"))
+        super().__init__(placeholder="Select Payment Method", options=options)
 
-        super().__init__(placeholder="Select Payment Option",options=options)
-        
     async def callback(self, interaction: discord.Interaction):
-        await interaction.response.send_modal(PaymentModal(custom_id='12ax23', test=self.values[0], productInfo=self.productInfo))
-        
-class PaymentOptionView(discord.ui.View):
+        await interaction.response.send_modal(
+            PaymentModal(custom_id='payment-modal', test=self.values[0], productInfo=self.productInfo)
+        )
+
+
+class PaymentMethodView(discord.ui.View):
+    """Ephemeral view shown after product selection — contains payment method dropdown."""
     def __init__(self, productInfo):
         super().__init__()
-        self.add_item(Dropdown(productInfo))
-        
-        
-class PaymentButtonView(discord.ui.View):
-    def __init__(self, productInfo):
-        self.productInfo = productInfo
-        super().__init__(timeout=None)
-        
-        # Create the button dynamically with the correct custom_id
-        self.purchase_button = discord.ui.Button(
-            label='Purchase',
-            style=discord.ButtonStyle.green,
-            custom_id=f"payment-button-{self.productInfo['name']}",
-            emoji="🛒"
-        )
-        self.purchase_button.callback = self.on_button_click
-        self.add_item(self.purchase_button)
+        self.add_item(PaymentMethodDropdown(productInfo))
 
-    async def on_button_click(self, interaction: discord.Interaction) -> None:
-        await interaction.response.defer(ephemeral=True)
-        if linesInFile(self.productInfo['product_file']) < self.productInfo['min_order_amount']:
-            print('Checked')
+
+class ProductDropdown(discord.ui.Select):
+    """Main dropdown on the store embed: pick a product."""
+    def __init__(self, products_list):
+        self.products_list = {p['name']: p for p in products_list}
+        options = []
+        for product in products_list:
+            stock = linesInFile(product['product_file'])
+            options.append(discord.SelectOption(
+                label=product['name'][:100],
+                description=f"${product['price']} • Stock: {stock}",
+                value=product['name']
+            ))
+        super().__init__(
+            placeholder="🛒 Select a product to purchase",
+            options=options,
+            custom_id="store-product-select"
+        )
+
+    async def callback(self, interaction: discord.Interaction):
+        product = self.products_list[self.values[0]]
+        stock = linesInFile(product['product_file'])
+
+        if stock < product['min_order_amount']:
             embed = discord.Embed(
                 title="Out Of Stock",
                 description="We are currently out of stock for this product. Please wait for a restock.",
-                colour=0x4900f5,
+                colour=0xde2a2a,
                 timestamp=datetime.now()
             )
-            return await interaction.followup.send(ephemeral=True, embed=embed)
+            return await interaction.response.send_message(embed=embed, ephemeral=True)
 
-        await interaction.followup.send(ephemeral=True, view=PaymentOptionView(self.productInfo))
+        embed = discord.Embed(
+            title=f"🎁 {product['name']}",
+            colour=0x4900f5,
+            timestamp=datetime.now()
+        )
+        embed.add_field(name="📝 Description", value=product['description'], inline=False)
+        embed.add_field(
+            name="💸 Price & Min Order",
+            value=f"**${product['price']}** per • Min order: **{product['min_order_amount']}**",
+            inline=True
+        )
+        if product.get('requirements'):
+            embed.add_field(name="🖥️ Requirements", value=product['requirements'], inline=True)
+        embed.add_field(name="📦 Stock", value=f"**{stock}** available", inline=True)
+
+        thumbnail_url = product.get('thumbnail_url', 'https://cdn-icons-png.flaticon.com/512/1170/1170678.png')
+        embed.set_thumbnail(url=thumbnail_url)
+        embed.set_footer(text="Select a payment method below to continue")
+
+        await interaction.response.send_message(
+            embed=embed,
+            view=PaymentMethodView(product),
+            ephemeral=True
+        )
+
+
+class StoreView(discord.ui.View):
+    """Persistent view on the store embed with the product dropdown."""
+    def __init__(self):
+        super().__init__(timeout=None)
+        products = ReadSettings('products.json')
+        self.add_item(ProductDropdown(products.json()))
+
+
+# Keep backward compat name for imports
+PaymentButtonView = StoreView

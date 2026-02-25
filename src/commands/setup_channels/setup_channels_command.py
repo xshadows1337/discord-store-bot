@@ -2,15 +2,10 @@ from typing import Optional
 import discord
 from discord import app_commands
 from datetime import datetime
-from setuptools import Command
 import asyncio
-from discord.ext.commands import cooldown, BucketType
-from datetime import timedelta
-import math
-import time
 from readsettings import ReadSettings
-from .views.purchase_button_view import PaymentButtonView
-from utils.product_manager import getAccounts, linesInFile
+from .views.purchase_button_view import StoreView
+from utils.product_manager import linesInFile
 
 class SetupCommand:
     
@@ -26,54 +21,47 @@ class SetupCommand:
 
             await interaction.edit_original_response(content="Setting Up..")
             products = ReadSettings("products.json")
-            for index, product in enumerate(products.json()):
-                embed = discord.Embed(
-                    title=f"🎁 {product['name']}",
-                    colour=0x4900f5,
-                    timestamp=datetime.now()
-                )
+            
+            # Build the store embed with all products listed
+            embed = discord.Embed(
+                title="🛒 Store",
+                description="Browse our products below and select one from the dropdown to purchase.",
+                colour=0x4900f5,
+                timestamp=datetime.now()
+            )
 
-                embed.add_field(
-                    name="📝 Description",
-                    value=product['description'],
-                    inline=False
-                )
-                embed.add_field(
-                    name="💸 Price & Min Order",
-                    value=f"**${product['price']}** per • Min order: **{product['min_order_amount']}**",
-                    inline=True
-                )
-                if product['requirements']:
-                    embed.add_field(
-                        name="🖥️ Requirements",
-                        value=product['requirements'],
-                        inline=True
-                    )
+            for product in products.json():
+                stock = linesInFile(product['product_file'])
                 paymentMethods = []
-                for paymentMethod in product['payment_methods']:
-                    if paymentMethod == 'CRYPTO':
-                        paymentMethods.append('💰 Crypto (BTC, LTC)')
-                    elif paymentMethod == 'CREDITCARD':
-                        paymentMethods.append('💳 Credit Card (Stripe)')
-                formattedMethods = '\n'.join(paymentMethods)
+                for method in product['payment_methods']:
+                    if method == 'CRYPTO':
+                        paymentMethods.append('💰 Crypto')
+                    elif method == 'CREDITCARD':
+                        paymentMethods.append('💳 Card')
+                methods_str = ' • '.join(paymentMethods)
+                
                 embed.add_field(
-                    name="💵 Payment Methods",
-                    value=formattedMethods,
+                    name=f"🎁 {product['name']}",
+                    value=(
+                        f"{product['description']}\n"
+                        f"**Price:** ${product['price']} • **Min:** {product['min_order_amount']} • **Stock:** {stock}\n"
+                        f"**Payments:** {methods_str}"
+                    ),
                     inline=False
                 )
 
-                embed.set_footer(text="🛒 Powered by ᴘᴏɪsᴏɴ.xʏᴢ")
+            embed.set_footer(text="🛒 Powered by ᴘᴏɪsᴏɴ.xʏᴢ")
 
-                # Thumbnail support: use product['thumbnail_url'] if present, else default
-                thumbnail_url = product.get('thumbnail_url', 'https://cdn-icons-png.flaticon.com/512/1170/1170678.png')
-                embed.set_thumbnail(url=thumbnail_url)
-
-                store_channel = interaction.guild.get_channel(config['store_channel_id'])
-                stock_msg = await store_channel.send(
-                    content=f'Stock: {linesInFile(product["product_file"])}',
-                    embed=embed,
-                    view=PaymentButtonView(productInfo=product)
-                )
-                products[index]['message_id'] = stock_msg.id
-                products[index]['channel_id'] = store_channel.id
+            store_channel = interaction.guild.get_channel(config['store_channel_id'])
+            store_msg = await store_channel.send(
+                embed=embed,
+                view=StoreView()
+            )
+            
+            # Save the store message ID
+            products.data = products.json()
+            for index in range(len(products.data)):
+                products[index]['message_id'] = store_msg.id
             products.save()
+            
+            await interaction.edit_original_response(content="✅ Store setup complete!")
