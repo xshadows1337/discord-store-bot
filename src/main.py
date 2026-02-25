@@ -100,9 +100,8 @@ class aclient(discord.Client):
 
                 if message_id:
                     try:
-                        embed = build_store_embed()
                         msg = store_channel.get_partial_message(message_id)
-                        await msg.edit(embed=embed, view=StoreView())
+                        await msg.edit(embeds=build_store_embed(), view=StoreView())
                     except Exception as e:
                         logger.error(f'Failed to update store embed: {e}')
         

@@ -7,28 +7,34 @@ from ..modals.payment_modal import PaymentModal
 
 # ──── Shared embed builder ────────────────────────────────────────────
 
+# One color per product slot — cycles if more than 6 products
+_PRODUCT_COLORS = [0x5865F2, 0xEB459E, 0x57F287, 0xFEE75C, 0xED4245, 0xE67E22]
+
+
 def build_store_embed():
-    """Build the main store embed used by /setup and the stock-update loop."""
+    """Returns a list of embeds: one header + one per product (each with a unique color)."""
     products = ReadSettings('products.json')
     product_list = products.json()
+    embeds = []
 
-    embed = discord.Embed(
-        colour=0x5865F2,          # Discord blurple — stands out cleanly on dark mode
-        timestamp=datetime.now()
-    )
-    embed.set_author(
+    # ── Header ──
+    header = discord.Embed(colour=0x2b2d31)
+    header.set_author(
         name="ᴘᴏɪsᴏɴ.xʏᴢ  ·  Store",
         icon_url="https://cdn-icons-png.flaticon.com/512/3081/3081559.png"
     )
-    embed.description = (
-        "-# 〔 Browse the catalog below and select a product to purchase 〕\n"
+    header.description = (
+        "-# Choose a product from the dropdown to start your purchase\n"
         "\u200b"
     )
+    embeds.append(header)
 
-    for product in product_list:
+    # ── One embed per product ──
+    for i, product in enumerate(product_list):
         stock = linesInFile(product['product_file'])
         in_stock = stock >= product.get('min_order_amount', 1)
-        status_icon = "🟢" if in_stock else "🔴"
+        color = _PRODUCT_COLORS[i % len(_PRODUCT_COLORS)]
+        status_label = "🟢  In Stock" if in_stock else "🔴  Out of Stock"
 
         methods = []
         for m in product['payment_methods']:
@@ -36,23 +42,32 @@ def build_store_embed():
                 methods.append('🪙 Crypto')
             elif m == 'CREDITCARD':
                 methods.append('💳 Card')
-        methods_str = '  ╱  '.join(methods)
+        methods_str = '   ·   '.join(methods)
 
-        embed.add_field(
-            name=f"╔  {product['name']}",
-            value=(
-                f"╠  {product['description']}\n"
-                f"╠\n"
-                f"╠  💰 **Price** ── `${product['price']}`   •   📦 **Min** ── `{product['min_order_amount']}`\n"
-                f"╠  {status_icon} **Stock** ── `{stock}`   •   {methods_str}\n"
-                f"╚{'─' * 28}\n"
-                f"\u200b"
-            ),
-            inline=False
-        )
+        emb = discord.Embed(colour=color)
+        emb.title = product['name']
+        emb.description = f"> {product['description']}\n\u200b"
 
-    embed.set_footer(text="ᴘᴏɪsᴏɴ.xʏᴢ  ·  Use the dropdown below to get started")
-    return embed
+        # Three inline stat fields
+        emb.add_field(name="💰  Price",     value=f"`${product['price']}`",           inline=True)
+        emb.add_field(name="📦  Min Order", value=f"`{product['min_order_amount']}`", inline=True)
+        emb.add_field(name="📊  Stock",     value=f"`{stock}`",                       inline=True)
+
+        # Spacer then status + payment row
+        emb.add_field(name="\u200b", value=f"{status_label}   ·   {methods_str}", inline=False)
+
+        if product.get('requirements'):
+            emb.add_field(name="🖥️  Requirements", value=f"```{product['requirements']}```", inline=False)
+
+        thumbnail_url = product.get('thumbnail_url', 'https://cdn-icons-png.flaticon.com/512/1170/1170678.png')
+        emb.set_thumbnail(url=thumbnail_url)
+        embeds.append(emb)
+
+    # Footer + timestamp only on the last embed
+    embeds[-1].set_footer(text="ᴘᴏɪsᴏɴ.xʏᴢ  ·  Use the dropdown below to purchase")
+    embeds[-1].timestamp = datetime.now()
+
+    return embeds
 
 
 # ──── Views / Dropdowns ───────────────────────────────────────────────
@@ -123,7 +138,7 @@ class ProductDropdown(discord.ui.Select):
 
         # ── Product detail card ──
         in_stock = stock >= product.get('min_order_amount', 1)
-        status_icon = "🟢" if in_stock else "🔴"
+        status_label = "🟢  In Stock" if in_stock else "🔴  Out of Stock"
 
         methods = []
         for m in product['payment_methods']:
@@ -131,22 +146,26 @@ class ProductDropdown(discord.ui.Select):
                 methods.append('🪙 Crypto')
             elif m == 'CREDITCARD':
                 methods.append('💳 Card')
-        methods_str = '  ╱  '.join(methods)
+        methods_str = '   ·   '.join(methods)
 
-        embed = discord.Embed(colour=0x5865F2, timestamp=datetime.now())
+        # Use same color as the store listing for this product
+        products_list_all = ReadSettings('products.json').json()
+        prod_index = next((j for j, p in enumerate(products_list_all) if p['name'] == product['name']), 0)
+        color = _PRODUCT_COLORS[prod_index % len(_PRODUCT_COLORS)]
+
+        embed = discord.Embed(colour=color, timestamp=datetime.now())
         embed.set_author(
             name="ᴘᴏɪsᴏɴ.xʏᴢ  ·  Product Details",
             icon_url="https://cdn-icons-png.flaticon.com/512/3081/3081559.png"
         )
         embed.title = product['name']
-        embed.description = (
-            f"> {product['description']}\n"
-            f"\u200b"
-        )
+        embed.description = f"> {product['description']}\n\u200b"
 
-        embed.add_field(name="💰  Price", value=f"`${product['price']}`", inline=True)
+        embed.add_field(name="💰  Price",     value=f"`${product['price']}`",           inline=True)
         embed.add_field(name="📦  Min Order", value=f"`{product['min_order_amount']}`", inline=True)
-        embed.add_field(name=f"{status_icon}  Stock", value=f"`{stock}` available", inline=True)
+        embed.add_field(name="📊  Stock",     value=f"`{stock}`",                       inline=True)
+
+        embed.add_field(name="\u200b", value=f"{status_label}   ·   {methods_str}", inline=False)
 
         if product.get('requirements'):
             embed.add_field(
@@ -154,8 +173,6 @@ class ProductDropdown(discord.ui.Select):
                 value=f"```{product['requirements']}```",
                 inline=False
             )
-
-        embed.add_field(name="\u200b", value=methods_str, inline=False)
 
         thumbnail_url = product.get('thumbnail_url', 'https://cdn-icons-png.flaticon.com/512/1170/1170678.png')
         embed.set_thumbnail(url=thumbnail_url)

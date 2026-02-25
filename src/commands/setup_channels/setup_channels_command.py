@@ -24,11 +24,9 @@ class SetupCommand:
             await interaction.edit_original_response(content="Setting up store …")
             products = ReadSettings("products.json")
 
-            embed = build_store_embed()
-
             store_channel = interaction.guild.get_channel(config['store_channel_id'])
             store_msg = await store_channel.send(
-                embed=embed,
+                embeds=build_store_embed(),
                 view=StoreView()
             )
             
