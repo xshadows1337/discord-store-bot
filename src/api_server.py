@@ -1,14 +1,55 @@
 import json
+from pathlib import Path
 from aiohttp import web
 from loguru import logger
+
+# Resolve paths relative to this file so they work regardless of CWD
+_HERE = Path(__file__).parent
+_STATIC_DIR = _HERE / 'static'
 
 
 async def start_api_server(secret: str, port: int = 8080):
     """
     Lightweight HTTP API server that runs alongside the Discord bot.
     Allows pushing a new products.json without a redeploy.
+    Also serves the xshadows.shop website at /.
     """
     app = web.Application()
+
+    # ── Website ──────────────────────────────────────────────────────────────
+
+    async def index(request):
+        """Serve the store landing page."""
+        index_file = _STATIC_DIR / 'index.html'
+        if not index_file.exists():
+            return web.Response(status=404, text="index.html not found")
+        return web.FileResponse(index_file)
+
+    async def public_products(request):
+        """Return products.json publicly (no auth) for the website."""
+        try:
+            with open('products.json', 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            # Strip internal fields before exposing publicly
+            safe = []
+            for p in data:
+                safe.append({
+                    'name':            p.get('name', ''),
+                    'description':     p.get('description', ''),
+                    'requirements':    p.get('requirements', ''),
+                    'price':           p.get('price', 0),
+                    'min_order_amount': p.get('min_order_amount', 1),
+                    'payment_methods': p.get('payment_methods', []),
+                    'thumbnail_url':   p.get('thumbnail_url', ''),
+                })
+            return web.json_response(safe)
+        except FileNotFoundError:
+            return web.json_response([])
+        except Exception as exc:
+            logger.error(f"Error serving public products: {exc}")
+            return web.Response(status=500, text="Internal error")
+
+    # ── Bot API ───────────────────────────────────────────────────────────────
 
     async def health(request):
         return web.json_response({'status': 'ok'})
@@ -45,11 +86,20 @@ async def start_api_server(secret: str, port: int = 8080):
         logger.success(f"products.json updated via API push ({len(new_data)} products)")
         return web.json_response({'status': 'ok', 'products': len(new_data)})
 
-    app.router.add_get('/health', health)
-    app.router.add_put('/api/products', update_products)
+    # Website routes
+    app.router.add_get('/',                      index)
+    app.router.add_get('/api/public/products',   public_products)
+
+    # Static asset serving (CSS, JS, images if added later)
+    if _STATIC_DIR.exists():
+        app.router.add_static('/static/', path=str(_STATIC_DIR), name='static')
+
+    # Bot API routes
+    app.router.add_get('/health',        health)
+    app.router.add_put('/api/products',  update_products)
 
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
-    logger.info(f"API server listening on :{port}")
+    logger.info(f"API server listening on :{port} — website live at /")
