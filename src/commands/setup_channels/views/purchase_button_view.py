@@ -18,46 +18,50 @@ def build_store_embed():
     embeds = []
 
     # ── Header ──
-    header = discord.Embed(colour=0x2b2d31)
+    header = discord.Embed(colour=0x5865F2)
     header.set_author(
-        name="ᴘᴏɪsᴏɴ.xʏᴢ  ·  Store",
+        name="ᴘᴏɪsᴏɴ.xʏᴢ",
         icon_url="https://cdn-icons-png.flaticon.com/512/3081/3081559.png"
     )
     header.description = (
-        "-# Choose a product from the dropdown to start your purchase\n"
+        "**Welcome to the store.**\n"
+        "-# Pick a product from the dropdown below to get started.\n"
         "\u200b"
     )
     embeds.append(header)
 
     # ── One embed per product ──
     for i, product in enumerate(product_list):
-        stock = linesInFile(product['product_file'])
-        in_stock = stock >= product.get('min_order_amount', 1)
-        color = _PRODUCT_COLORS[i % len(_PRODUCT_COLORS)]
-        status_label = "🟢  In Stock" if in_stock else "🔴  Out of Stock"
+        stock       = linesInFile(product['product_file'])
+        in_stock    = stock >= product.get('min_order_amount', 1)
+        color       = _PRODUCT_COLORS[i % len(_PRODUCT_COLORS)]
+        stock_badge = "🟢 In Stock" if in_stock else "🔴 Out of Stock"
 
         methods = []
         for m in product['payment_methods']:
-            if m == 'CRYPTO':
-                methods.append('🪙 Crypto')
-            elif m == 'CREDITCARD':
-                methods.append('💳 Card')
-        methods_str = '   ·   '.join(methods)
+            if m == 'CRYPTO':    methods.append('🪙 Crypto')
+            elif m == 'CREDITCARD': methods.append('💳 Card')
+        methods_str = '  ·  '.join(methods)
+
+        req = product.get('requirements', '')
 
         emb = discord.Embed(colour=color)
         emb.title = product['name']
-        emb.description = f"> {product['description']}\n\u200b"
+        emb.description = (
+            f"*{product['description']}*\n"
+            f"\u200b"
+        )
 
-        # Three inline stat fields
-        emb.add_field(name="💰  Price",     value=f"`${product['price']}`",           inline=True)
-        emb.add_field(name="📦  Min Order", value=f"`{product['min_order_amount']}`", inline=True)
-        emb.add_field(name="📊  Stock",     value=f"`{stock}`",                       inline=True)
+        # ── Stats row ──
+        emb.add_field(name="Price",     value=f"` ${product['price']} `",            inline=True)
+        emb.add_field(name="Min Order", value=f"` {product['min_order_amount']} `",  inline=True)
+        emb.add_field(name="Stock",     value=f"` {stock} `",                        inline=True)
 
-        # Spacer then status + payment row
-        emb.add_field(name="\u200b", value=f"{status_label}   ·   {methods_str}", inline=False)
+        # ── Status + payment — with a blank-name spacer above for breathing room ──
+        emb.add_field(name="\u200b",    value=f"{stock_badge}   ·   {methods_str}",  inline=False)
 
-        if product.get('requirements'):
-            emb.add_field(name="🖥️  Requirements", value=f"```{product['requirements']}```", inline=False)
+        if req:
+            emb.add_field(name="Requirements", value=f"```{req}```", inline=False)
 
         thumbnail_url = product.get('thumbnail_url', 'https://cdn-icons-png.flaticon.com/512/1170/1170678.png')
         emb.set_thumbnail(url=thumbnail_url)
@@ -124,52 +128,54 @@ class ProductDropdown(discord.ui.Select):
 
         # ── Out-of-stock ──
         if stock < product['min_order_amount']:
-            oos = discord.Embed(colour=0xed4245, timestamp=datetime.now())
-            oos.set_author(name="Out of Stock", icon_url="https://cdn-icons-png.flaticon.com/512/753/753345.png")
+            oos = discord.Embed(colour=0xED4245, timestamp=datetime.now())
+            oos.set_author(
+                name="ᴘᴏɪsᴏɴ.xʏᴢ",
+                icon_url="https://cdn-icons-png.flaticon.com/512/3081/3081559.png"
+            )
+            oos.title = "Out of Stock"
             oos.description = (
-                "```\n"
-                "  ✗  This product is currently out of stock.\n"
-                "```\n"
-                "> Please check back later or wait for a restock.\n"
-                "\u200b"
+                f"**{product['name']}** is currently unavailable.\n"
+                "\u200b\n"
+                "-# Check back later or wait for a restock notification."
             )
             oos.set_footer(text="ᴘᴏɪsᴏɴ.xʏᴢ")
             return await interaction.response.send_message(embed=oos, ephemeral=True)
 
         # ── Product detail card ──
-        in_stock = stock >= product.get('min_order_amount', 1)
-        status_label = "🟢  In Stock" if in_stock else "🔴  Out of Stock"
+        in_stock    = stock >= product.get('min_order_amount', 1)
+        stock_badge = "🟢 In Stock" if in_stock else "🔴 Out of Stock"
 
         methods = []
         for m in product['payment_methods']:
-            if m == 'CRYPTO':
-                methods.append('🪙 Crypto')
-            elif m == 'CREDITCARD':
-                methods.append('💳 Card')
-        methods_str = '   ·   '.join(methods)
+            if m == 'CRYPTO':    methods.append('🪙 Crypto')
+            elif m == 'CREDITCARD': methods.append('💳 Card')
+        methods_str = '  ·  '.join(methods)
 
-        # Use same color as the store listing for this product
         products_list_all = ReadSettings('products.json').json()
         prod_index = next((j for j, p in enumerate(products_list_all) if p['name'] == product['name']), 0)
         color = _PRODUCT_COLORS[prod_index % len(_PRODUCT_COLORS)]
 
         embed = discord.Embed(colour=color, timestamp=datetime.now())
         embed.set_author(
-            name="ᴘᴏɪsᴏɴ.xʏᴢ  ·  Product Details",
+            name="ᴘᴏɪsᴏɴ.xʏᴢ",
             icon_url="https://cdn-icons-png.flaticon.com/512/3081/3081559.png"
         )
         embed.title = product['name']
-        embed.description = f"> {product['description']}\n\u200b"
+        embed.description = (
+            f"*{product['description']}*\n"
+            "\u200b"
+        )
 
-        embed.add_field(name="💰  Price",     value=f"`${product['price']}`",           inline=True)
-        embed.add_field(name="📦  Min Order", value=f"`{product['min_order_amount']}`", inline=True)
-        embed.add_field(name="📊  Stock",     value=f"`{stock}`",                       inline=True)
+        embed.add_field(name="Price",     value=f"` ${product['price']} `",           inline=True)
+        embed.add_field(name="Min Order", value=f"` {product['min_order_amount']} `", inline=True)
+        embed.add_field(name="Stock",     value=f"` {stock} `",                       inline=True)
 
-        embed.add_field(name="\u200b", value=f"{status_label}   ·   {methods_str}", inline=False)
+        embed.add_field(name="\u200b",    value=f"{stock_badge}   ·   {methods_str}", inline=False)
 
         if product.get('requirements'):
             embed.add_field(
-                name="🖥️  Requirements",
+                name="Requirements",
                 value=f"```{product['requirements']}```",
                 inline=False
             )
