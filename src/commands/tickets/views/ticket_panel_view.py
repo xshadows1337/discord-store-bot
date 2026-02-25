@@ -114,11 +114,13 @@ class TicketCategorySelect(discord.ui.Select):
                     read_message_history=True,
                 )
 
-        # Create the ticket channel
+        # Create the ticket channel under the tickets category
+        ticket_category = guild.get_channel(1476294089703034900)
         try:
             channel = await guild.create_text_channel(
                 name=channel_name,
                 overwrites=overwrites,
+                category=ticket_category,
                 topic=f"Ticket | {CATEGORY_LABELS[category]} | {interaction.user} ({interaction.user.id})",
                 reason=f"Ticket opened by {interaction.user} — {CATEGORY_LABELS[category]}",
             )
