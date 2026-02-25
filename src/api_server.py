@@ -49,6 +49,66 @@ async def start_api_server(secret: str, port: int = 8080):
             logger.error(f"Error serving public products: {exc}")
             return web.Response(status=500, text="Internal error")
 
+    async def create_checkout(request):
+        """Public endpoint for the website checkout — creates a Stripe or BTCPay session."""
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text="Invalid JSON")
+
+        product_name = body.get('product')
+        quantity     = int(body.get('quantity', 1))
+        email        = body.get('email', '').strip()
+        method       = body.get('method', 'CRYPTO').upper()
+
+        if not product_name or not email:
+            return web.Response(status=422, text="product and email are required")
+
+        try:
+            with open('products.json', 'r', encoding='utf-8') as f:
+                products_data = json.load(f)
+        except FileNotFoundError:
+            return web.Response(status=503, text="Products unavailable")
+
+        product = next((p for p in products_data if p['name'] == product_name), None)
+        if not product:
+            return web.Response(status=404, text="Product not found")
+
+        if method not in product.get('payment_methods', []):
+            return web.Response(status=422, text=f"Payment method {method} not available for this product")
+
+        min_qty = product.get('min_order_amount', 1)
+        if quantity < min_qty:
+            return web.json_response({'error': f'Minimum order quantity is {min_qty}'}, status=422)
+
+        try:
+            if method == 'CRYPTO':
+                from utils.crypto_api import createOrder
+                import asyncio
+                order = await asyncio.get_event_loop().run_in_executor(
+                    None, lambda: createOrder(product['price'], quantity, email, product['name'])
+                )
+                if not order:
+                    return web.Response(status=502, text="Failed to create crypto invoice")
+                return web.json_response({'redirect_url': order['checkoutLink']})
+
+            elif method == 'CREDITCARD':
+                from utils.cardpayment_utils import createPayment
+                import asyncio
+                result = await asyncio.get_event_loop().run_in_executor(
+                    None, lambda: createPayment(quantity, product['stripe_priceident'])
+                )
+                if not result:
+                    return web.Response(status=502, text="Failed to create payment link")
+                _, url = result
+                return web.json_response({'redirect_url': url})
+
+            else:
+                return web.Response(status=422, text="Unknown payment method")
+        except Exception as exc:
+            logger.error(f"Checkout error: {exc}")
+            return web.Response(status=500, text="Internal error")
+
     # ── Bot API ───────────────────────────────────────────────────────────────
 
     async def health(request):
@@ -89,6 +149,7 @@ async def start_api_server(secret: str, port: int = 8080):
     # Website routes
     app.router.add_get('/',                      index)
     app.router.add_get('/api/public/products',   public_products)
+    app.router.add_post('/api/create-checkout',  create_checkout)
 
     # Static asset serving (CSS, JS, images if added later)
     if _STATIC_DIR.exists():

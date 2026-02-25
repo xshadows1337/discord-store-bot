@@ -170,11 +170,12 @@
       line-height: 1.3;
     }
     .card-desc {
-      font-size: .78rem; color: var(--muted); margin-bottom: 1rem;
+      font-size: .78rem; color: var(--muted); margin-bottom: .75rem;
       line-height: 1.55;
     }
     .card-footer {
       display: flex; align-items: center; justify-content: space-between;
+      margin-top: .85rem;
     }
     .card-price {
       font-size: 1.25rem; font-weight: 800;
@@ -192,6 +193,116 @@
     }
     .method-pill.crypto { background: rgba(61,220,132,.15); color: var(--green); }
     .method-pill.card   { background: rgba(124,92,252,.15); color: var(--accent2); }
+
+    .btn-buy {
+      width: 100%; margin-top: 1rem;
+      padding: .6rem; border-radius: 8px;
+      font-size: .82rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; border: none; cursor: pointer;
+      transition: opacity .15s, transform .1s;
+      letter-spacing: .02em;
+    }
+    .btn-buy:hover  { opacity: .88; }
+    .btn-buy:active { transform: scale(.97); }
+
+    /* ── CHECKOUT MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 999;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); width: 100%; max-width: 460px;
+      padding: 2rem; position: relative;
+      animation: slide-up .2s ease;
+    }
+    @keyframes slide-up { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+    .modal-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: none; border: none; color: var(--muted);
+      font-size: 1.3rem; cursor: pointer; line-height: 1;
+      transition: color .15s;
+    }
+    .modal-close:hover { color: var(--text); }
+    .modal h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: .25rem; }
+    .modal-sub { font-size: .82rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .modal-product-row {
+      display: flex; align-items: center; gap: .75rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: .75rem; margin-bottom: 1.25rem;
+    }
+    .modal-product-img {
+      width: 48px; height: 48px; border-radius: 6px;
+      object-fit: cover; flex-shrink: 0;
+      background: var(--border);
+    }
+    .modal-product-info { flex: 1; min-width: 0; }
+    .modal-product-name { font-size: .85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .modal-product-price { font-size: .78rem; color: var(--accent2); margin-top: .15rem; }
+    label {
+      display: block; font-size: .75rem; font-weight: 600;
+      color: var(--muted); margin-bottom: .35rem; letter-spacing: .06em; text-transform: uppercase;
+    }
+    .form-group { margin-bottom: 1rem; }
+    .form-input {
+      width: 100%; background: var(--surface); border: 1.5px solid var(--border);
+      color: var(--text); border-radius: 8px; padding: .6rem .85rem;
+      font-size: .9rem; transition: border-color .15s; font-family: inherit;
+    }
+    .form-input:focus { outline: none; border-color: var(--accent); }
+
+    .method-tabs { display: flex; gap: .5rem; margin-bottom: 1.25rem; }
+    .method-tab {
+      flex: 1; padding: .6rem; border-radius: 8px;
+      border: 1.5px solid var(--border); background: none;
+      color: var(--muted); font-size: .82rem; font-weight: 600;
+      cursor: pointer; transition: all .15s; font-family: inherit;
+      text-align: center;
+    }
+    .method-tab:hover { border-color: var(--accent); color: var(--text); }
+    .method-tab.active {
+      border-color: var(--accent); background: rgba(124,92,252,.12);
+      color: var(--accent2);
+    }
+    .method-tab:disabled { opacity: .35; cursor: not-allowed; }
+
+    .modal-total {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: .65rem .85rem; margin-bottom: 1.25rem;
+      font-size: .85rem;
+    }
+    .modal-total-label { color: var(--muted); }
+    .modal-total-value { font-weight: 800; font-size: 1.1rem; color: var(--accent2); }
+
+    .modal-error {
+      background: rgba(237,66,69,.12); border: 1px solid rgba(237,66,69,.3);
+      color: #ff8a8a; border-radius: 8px; padding: .65rem .85rem;
+      font-size: .82rem; margin-bottom: 1rem; display: none;
+    }
+    .modal-error.show { display: block; }
+
+    .btn-checkout {
+      width: 100%; padding: .78rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; border: none; border-radius: 8px;
+      font-size: .9rem; font-weight: 700; cursor: pointer;
+      transition: opacity .15s; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+    }
+    .btn-checkout:hover   { opacity: .9; }
+    .btn-checkout:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-checkout .btn-spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin .6s linear infinite; display: none;
+    }
+    .btn-checkout.loading .btn-spinner { display: block; }
+    .btn-checkout.loading .btn-label   { display: none; }
 
     /* loading / empty state */
     .products-placeholder {
@@ -344,7 +455,7 @@
   <!-- CTA BANNER -->
   <div class="cta-banner">
     <h2>Ready to shop?</h2>
-    <p>Join our Discord server and use <code style="background:rgba(255,255,255,.08);padding:2px 7px;border-radius:6px;font-family:monospace;">/setup</code> to open the store.</p>
+    <p>Browse our products above and click <strong>Buy Now</strong> to checkout directly — or join our Discord for help.</p>
     <a id="cta-discord-btn" class="btn btn-primary" href="#" target="_blank" rel="noopener">
       <svg class="discord-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.844 19.844 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
@@ -358,19 +469,69 @@
     <p>&copy; 2026 xShadows Shop &mdash; All rights reserved.</p>
   </footer>
 
-  <script>
-    // ── CONFIG ──────────────────────────────────────────────────────────────
-    // Replace this with your actual Discord invite link
-    const DISCORD_INVITE = 'https://discord.gg/Y69UbMUEfu';
+  <!-- CHECKOUT MODAL -->
+  <div class="modal-overlay" id="checkout-modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>
+      <h2 id="modal-title">Checkout</h2>
+      <p class="modal-sub">Fill in the details below to complete your purchase.</p>
 
-    // ── DISCORD BUTTONS ─────────────────────────────────────────────────────
+      <!-- Product row -->
+      <div class="modal-product-row">
+        <img class="modal-product-img" id="modal-img" src="" alt="">
+        <div class="modal-product-info">
+          <div class="modal-product-name" id="modal-name"></div>
+          <div class="modal-product-price" id="modal-price-line"></div>
+        </div>
+      </div>
+
+      <!-- Payment method -->
+      <div class="form-group">
+        <label>Payment Method</label>
+        <div class="method-tabs">
+          <button class="method-tab active" id="tab-crypto"   data-method="CRYPTO">₿ Crypto</button>
+          <button class="method-tab"         id="tab-card"    data-method="CREDITCARD">💳 Card</button>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="modal-email">Email Address</label>
+        <input class="form-input" type="email" id="modal-email" placeholder="you@example.com" autocomplete="email">
+      </div>
+
+      <!-- Quantity -->
+      <div class="form-group">
+        <label for="modal-qty">Quantity <span id="modal-min-label" style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;"></span></label>
+        <input class="form-input" type="number" id="modal-qty" value="1" min="1" step="1">
+      </div>
+
+      <!-- Order total -->
+      <div class="modal-total">
+        <span class="modal-total-label">Order Total</span>
+        <span class="modal-total-value" id="modal-total">$0.00</span>
+      </div>
+
+      <!-- Error -->
+      <div class="modal-error" id="modal-error"></div>
+
+      <!-- Submit -->
+      <button class="btn-checkout" id="modal-submit">
+        <span class="btn-spinner"></span>
+        <span class="btn-label">Pay Now →</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const DISCORD_INVITE = 'https://discord.gg/Y69UbMUEfu';
     document.getElementById('hero-discord-btn').href = DISCORD_INVITE;
     document.getElementById('cta-discord-btn').href  = DISCORD_INVITE;
 
-    // ── PRODUCTS ─────────────────────────────────────────────────────────────
+    // ── Helpers ──────────────────────────────────────────────────────────────
     const PAYMENT_LABELS = {
-      CRYPTO:     { cls: 'crypto', label: 'Crypto'  },
-      CREDITCARD: { cls: 'card',   label: 'Card'    },
+      CRYPTO:     { cls: 'crypto', label: 'Crypto' },
+      CREDITCARD: { cls: 'card',   label: 'Card'   },
     };
 
     function sanitize(str) {
@@ -379,7 +540,15 @@
       return d.innerHTML;
     }
 
+    function fmtPrice(price, qty = 1) {
+      return `$${(price * qty).toFixed(2)}`;
+    }
+
+    // ── Products grid ─────────────────────────────────────────────────────────
+    let _products = [];
+
     function renderProducts(products) {
+      _products = products;
       const grid = document.getElementById('products-grid');
       document.getElementById('stat-products').textContent = products.length;
 
@@ -388,13 +557,13 @@
         return;
       }
 
-      grid.innerHTML = products.map(p => {
-        const price  = typeof p.price === 'number'
+      grid.innerHTML = products.map((p, i) => {
+        const price = typeof p.price === 'number'
           ? (p.price < 1 ? `$${p.price.toFixed(2)}≈` : `$${p.price.toFixed(2)}`)
           : `$${sanitize(p.price)}`;
 
         const minQty = p.min_order_amount && p.min_order_amount > 1
-          ? `<div class="card-desc" style="color:var(--muted);font-size:.72rem;margin-top:.25rem;">Min. order: ${sanitize(String(p.min_order_amount))}</div>`
+          ? `<div class="card-desc" style="font-size:.72rem;margin-top:.2rem;">Min. order: ${sanitize(String(p.min_order_amount))}</div>`
           : '';
 
         const methods = (p.payment_methods ?? []).map(m => {
@@ -413,10 +582,11 @@
               <div class="card-name">${sanitize(p.name)}</div>
               <div class="card-desc">${sanitize(p.description ?? p.requirements ?? '')}</div>
               ${minQty}
-              <div class="card-footer" style="margin-top:.9rem;">
+              <div class="card-footer">
                 <span class="card-price">${price}</span>
                 <div class="card-methods">${methods}</div>
               </div>
+              <button class="btn-buy" onclick="openCheckout(${i})">Buy Now →</button>
             </div>
           </div>`;
       }).join('');
@@ -434,6 +604,141 @@
     }
 
     loadProducts();
+
+    // ── Checkout modal ────────────────────────────────────────────────────────
+    let _activeProduct = null;
+    let _activeMethod  = 'CRYPTO';
+
+    function openCheckout(idx) {
+      const p = _products[idx];
+      if (!p) return;
+      _activeProduct = p;
+
+      // Reset form
+      document.getElementById('modal-email').value = '';
+      document.getElementById('modal-qty').value   = p.min_order_amount ?? 1;
+      document.getElementById('modal-qty').min     = p.min_order_amount ?? 1;
+      setModalError('');
+
+      // Product row
+      const img = document.getElementById('modal-img');
+      img.src   = p.thumbnail_url || '';
+      img.style.display = p.thumbnail_url ? '' : 'none';
+      document.getElementById('modal-name').textContent       = p.name;
+
+      // Payment tabs — hide unavailable methods
+      const methods = p.payment_methods ?? ['CRYPTO', 'CREDITCARD'];
+      document.getElementById('tab-crypto').disabled = !methods.includes('CRYPTO');
+      document.getElementById('tab-card').disabled   = !methods.includes('CREDITCARD');
+
+      // Default the active method to the first available
+      _activeMethod = methods[0] ?? 'CRYPTO';
+      document.querySelectorAll('.method-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.method === _activeMethod);
+      });
+
+      const minQty = p.min_order_amount && p.min_order_amount > 1;
+      document.getElementById('modal-min-label').textContent = minQty ? `(min ${p.min_order_amount})` : '';
+
+      updateTotal();
+      document.getElementById('checkout-modal').classList.add('open');
+      document.getElementById('modal-email').focus();
+    }
+
+    function closeCheckout() {
+      document.getElementById('checkout-modal').classList.remove('open');
+    }
+
+    function updateTotal() {
+      if (!_activeProduct) return;
+      const qty = parseInt(document.getElementById('modal-qty').value, 10) || 1;
+      document.getElementById('modal-total').textContent = fmtPrice(_activeProduct.price, qty);
+      document.getElementById('modal-price-line').textContent =
+        `${fmtPrice(_activeProduct.price)} each${_activeProduct.min_order_amount > 1 ? ` · min ${_activeProduct.min_order_amount}` : ''}`;
+    }
+
+    function setModalError(msg) {
+      const el = document.getElementById('modal-error');
+      el.textContent = msg;
+      el.classList.toggle('show', !!msg);
+    }
+
+    // Method tab clicks
+    document.querySelectorAll('.method-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        if (tab.disabled) return;
+        _activeMethod = tab.dataset.method;
+        document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+
+    // Quantity change → recalculate total
+    document.getElementById('modal-qty').addEventListener('input', updateTotal);
+
+    // Close on backdrop click
+    document.getElementById('checkout-modal').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeCheckout();
+    });
+    document.getElementById('modal-close-btn').addEventListener('click', closeCheckout);
+
+    // Escape key
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeCheckout();
+    });
+
+    // Submit
+    document.getElementById('modal-submit').addEventListener('click', async () => {
+      if (!_activeProduct) return;
+      const email = document.getElementById('modal-email').value.trim();
+      const qty   = parseInt(document.getElementById('modal-qty').value, 10);
+      const min   = _activeProduct.min_order_amount ?? 1;
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setModalError('Please enter a valid email address.');
+        return;
+      }
+      if (!qty || qty < min) {
+        setModalError(`Minimum order quantity is ${min}.`);
+        return;
+      }
+      setModalError('');
+
+      const btn = document.getElementById('modal-submit');
+      btn.disabled = true;
+      btn.classList.add('loading');
+
+      try {
+        const res = await fetch('/api/create-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            product: _activeProduct.name,
+            quantity: qty,
+            email,
+            method: _activeMethod,
+          }),
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          setModalError(text || 'Something went wrong. Please try again.');
+          return;
+        }
+
+        const { redirect_url } = await res.json();
+        if (redirect_url) {
+          window.location.href = redirect_url;
+        } else {
+          setModalError('No payment URL received. Please try again.');
+        }
+      } catch {
+        setModalError('Network error. Please check your connection and try again.');
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+    });
   </script>
 </body>
 </html>

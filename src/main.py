@@ -85,6 +85,32 @@ class aclient(discord.Client):
         print(f"Logged into bot account: {self.user}.")
         self.checkPendingPayments.start()
         logger.success('All threads running.')
+
+    async def on_member_remove(self, member: discord.Member):
+        """Post a leave notification when someone leaves the server."""
+        channel = self.get_channel(1476360273341321391)
+        if channel is None:
+            return
+        embed = discord.Embed(
+            color=0xED4245,
+            timestamp=datetime.now(),
+        )
+        embed.set_author(
+            name=f"{member} left the server",
+            icon_url=member.display_avatar.url,
+        )
+        embed.description = (
+            f"{member.mention} has left **{member.guild.name}**.\n"
+            f"\u200b"
+        )
+        embed.add_field(name="Account Created", value=f"<t:{int(member.created_at.timestamp())}:R>", inline=True)
+        embed.add_field(name="Joined Server", value=f"<t:{int(member.joined_at.timestamp())}:R>" if member.joined_at else "Unknown", inline=True)
+        embed.add_field(name="Member Count", value=str(member.guild.member_count), inline=True)
+        embed.set_footer(text=f"ID: {member.id}  \u2022  xShadows Shop")
+        try:
+            await channel.send(embed=embed)
+        except Exception as e:
+            logger.error(f"Failed to send leave message: {e}")
         
     async def setup_hook(self) -> None:
         self.add_view(StoreView())

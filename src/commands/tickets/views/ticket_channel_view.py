@@ -1,5 +1,78 @@
+import io
+import asyncio
 import discord
 from datetime import datetime
+
+TRANSCRIPT_LOG_CHANNEL = 1476360741928833187
+
+
+async def _build_and_send_transcript(channel: discord.TextChannel, opener_id: int, closed_by: discord.Member, category: str):
+    """Collect all messages, build a .txt transcript, DM the opener and log to channel."""
+    lines = []
+    lines.append(f"═══════════════════════════════════════════════")
+    lines.append(f"  xShadows Shop — Ticket Transcript")
+    lines.append(f"  Channel : #{channel.name}")
+    lines.append(f"  Category: {category}")
+    lines.append(f"  Closed by: {closed_by} ({closed_by.id})")
+    lines.append(f"  Date    : {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC")
+    lines.append(f"═══════════════════════════════════════════════\n")
+
+    messages = []
+    async for msg in channel.history(limit=500, oldest_first=True):
+        if msg.author.bot and not msg.embeds:
+            continue
+        ts = msg.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        content = msg.content or ""
+        if msg.embeds:
+            for emb in msg.embeds:
+                if emb.title:
+                    content += f"[Embed: {emb.title}]"
+                if emb.description:
+                    content += f" — {emb.description[:120]}"
+        if content.strip():
+            messages.append(f"[{ts}] {msg.author} : {content.strip()}")
+
+    lines += messages if messages else ["(no messages)"]
+    lines.append(f"\n═══════════════════════════════════════════════")
+
+    transcript_text = "\n".join(lines)
+    file_bytes = transcript_text.encode("utf-8")
+
+    embed = discord.Embed(
+        color=0x5865F2,
+        timestamp=datetime.utcnow(),
+    )
+    embed.set_author(name="Ticket Transcript")
+    embed.description = (
+        f"**Channel:** #{channel.name}\n"
+        f"**Category:** {category}\n"
+        f"**Closed by:** {closed_by.mention}\n"
+        f"**Messages:** {len(messages)}\n"
+        f"\u200b"
+    )
+    embed.set_footer(text="xShadows Shop  \u2022  Support")
+
+    # DM the opener
+    opener = channel.guild.get_member(opener_id)
+    if opener:
+        try:
+            await opener.send(
+                embed=embed,
+                file=discord.File(io.BytesIO(file_bytes), filename=f"transcript-{channel.name}.txt"),
+            )
+        except Exception:
+            pass
+
+    # Log to transcript channel
+    log_channel = channel.guild.get_channel(TRANSCRIPT_LOG_CHANNEL)
+    if log_channel:
+        try:
+            await log_channel.send(
+                embed=embed,
+                file=discord.File(io.BytesIO(file_bytes), filename=f"transcript-{channel.name}.txt"),
+            )
+        except Exception:
+            pass
 
 
 class TicketChannelView(discord.ui.View):
@@ -14,9 +87,10 @@ class TicketChannelView(discord.ui.View):
         from utils.env_config import Config
         cfg = Config()
         admin_ids = cfg.get('admin_ids', [])
-        # Parse opener_id from custom_id
+        # Parse opener_id and category from custom_id
         parts = button.custom_id.split(":")
         opener_id = int(parts[2]) if len(parts) > 2 else 0
+        category  = parts[3] if len(parts) > 3 else "general"
 
         is_admin = interaction.user.id in admin_ids
         is_opener = interaction.user.id == opener_id
@@ -35,14 +109,26 @@ class TicketChannelView(discord.ui.View):
         embed.set_author(name="Ticket Closing")
         embed.description = (
             f"{interaction.user.mention} is closing this ticket.\n"
-            f"This channel will be deleted in **5 seconds**.\n"
+            f"Saving transcript and deleting in **5 seconds**.\n"
             f"\u200b"
         )
         embed.set_footer(text="xShadows Shop  \u2022  Support")
         await interaction.response.send_message(embed=embed)
+
+        await asyncio.sleep(5)
+
+        # Build and send transcript before deleting
         try:
-            import asyncio
-            await asyncio.sleep(5)
+            await _build_and_send_transcript(
+                channel=interaction.channel,
+                opener_id=opener_id,
+                closed_by=interaction.user,
+                category=category,
+            )
+        except Exception:
+            pass
+
+        try:
             await interaction.channel.delete(reason=f"Ticket closed by {interaction.user}")
         except discord.Forbidden:
             await interaction.channel.send("⚠️ I don't have permission to delete this channel.")
