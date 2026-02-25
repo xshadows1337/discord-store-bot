@@ -3,25 +3,25 @@ from datetime import datetime
 
 TICKET_CATEGORIES = [
     discord.SelectOption(
-        label="General Help",
+        label="General Support",
         value="general",
         description="General questions or issues",
         emoji="💬",
     ),
     discord.SelectOption(
-        label="Steam Hub",
+        label="Steam Hub Support",
         value="steam_hub",
         description="Issues related to Steam Hub products",
         emoji="🎮",
     ),
     discord.SelectOption(
-        label="Xbox Code",
+        label="Xbox Code Support",
         value="xbox_code",
         description="Help with Xbox Gamepass codes",
         emoji="🎯",
     ),
     discord.SelectOption(
-        label="Steam Account Help",
+        label="Steam Account Support",
         value="steam_account",
         description="Help with Steam FA accounts",
         emoji="🔑",
@@ -43,10 +43,10 @@ CATEGORY_COLORS = {
 }
 
 CATEGORY_LABELS = {
-    "general":       "General Help",
-    "steam_hub":     "Steam Hub",
-    "xbox_code":     "Xbox Code",
-    "steam_account": "Steam Account Help",
+    "general":       "General Support",
+    "steam_hub":     "Steam Hub Support",
+    "xbox_code":     "Xbox Code Support",
+    "steam_account": "Steam Account Support",
     "other":         "Other",
 }
 

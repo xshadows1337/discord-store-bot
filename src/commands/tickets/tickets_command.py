@@ -38,10 +38,10 @@ class TicketsCommand:
                 description=(
                     "Need help? Open a ticket by selecting a category below.\n\n"
                     "**Categories**\n"
-                    "💬 **General Help** — General questions or issues\n"
-                    "🎮 **Steam Hub** — Issues with Steam Hub products\n"
-                    "🎯 **Xbox Code** — Help with Xbox Gamepass codes\n"
-                    "🔑 **Steam Account Help** — Help with Steam FA accounts\n"
+                    "💬 **General Support** — General questions or issues\n"
+                    "🎮 **Steam Hub Support** — Issues with Steam Hub products\n"
+                    "🎯 **Xbox Code Support** — Help with Xbox Gamepass codes\n"
+                    "🔑 **Steam Account Support** — Help with Steam FA accounts\n"
                     "📩 **Other** — Anything else\n\n"
                     "*Our team will respond as soon as possible.*"
                 ),
