@@ -47,9 +47,10 @@ def createOrder(cost, quantity, email, product):
 
     req = requests.post(f"{BTCPAY_URL}/api/v1/stores/{BTCPAY_STORE_ID}/invoices", headers=header, json=payload)
     print(req.json())
-    if(req.status_code == 200):
+    if req.status_code in (200, 201):
         return req.json()
     else:
+        print(f"BTCPay error {req.status_code}: {req.text}")
         return False
 
 

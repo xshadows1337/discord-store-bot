@@ -54,51 +54,66 @@ class PaymentModal(discord.ui.Modal, title='Payment Details'):
             return await interaction.response.send_message(embed=embed, ephemeral=True)
 
         if(self.paymentType == "Crypto"):
-            if(orderDetails := createOrder(self.productInfo['price'], int(self.quantity.value), self.email.value, self.productInfo['name'])):
-                insertOrder(orderDetails['id'], orderDetails['metadata']['orderId'], orderDetails['amount'], orderDetails['checkoutLink'], orderDetails['status'], orderDetails['expirationTime'], orderDetails['metadata']['itemDesc'], orderDetails['metadata']['buyerEmail'], orderDetails['metadata']['orderQuantity'], interaction.user.id, self.paymentType.lower())
-                embed = discord.Embed(title="ANY.XYZ Order",
-                        url=orderDetails['checkoutLink'],
-                        colour=0x7a00f5,
-                        timestamp=datetime.now())
+            try:
+                orderDetails = createOrder(self.productInfo['price'], int(self.quantity.value), self.email.value, self.productInfo['name'])
+            except Exception as e:
+                traceback.print_exc()
+                orderDetails = False
 
-                embed.add_field(name="Order ID",
-                                value=f"```{orderDetails['metadata']['orderId']}```",
-                                inline=False)
-                embed.add_field(name="Product",
-                                value=f"```{orderDetails['metadata']['itemDesc']}```",
-                                inline=False)
-                embed.add_field(name="Quantity",
-                                value=f"```{orderDetails['metadata']['orderQuantity']}```",
-                                inline=False)
-                embed.add_field(name="Amount",
-                                value=f"```${orderDetails['amount']} ({orderDetails['metadata']['orderQuantity']} @ ${orderDetails['metadata']['pricePer']} Each)```",
-                                inline=False)
-                embed.add_field(name="Payment Expiration",
-                                value=f"<t:{orderDetails['expirationTime']}:R>",
-                                inline=False)
-                embed.add_field(name="Payment Link",
-                                value=orderDetails['checkoutLink'],
-                                inline=False)
+            if not orderDetails:
+                embed = discord.Embed(
+                    title="Payment Error",
+                    description="Could not create a crypto invoice. Please try again later or contact support.",
+                    colour=0xde2a2a,
+                    timestamp=datetime.now()
+                )
+                return await interaction.response.send_message(embed=embed, ephemeral=True)
 
-                await interaction.response.send_message(embed=embed, ephemeral=True)
-                try:
-                    await interaction.user.send(embed=embed)
-                except:
-                    pass
+            insertOrder(orderDetails['id'], orderDetails['metadata']['orderId'], orderDetails['amount'], orderDetails['checkoutLink'], orderDetails['status'], orderDetails['expirationTime'], orderDetails['metadata']['itemDesc'], orderDetails['metadata']['buyerEmail'], orderDetails['metadata']['orderQuantity'], interaction.user.id, self.paymentType.lower())
 
-                webhook = DiscordWebhook(url=os.environ.get('ORDER_WEBHOOK_URL', 'https://discordapp.com/api/webhooks/1391143167738249379/Hd0UQZzUMzPYiqkp4xsbNzJsyZa78mYFya2CgEBLaQjmrxn0ZIHD9OG8JqmUvWZqtm6W'), username="ANY.XYZ Orders")
+            embed = discord.Embed(title="ANY.XYZ Order",
+                    url=orderDetails['checkoutLink'],
+                    colour=0x7a00f5,
+                    timestamp=datetime.now())
 
-                embed = DiscordEmbed(title="New Invoice Created", color="03b2f8")
-                embed.set_footer(text="ANY.XYZ Store Notifications")
-                embed.set_timestamp()
-                embed.add_embed_field(name="Order ID", value=orderDetails['metadata']['orderId'], inline=False)
-                embed.add_embed_field(name="Quantity", value=orderDetails['metadata']['orderQuantity'], inline=False)
-                embed.add_embed_field(name="Amount", value=f"${orderDetails['amount']} ({orderDetails['metadata']['orderQuantity']} @ ${orderDetails['metadata']['pricePer']} Each)", inline=False)
-                embed.add_embed_field(name="Method", value="Crypto", inline=False)
-                embed.add_embed_field(name="User", value=f"<@{interaction.user.id}>", inline=False)
+            embed.add_field(name="Order ID",
+                            value=f"```{orderDetails['metadata']['orderId']}```",
+                            inline=False)
+            embed.add_field(name="Product",
+                            value=f"```{orderDetails['metadata']['itemDesc']}```",
+                            inline=False)
+            embed.add_field(name="Quantity",
+                            value=f"```{orderDetails['metadata']['orderQuantity']}```",
+                            inline=False)
+            embed.add_field(name="Amount",
+                            value=f"```${orderDetails['amount']} ({orderDetails['metadata']['orderQuantity']} @ ${orderDetails['metadata']['pricePer']} Each)```",
+                            inline=False)
+            embed.add_field(name="Payment Expiration",
+                            value=f"<t:{orderDetails['expirationTime']}:R>",
+                            inline=False)
+            embed.add_field(name="Payment Link",
+                            value=orderDetails['checkoutLink'],
+                            inline=False)
 
-                webhook.add_embed(embed)
-                response = webhook.execute()
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            try:
+                await interaction.user.send(embed=embed)
+            except:
+                pass
+
+            webhook = DiscordWebhook(url=os.environ.get('ORDER_WEBHOOK_URL', 'https://discordapp.com/api/webhooks/1391143167738249379/Hd0UQZzUMzPYiqkp4xsbNzJsyZa78mYFya2CgEBLaQjmrxn0ZIHD9OG8JqmUvWZqtm6W'), username="ANY.XYZ Orders")
+
+            embed = DiscordEmbed(title="New Invoice Created", color="03b2f8")
+            embed.set_footer(text="ANY.XYZ Store Notifications")
+            embed.set_timestamp()
+            embed.add_embed_field(name="Order ID", value=orderDetails['metadata']['orderId'], inline=False)
+            embed.add_embed_field(name="Quantity", value=orderDetails['metadata']['orderQuantity'], inline=False)
+            embed.add_embed_field(name="Amount", value=f"${orderDetails['amount']} ({orderDetails['metadata']['orderQuantity']} @ ${orderDetails['metadata']['pricePer']} Each)", inline=False)
+            embed.add_embed_field(name="Method", value="Crypto", inline=False)
+            embed.add_embed_field(name="User", value=f"<@{interaction.user.id}>", inline=False)
+
+            webhook.add_embed(embed)
+            response = webhook.execute()
         elif(self.paymentType == "CreditCard"):
             plink, url = createPayment(int(self.quantity.value), self.productInfo['stripe_priceident'])
             import uuid, time
