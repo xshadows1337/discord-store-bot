@@ -98,7 +98,7 @@ class aclient(discord.Client):
                         except Exception as e:
                             logger.error(f'Failed to update stock message: {e}')
         
-            for order in getOutOfStockOrders():
+            for order in (getOutOfStockOrders() or []):
                 productName = ' '.join(order[7].split(' ')[1:])
                 for prod in products.json():
                     if(prod['name'] == productName):
@@ -118,7 +118,7 @@ class aclient(discord.Client):
                     logger.success(f'Order {order[2]} has been settled')
                     setOrderStatusById(order[1],'Settled')
             
-            for order in getAllNewOrders():
+            for order in (getAllNewOrders() or []):
                 if(order[11] == 'crypto'):
                     orderDetails = getOrderById(order[1])
                     if(orderDetails['status'] == "New"):
