@@ -88,6 +88,14 @@ class aclient(discord.Client):
         
     async def setup_hook(self) -> None:
         self.add_view(StoreView())
+        # Start the live-push API server
+        api_secret = os.environ.get('BOT_API_SECRET') or config.get('bot_api_secret', '')
+        api_port = int(os.environ.get('PORT', 8080))
+        if api_secret:
+            from api_server import start_api_server
+            await start_api_server(api_secret, api_port)
+        else:
+            logger.warning("BOT_API_SECRET not set — API live-push disabled")
         
     @tasks.loop(seconds=10.0, reconnect=True)
     @logger.catch(onerror=lambda _: logger.exception(_))

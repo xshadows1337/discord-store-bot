@@ -19,6 +19,7 @@ class Config(dict):
             self['admin_ids'] = json.loads(os.environ.get('ADMIN_IDS', '[]'))
             self['log_channel_id'] = int(os.environ['LOG_CHANNEL_ID'])
             self['store_channel_id'] = int(os.environ['STORE_CHANNEL_ID'])
+            self['bot_api_secret'] = os.environ.get('BOT_API_SECRET', '')
         else:
             # Fallback to settings.json for local development
             from readsettings import ReadSettings

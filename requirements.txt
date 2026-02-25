@@ -1,4 +1,5 @@
 discord.py==2.5.2
+aiohttp>=3.9
 readsettings==3.4.5
 requests==2.32.4
 stripe==12.3.0
