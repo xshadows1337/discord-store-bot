@@ -50,18 +50,14 @@ class aclient(discord.Client):
         await self.wait_until_ready()
         if not self.synced:
             guild_id = config['discord_guild_id']
+            guild_obj = discord.Object(id=guild_id)
             logger.info(f"Syncing commands to guild {guild_id}...")
             # Clear stale global commands
             tree.clear_commands(guild=None)
             await tree.sync()
-            # Copy guild commands to global as well
-            tree.copy_global_to(guild=discord.Object(id=guild_id))
             # Sync guild commands
-            synced_commands = await tree.sync(guild=discord.Object(id=guild_id))
+            synced_commands = await tree.sync(guild=guild_obj)
             logger.info(f"Synced {len(synced_commands)} guild commands: {[c.name for c in synced_commands]}")
-            # Also sync globally (takes up to 1h but ensures visibility)
-            global_commands = await tree.sync()
-            logger.info(f"Synced {len(global_commands)} global commands: {[c.name for c in global_commands]}")
             self.synced = True
         print(f"Logged into bot account: {self.user}.")
         self.checkPendingPayments.start()
