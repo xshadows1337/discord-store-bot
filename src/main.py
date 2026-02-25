@@ -64,9 +64,13 @@ class aclient(discord.Client):
     async def checkPendingPayments(self):
         try:
             products = ReadSettings('products.json')
+            store_channel = client.get_channel(config['store_channel_id'])
+            if store_channel is None:
+                logger.warning(f"Store channel {config['store_channel_id']} not found in cache, skipping...")
+                return
             for product in products.json():
                 foundThread = False
-                for thread in client.get_channel(config['store_channel_id']).threads:
+                for thread in store_channel.threads:
                     if(thread.id == product['thread_id']):
                         foundThread = True
                 if(not foundThread):
