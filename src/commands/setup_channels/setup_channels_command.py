@@ -68,11 +68,12 @@ class SetupCommand:
                 thumbnail_url = product.get('thumbnail_url', 'https://cdn-icons-png.flaticon.com/512/1170/1170678.png')
                 embed.set_thumbnail(url=thumbnail_url)
 
-                created = await interaction.guild.get_channel(config['store_channel_id']).create_thread(
-                    name=product['name'],
-                    content=f'Current Stock: {linesInFile(product["product_file"])}',
+                store_channel = interaction.guild.get_channel(config['store_channel_id'])
+                stock_msg = await store_channel.send(
+                    content=f'Stock: {linesInFile(product["product_file"])}',
                     embed=embed,
                     view=PaymentButtonView(productInfo=product)
                 )
-                products[index]['thread_id'] = created.thread.id
+                products[index]['message_id'] = stock_msg.id
+                products[index]['channel_id'] = store_channel.id
             products.save()

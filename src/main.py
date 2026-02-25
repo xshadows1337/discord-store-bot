@@ -69,23 +69,26 @@ class aclient(discord.Client):
                 logger.warning(f"Store channel {config['store_channel_id']} not found in cache, skipping...")
                 return
             for product in products.json():
-                foundThread = False
-                for thread in store_channel.threads:
-                    if(thread.id == product['thread_id']):
-                        foundThread = True
-                if(not foundThread):
+                message_id = product.get('message_id')
+                if not message_id:
                     continue
                 filePath = product['product_file']
-                if(product['name'] not in lastStock):
-                    lastStock[product['name']] = linesInFile(filePath)
-                    msg = client.get_channel(config['store_channel_id']).get_thread(product['thread_id']).get_partial_message(product['thread_id'])
-                    await msg.edit(content=f"Stock: {linesInFile(filePath)}")
+                currentStock = linesInFile(filePath)
+                if product['name'] not in lastStock:
+                    lastStock[product['name']] = currentStock
+                    try:
+                        msg = store_channel.get_partial_message(message_id)
+                        await msg.edit(content=f"Stock: {currentStock}")
+                    except Exception as e:
+                        logger.error(f'Failed to update stock message: {e}')
                 else:
-                    if(lastStock[product['name']] != linesInFile(filePath)):
-                        lastStock[product['name']] = linesInFile(filePath)
-                        
-                        msg = client.get_channel(config['store_channel_id']).get_thread(product['thread_id']).get_partial_message(product['thread_id'])
-                        await msg.edit(content=f"Stock: {linesInFile(filePath)}")
+                    if lastStock[product['name']] != currentStock:
+                        lastStock[product['name']] = currentStock
+                        try:
+                            msg = store_channel.get_partial_message(message_id)
+                            await msg.edit(content=f"Stock: {currentStock}")
+                        except Exception as e:
+                            logger.error(f'Failed to update stock message: {e}')
         
             for order in getOutOfStockOrders():
                 productName = ' '.join(order[7].split(' ')[1:])

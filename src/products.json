@@ -6,7 +6,7 @@
     "price": 4.99,
     "min_order_amount": 1,
     "product_file": "products/ᴇxᴛᴇʀɴᴀʟ ᴅᴀʏ ᴋᴇʏs.txt",
-    "thread_id": 1401869772676792380,
+    "message_id": 0,
     "payment_methods": [
       "CRYPTO",
       "CREDITCARD"
@@ -21,7 +21,7 @@
     "price": 24.99,
     "min_order_amount": 1,
     "product_file": "products/ᴇxᴛᴇʀɴᴀʟ ᴍᴏɴᴛʜ ᴋᴇʏs.txt",
-    "thread_id": 1401869774513766441,
+    "message_id": 0,
     "payment_methods": [
       "CRYPTO",
       "CREDITCARD"
@@ -36,7 +36,7 @@
     "price": 6.99,
     "min_order_amount": 1,
     "product_file": "products/xʙᴏx ɢᴀᴍᴇᴘᴀss ᴄᴏᴅᴇs.txt",
-    "thread_id": 1401869775117877268,
+    "message_id": 0,
     "payment_methods": [
       "CRYPTO",
       "CREDITCARD"
@@ -51,7 +51,7 @@
     "price": 0.2,
     "min_order_amount": 50,
     "product_file": "products/sᴛᴇᴀᴍ ᴀᴄᴄᴏᴜɴᴛs.txt",
-    "thread_id": 1401869775755411458,
+    "message_id": 0,
     "payment_methods": [
       "CRYPTO",
       "CREDITCARD"
@@ -66,7 +66,7 @@
     "price": 0.01,
     "min_order_amount": 1,
     "product_file": "products/ɢᴀᴍʙʟɪɴɢ ʀᴇᴅᴇᴇᴍs.txt",
-    "thread_id": 1401869776348238091,
+    "message_id": 0,
     "payment_methods": [
       "CRYPTO",
       "CREDITCARD"
