@@ -1,59 +1,145 @@
 import os
-import requests, uuid
-from datetime import datetime
+import sqlite3
+import requests
+import uuid
+from datetime import datetime, timedelta
 
-BTCPAY_URL = os.environ.get('BTCPAY_URL', 'https://pay.xshadows.shop')
-BTCPAY_STORE_ID = os.environ.get('BTCPAY_STORE_ID', 'BfNircsQUjse5CJ9wAyyUET5Q6muCVCqdvuZEqw99c32')
-BTCPAY_API_TOKEN = os.environ.get('BTCPAY_API_TOKEN', '6979d4ba6006ce8d87d5ca2e0f04cc64c88899ba')
-BTCPAY_EMAIL_TOKEN = os.environ.get('BTCPAY_EMAIL_TOKEN', '92f42e11da40e6ca9605d2e8a29e37ab5163a425')
+# ── NOWPayments configuration ─────────────────────────────────────────────────
+NOWPAYMENTS_API_KEY = os.environ.get('NOWPAYMENTS_API_KEY', '')
+NOWPAYMENTS_API_URL = 'https://api.nowpayments.io/v1'
 
-def getOrderById(id):
-    header = {'Authorization': f'token {BTCPAY_API_TOKEN}'}
+# Map NOWPayments statuses → internal statuses used by the bot
+_STATUS_MAP = {
+    'waiting':        'New',
+    'confirming':     'Processing',
+    'confirmed':      'Processing',
+    'sending':        'Processing',
+    'finished':       'Settled',
+    'failed':         'Expired',
+    'refunded':       'Expired',
+    'expired':        'Expired',
+    'partially_paid': 'Expired',
+}
 
-    req = requests.get(f"{BTCPAY_URL}/api/v1/stores/{BTCPAY_STORE_ID}/invoices/{id}", headers=header)
-    if(req.status_code == 200):
-        return req.json()
-    elif(req.status_code == 404):
+
+def _headers():
+    return {'x-api-key': NOWPAYMENTS_API_KEY}
+
+
+def getOrderById(invoice_id):
+    """
+    Fetch NOWPayments invoice status and return a BTCPay-compatible dict
+    so the rest of the codebase (main.py, payment_modal.py) doesn't change.
+    Extra metadata is pulled from the local DB since NOWPayments doesn't
+    store arbitrary metadata.
+    """
+    resp = requests.get(f"{NOWPAYMENTS_API_URL}/invoice/{invoice_id}", headers=_headers())
+    if resp.status_code != 200:
+        print(f"NOWPayments getOrderById error {resp.status_code}: {resp.text}")
         return False
 
-def createOrder(cost, quantity, email, product):
-    header = {'Authorization': f'token {BTCPAY_API_TOKEN}'}
-    
-    orderID = str(uuid.uuid4())
-    payload = {
-        "metadata": {
-            "orderId": orderID,
-            "itemDesc": f"x{quantity} {product}",
-            "buyerEmail": email,
-            "orderQuantity": str(quantity),
-            "pricePer": "{:.2f}".format(float(cost)),
-            "orderDate": datetime.now().now().strftime('%Y-%m-%d %H:%M:%S'),
-        },
-        "checkout": {
-            "speedPolicy": "MediumSpeed",
-            "paymentMethods": [
-            "BTC-CHAIN", "LTC-CHAIN"
-            ],
-            "defaultPaymentMethod": "BTC-CHAIN",
-            "lazyPaymentMethods": True,
-            "expirationMinutes": 90,
-            "monitoringMinutes": 90,
-            "paymentTolerance": 0,
-        },
-        "amount": "{:.2f}".format(float(float(cost) * float(quantity))),
-        "currency": "USD",
-        }
-    
+    data = resp.json()
+    mapped_status = _STATUS_MAP.get(data.get('status', 'waiting'), 'New')
 
-    req = requests.post(f"{BTCPAY_URL}/api/v1/stores/{BTCPAY_STORE_ID}/invoices", headers=header, json=payload)
-    if req.status_code in (200, 201):
-        return req.json()
+    # Pull the stored metadata from the local DB
+    local_row = {}
+    try:
+        conn = sqlite3.connect('orders.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM orders WHERE originalid = ?", (str(invoice_id),))
+        row = cursor.fetchone()
+        conn.close()
+        if row:
+            local_row = {
+                'orderid':      row[2],
+                'amount':       row[3],
+                'checkoutlink': row[4],
+                'expirationtime': row[6],
+                'item':         row[7],
+                'quantity':     row[8],
+                'buyeremail':   row[9],
+            }
+    except Exception as e:
+        print(f"DB lookup error in getOrderById: {e}")
+
+    return {
+        'id':           str(invoice_id),
+        'status':       mapped_status,
+        'checkoutLink': local_row.get('checkoutlink') or data.get('invoice_url', ''),
+        'amount':       local_row.get('amount') or str(data.get('price_amount', '0')),
+        'expirationTime': local_row.get('expirationtime', 0),
+        'metadata': {
+            'orderId':       local_row.get('orderid', str(invoice_id)),
+            'itemDesc':      local_row.get('item', data.get('order_description', '')),
+            'orderQuantity': str(local_row.get('quantity', 1)),
+            'buyerEmail':    local_row.get('buyeremail', ''),
+            'pricePer':      '0.00',
+        },
+    }
+
+
+def createOrder(cost, quantity, email, product):
+    """
+    Create a NOWPayments hosted invoice and return a BTCPay-compatible dict.
+    Fields: id, checkoutLink, status, amount, expirationTime, metadata.
+    """
+    if not NOWPAYMENTS_API_KEY:
+        print("ERROR: NOWPAYMENTS_API_KEY environment variable is not set.")
+        return False
+
+    orderID = str(uuid.uuid4())
+    total   = round(float(cost) * float(quantity), 2)
+    expiry_unix = int((datetime.now() + timedelta(minutes=90)).timestamp())
+
+    payload = {
+        'price_amount':     total,
+        'price_currency':   'usd',
+        'order_id':         orderID,
+        'order_description': f'x{quantity} {product}',
+        'ipn_callback_url': 'https://xshadows.shop/api/nowpayments/ipn',
+        'success_url':      'https://xshadows.shop/?payment=success',
+        'cancel_url':       'https://xshadows.shop/?payment=cancel',
+        'is_fixed_rate':    False,
+        'is_fee_paid_by_user': False,
+    }
+
+    resp = requests.post(
+        f"{NOWPAYMENTS_API_URL}/invoice",
+        headers=_headers(),
+        json=payload,
+    )
+
+    if resp.status_code in (200, 201):
+        data = resp.json()
+        return {
+            'id':           str(data['id']),
+            'checkoutLink': data.get('invoice_url', ''),
+            'status':       'New',
+            'amount':       '{:.2f}'.format(total),
+            'expirationTime': expiry_unix,
+            'metadata': {
+                'orderId':       orderID,
+                'itemDesc':      f'x{quantity} {product}',
+                'orderQuantity': str(quantity),
+                'buyerEmail':    email,
+                'pricePer':      '{:.2f}'.format(float(cost)),
+            },
+        }
     else:
-        print(f"BTCPay error {req.status_code}: {req.text}")
+        print(f"NOWPayments createOrder error {resp.status_code}: {resp.text}")
         return False
 
 
 def sendProductToCustomer(email, orderId, product):
+    """
+    Email delivery placeholder — NOWPayments has no built-in email API.
+    Product delivery is handled via Discord DM (see main.py).
+    To enable emails, configure an SMTP provider here.
+    """
+    print(f"[sendProductToCustomer] Order {orderId} for {email} — Discord DM is primary delivery.")
+    return
+
+    # --- Legacy BTCPay HTML email (kept for reference, never reached) ---
     payload = {
     "email": email,
     "subject": "Order Delivery",
@@ -233,7 +319,4 @@ def sendProductToCustomer(email, orderId, product):
     <!-- /Footer -->
     """
     }
-
-    header = {'Authorization': f'token {BTCPAY_EMAIL_TOKEN}'}
-
-    req = requests.post(f"{BTCPAY_URL}/api/v1/stores/{BTCPAY_STORE_ID}/email/send", json=payload, headers=header)
+    # (unreachable — kept for reference only)
