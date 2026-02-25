@@ -1,4 +1,5 @@
 import os
+import hashlib
 import discord
 from discord import app_commands
 from readsettings import ReadSettings
@@ -23,6 +24,27 @@ commandHandler = None
 config = Config()
 products = ReadSettings('products.json')
 lastStock = {}
+lastContentHash = None
+
+
+def _store_content_hash():
+    """Hash products.json + every stock file so any edit triggers a rebuild."""
+    h = hashlib.md5()
+    try:
+        with open('products.json', 'rb') as f:
+            h.update(f.read())
+    except Exception:
+        pass
+    try:
+        for product in ReadSettings('products.json').json():
+            try:
+                with open(product['product_file'], 'rb') as f:
+                    h.update(f.read())
+            except Exception:
+                pass
+    except Exception:
+        pass
+    return h.hexdigest()
 
 def sendOrderWebhook(orderid, quantity, amount, method, user):
     from discord_webhook import DiscordWebhook, DiscordEmbed
@@ -70,6 +92,7 @@ class aclient(discord.Client):
     @tasks.loop(seconds=10.0, reconnect=True)
     @logger.catch(onerror=lambda _: logger.exception(_))
     async def checkPendingPayments(self):
+        global lastContentHash
         try:
             products = ReadSettings('products.json')
             store_channel = client.get_channel(config['store_channel_id'])
@@ -77,20 +100,10 @@ class aclient(discord.Client):
                 logger.warning(f"Store channel {config['store_channel_id']} not found in cache, skipping...")
                 return
 
-            # Check if any stock changed — if so, rebuild the store embed
-            stock_changed = False
-            for product in products.json():
-                filePath = product['product_file']
-                currentStock = linesInFile(filePath)
-                if product['name'] not in lastStock:
-                    lastStock[product['name']] = currentStock
-                    stock_changed = True
-                elif lastStock[product['name']] != currentStock:
-                    lastStock[product['name']] = currentStock
-                    stock_changed = True
-
-            if stock_changed:
-                # All products share the same store message — use first non-zero message_id
+            # Rebuild the store embed whenever products.json or any stock file changes
+            current_hash = _store_content_hash()
+            if current_hash != lastContentHash:
+                lastContentHash = current_hash
                 message_id = None
                 for product in products.json():
                     mid = product.get('message_id')
@@ -102,8 +115,9 @@ class aclient(discord.Client):
                     try:
                         msg = store_channel.get_partial_message(message_id)
                         await msg.edit(embeds=build_store_embed(), view=StoreView())
+                        logger.info('Store embed auto-updated.')
                     except Exception as e:
-                        logger.error(f'Failed to update store embed: {e}')
+                        logger.error(f'Failed to auto-update store embed: {e}')
         
             for order in (getOutOfStockOrders() or []):
                 productName = ' '.join(order[7].split(' ')[1:])
