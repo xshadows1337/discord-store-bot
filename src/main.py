@@ -7,7 +7,7 @@ import time
 from datetime import datetime
 from discord.ext import tasks
 from commands.setup_channels.setup_channels_command import SetupCommand
-from commands.setup_channels.views.purchase_button_view import StoreView
+from commands.setup_channels.views.purchase_button_view import StoreView, build_store_embed
 from utils.crypto_api import getOrderById, sendProductToCustomer
 from utils.db_functions import getAllNewOrders, setOrderStatusById, getOutOfStockOrders
 from utils.product_manager import getAccounts, linesInFile
@@ -100,31 +100,7 @@ class aclient(discord.Client):
 
                 if message_id:
                     try:
-                        embed = discord.Embed(
-                            title="🛒 Store",
-                            description="Browse our products below and select one from the dropdown to purchase.",
-                            colour=0x4900f5,
-                            timestamp=datetime.now()
-                        )
-                        for product in products.json():
-                            stock = linesInFile(product['product_file'])
-                            paymentMethods = []
-                            for method in product['payment_methods']:
-                                if method == 'CRYPTO':
-                                    paymentMethods.append('💰 Crypto')
-                                elif method == 'CREDITCARD':
-                                    paymentMethods.append('💳 Card')
-                            methods_str = ' • '.join(paymentMethods)
-                            embed.add_field(
-                                name=f"🎁 {product['name']}",
-                                value=(
-                                    f"{product['description']}\n"
-                                    f"**Price:** ${product['price']} • **Min:** {product['min_order_amount']} • **Stock:** {stock}\n"
-                                    f"**Payments:** {methods_str}"
-                                ),
-                                inline=False
-                            )
-                        embed.set_footer(text="🛒 Powered by ᴘᴏɪsᴏɴ.xʏᴢ")
+                        embed = build_store_embed()
                         msg = store_channel.get_partial_message(message_id)
                         await msg.edit(embed=embed, view=StoreView())
                     except Exception as e:
