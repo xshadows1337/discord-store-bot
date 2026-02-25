@@ -1,6 +1,35 @@
 import sqlite3
 from .crypto_api import getOrderById
 
+def initDB():
+    conn = sqlite3.connect('orders.db')
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            originalid TEXT,
+            orderid TEXT,
+            amount TEXT,
+            checkoutlink TEXT,
+            status TEXT,
+            expirationtime INTEGER,
+            item TEXT,
+            quantity INTEGER,
+            buyeremail TEXT,
+            discordid INTEGER,
+            method TEXT
+        )
+        """)
+        conn.commit()
+    except sqlite3.Error as e:
+        print("An error occurred while initializing the database:", e)
+    finally:
+        conn.close()
+
+# Initialize DB on import
+initDB()
+
 def insertOrder(original_id, order_id, amount, checkoutLink, status, expirationTime, item, buyeremail, quantity, discordid, method):
     conn = sqlite3.connect('orders.db')
     

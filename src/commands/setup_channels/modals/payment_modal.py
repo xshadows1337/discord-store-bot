@@ -104,8 +104,8 @@ class PaymentModal(discord.ui.Modal, title='Payment Details'):
             import uuid, time
             #original_id, order_id, amount, checkoutLink, status, expirationTime, item, buyeremail, quantity, discordid, method
             orderId = str(uuid.uuid4())
-            cost = 0.10*int(self.quantity.value)
-            insertOrder(plink, orderId, 0.10*int(self.quantity.value), url, "New", int(time.time())+3600, f"x({self.quantity.value}) {self.productInfo['name']}", self.email.value, self.quantity.value, interaction.user.id, self.paymentType.lower())
+            cost = self.productInfo['price']*int(self.quantity.value)
+            insertOrder(plink, orderId, cost, url, "New", int(time.time())+3600, f"x({self.quantity.value}) {self.productInfo['name']}", self.email.value, self.quantity.value, interaction.user.id, self.paymentType.lower())
             embed = discord.Embed(title="ANY.XYZ Order",
                     url=url,
                     colour=0x7a00f5,
