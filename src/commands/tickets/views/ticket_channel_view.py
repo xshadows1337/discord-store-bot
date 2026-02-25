@@ -29,11 +29,16 @@ class TicketChannelView(discord.ui.View):
             return
 
         embed = discord.Embed(
-            title="🔒  Ticket Closing",
-            description=f"This ticket is being closed by {interaction.user.mention}.\nThe channel will be deleted in **5 seconds**.",
             color=0xED4245,
             timestamp=datetime.utcnow(),
         )
+        embed.set_author(name="Ticket Closing")
+        embed.description = (
+            f"{interaction.user.mention} is closing this ticket.\n"
+            f"This channel will be deleted in **5 seconds**.\n"
+            f"\u200b"
+        )
+        embed.set_footer(text="xShadows Shop  \u2022  Support")
         await interaction.response.send_message(embed=embed)
         try:
             import asyncio
@@ -63,8 +68,16 @@ class TicketChannelView(discord.ui.View):
         await interaction.response.edit_message(view=self)
 
         embed = discord.Embed(
-            description=f"✅ {interaction.user.mention} has claimed this ticket and will assist you shortly.",
             color=0x57F287,
             timestamp=datetime.utcnow(),
         )
+        embed.set_author(
+            name="Ticket Claimed",
+            icon_url=interaction.user.display_avatar.url,
+        )
+        embed.description = (
+            f"{interaction.user.mention} has claimed this ticket and will assist you shortly.\n"
+            f"\u200b"
+        )
+        embed.set_footer(text="xShadows Shop  \u2022  Support")
         await interaction.channel.send(embed=embed)

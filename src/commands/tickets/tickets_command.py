@@ -34,21 +34,45 @@ class TicketsCommand:
                 return
 
             embed = discord.Embed(
-                title="🎫  Support Tickets",
-                description=(
-                    "Need help? Open a ticket by selecting a category below.\n\n"
-                    "**Categories**\n"
-                    "💬 **General Support** — General questions or issues\n"
-                    "🎮 **Steam Hub Support** — Issues with Steam Hub products\n"
-                    "🎯 **Xbox Code Support** — Help with Xbox Gamepass codes\n"
-                    "🔑 **Steam Account Support** — Help with Steam FA accounts\n"
-                    "📩 **Other** — Anything else\n\n"
-                    "*Our team will respond as soon as possible.*"
-                ),
                 color=0x5865F2,
                 timestamp=datetime.utcnow(),
             )
-            embed.set_footer(text="xShadows Shop  •  Support")
+            embed.set_author(name="xShadows Shop  ·  Support")
+            embed.title = "Open a Support Ticket"
+            embed.description = (
+                "Select a category from the dropdown below and\n"
+                "a private channel will be created just for you.\n"
+                "\u200b"
+            )
+            embed.add_field(
+                name="💬\u2002General Support",
+                value="General questions or issues",
+                inline=True,
+            )
+            embed.add_field(
+                name="🎮\u2002Steam Hub Support",
+                value="Issues with Steam Hub products",
+                inline=True,
+            )
+            embed.add_field(name="\u200b", value="\u200b", inline=False)
+            embed.add_field(
+                name="🎯\u2002Xbox Code Support",
+                value="Help with Xbox Gamepass codes",
+                inline=True,
+            )
+            embed.add_field(
+                name="🔑\u2002Steam Account Support",
+                value="Help with Steam FA accounts",
+                inline=True,
+            )
+            embed.add_field(name="\u200b", value="\u200b", inline=False)
+            embed.add_field(
+                name="📩\u2002Other",
+                value="Anything else — we'll help",
+                inline=True,
+            )
+            embed.add_field(name="\u200b", value="\u200b", inline=True)
+            embed.set_footer(text="Response times may vary  •  xShadows Shop")
 
             await channel.send(embed=embed, view=TicketPanelView())
             await interaction.edit_original_response(

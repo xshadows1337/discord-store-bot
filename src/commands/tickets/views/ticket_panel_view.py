@@ -134,17 +134,23 @@ class TicketCategorySelect(discord.ui.Select):
         # Send ticket embed inside the new channel
         from commands.tickets.views.ticket_channel_view import TicketChannelView
         embed = discord.Embed(
-            title=f"{CATEGORY_EMOJI[category]}  {CATEGORY_LABELS[category]} Ticket",
-            description=(
-                f"Hey {interaction.user.mention}, thanks for opening a ticket!\n\n"
-                f"Please describe your issue and a staff member will be with you shortly."
-            ),
             color=CATEGORY_COLORS[category],
             timestamp=datetime.utcnow(),
         )
-        embed.add_field(name="Category", value=f"{CATEGORY_EMOJI[category]} {CATEGORY_LABELS[category]}", inline=True)
+        embed.set_author(
+            name=f"{CATEGORY_EMOJI[category]}  {CATEGORY_LABELS[category]}",
+            icon_url=interaction.user.display_avatar.url,
+        )
+        embed.title = "Support Ticket Opened"
+        embed.description = (
+            f"Welcome {interaction.user.mention}! A staff member will be with you shortly.\n"
+            f"Please describe your issue in as much detail as possible.\n"
+            f"\u200b"
+        )
         embed.add_field(name="Opened by", value=interaction.user.mention, inline=True)
-        embed.set_footer(text=f"xShadows Shop  •  Ticket ID: {interaction.user.id}")
+        embed.add_field(name="Category", value=f"{CATEGORY_EMOJI[category]}\u2002{CATEGORY_LABELS[category]}", inline=True)
+        embed.add_field(name="Status", value="🟢\u2002Open", inline=True)
+        embed.set_footer(text=f"Ticket ID: {interaction.user.id}  •  xShadows Shop")
 
         await channel.send(
             content=interaction.user.mention,
