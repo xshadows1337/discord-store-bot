@@ -64,7 +64,7 @@ def build_store_embed():
             emb.add_field(name="Requirements", value=f"```{req}```", inline=False)
 
         thumbnail_url = product.get('thumbnail_url', 'https://cdn-icons-png.flaticon.com/512/1170/1170678.png')
-        emb.set_image(url=thumbnail_url)
+        emb.set_thumbnail(url=thumbnail_url)
         embeds.append(emb)
 
     # Footer + timestamp only on the last embed
@@ -181,7 +181,7 @@ class ProductDropdown(discord.ui.Select):
             )
 
         thumbnail_url = product.get('thumbnail_url', 'https://cdn-icons-png.flaticon.com/512/1170/1170678.png')
-        embed.set_image(url=thumbnail_url)
+        embed.set_thumbnail(url=thumbnail_url)
         embed.set_footer(text="ᴘᴏɪsᴏɴ.xʏᴢ  ·  Choose a payment method below ↓")
 
         await interaction.response.send_message(
