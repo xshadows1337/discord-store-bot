@@ -155,6 +155,7 @@
     .trending-card:hover { border-color:var(--orange); transform:translateY(-2px); }
     .trending-card-rank { position:absolute; top:0; left:0; background:var(--orange); color:#000; font-size:.7rem; font-weight:900; width:22px; height:22px; display:flex; align-items:center; justify-content:center; }
     .trending-thumb { width:100%; aspect-ratio:16/9; position:relative; overflow:hidden; background:#111; }
+    .trending-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
     .trending-thumb-ph { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:1.8rem; background:linear-gradient(135deg,#0e0e0e,#1e1100); }
     .trending-info { padding:.5rem .6rem; }
     .trending-name { font-size:.76rem; font-weight:700; line-height:1.3; margin-bottom:.2rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
@@ -236,7 +237,7 @@
     .btn-checkout.loading .btn-label  { display:none; }
 
     .discord-icon { width:16px; height:16px; fill:currentColor; flex-shrink:0; }
-    @media(max-width:640px){ nav{gap:.75rem;} .nav-search{display:none;} .statsbar{gap:1.5rem;} .promo{flex-direction:column;text-align:center;} .section-tabs-bar{padding:0 .75rem;} .sort-view-btns{display:none;} }
+    @media(max-width:640px){ nav{gap:.75rem;} .nav-search{display:none;} .statsbar{gap:1.5rem;} .promo{flex-direction:column;text-align:center;} .section-tabs-bar{padding:0 .75rem;} .sort-view-btns{display:none;} .adpop{width:260px;right:calc(1.5rem + 52px + .5rem);} }
 
     /* CART */
     .cart-icon-btn { position:relative; background:none; border:none; cursor:pointer; color:#ccc; padding:.3rem; display:flex; align-items:center; transition:color .15s; }
@@ -348,14 +349,13 @@
     .toast-body { flex:1; }
     .toast-title { font-weight:700; color:var(--text); margin-bottom:1px; }
     .toast-msg { color:var(--muted); font-size:.72rem; }
-    .adpop { position:fixed; bottom:1.25rem; right:1.25rem; z-index:1200; width:300px;
+    .adpop { position:fixed; bottom:1.25rem; right:calc(1.5rem + 52px + .75rem); z-index:1200; width:300px;
       background:var(--card); border:1px solid var(--orange); border-radius:var(--radius);
       box-shadow:0 8px 32px rgba(0,0,0,.6); overflow:hidden;
       transform:translateY(120%); opacity:0;
-      transition:transform .4s cubic-bezier(.22,1,.36,1), opacity .4s ease, right .35s ease, left .35s ease;
+      transition:transform .4s cubic-bezier(.22,1,.36,1), opacity .4s ease;
       pointer-events:none; }
     .adpop.show { transform:none; opacity:1; pointer-events:all; }
-    .adpop.chat-shifted { right:auto; left:1.25rem; }
     .adpop-label { background:var(--orange); color:#000; font-size:.62rem; font-weight:900;
       padding:2px 8px; letter-spacing:.1em; text-transform:uppercase; display:flex;
       align-items:center; justify-content:space-between; }
@@ -374,12 +374,12 @@
     /* ── AI SUPPORT CHAT ─────────────────────────────────────────────────── */
     #chat-fab { position:fixed; bottom:1.5rem; right:1.5rem; z-index:1400; width:52px; height:52px; border-radius:50%; background:var(--orange); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 18px rgba(255,144,0,.45); transition:bottom .35s cubic-bezier(.22,1,.36,1), transform .2s, background .15s; }
     #chat-fab:hover { transform:scale(1.08); background:var(--orange2); }
-    #chat-fab.raised { bottom:20rem; }
+
     #chat-fab svg { width:26px; height:26px; fill:#000; }
     #chat-fab .chat-notif { position:absolute; top:-3px; right:-3px; width:18px; height:18px; background:#e63946; border-radius:50%; font-size:.62rem; font-weight:900; color:#fff; display:flex; align-items:center; justify-content:center; border:2px solid var(--bg); }
     #chat-window { position:fixed; bottom:5.5rem; right:1.5rem; z-index:1400; width:340px; max-height:520px; background:var(--surface); border:1px solid var(--border); border-radius:10px; box-shadow:0 12px 40px rgba(0,0,0,.6); display:flex; flex-direction:column; transform:scale(.92) translateY(16px); opacity:0; pointer-events:none; transition:bottom .35s cubic-bezier(.22,1,.36,1), transform .25s cubic-bezier(.22,1,.36,1), opacity .2s; transform-origin:bottom right; }
     #chat-window.open { transform:none; opacity:1; pointer-events:all; }
-    #chat-window.raised { bottom:24rem; }
+
     .chat-head { background:#000; border-radius:10px 10px 0 0; padding:.75rem 1rem; display:flex; align-items:center; gap:.65rem; border-bottom:1px solid var(--border); }
     .chat-head-avatar { width:34px; height:34px; border-radius:50%; background:var(--orange); display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:900; color:#000; flex-shrink:0; }
     .chat-head-info { flex:1; }
@@ -548,7 +548,7 @@
       <a href="#products">Products</a>
       <a href="#features">Why Us</a>
       <div id="nav-auth-area">
-        <a href="#" class="nav-links a" id="nav-login-link" onclick="event.preventDefault();openAuthModal()" style="font-size:.85rem;font-weight:600;color:#ccc;text-decoration:none;">Login</a>
+        <a href="#" id="nav-login-link" onclick="event.preventDefault();openAuthModal()" style="font-size:.85rem;font-weight:600;color:#ccc;text-decoration:none;">Login</a>
       </div>
       <a href="https://discord.gg/Y69UbMUEfu" class="nav-btn" target="_blank" rel="noopener">Join Discord</a>
     </div>
@@ -789,12 +789,14 @@
       document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
       e.target.classList.add('active');
       document.getElementById('products').scrollIntoView({behavior:'smooth'});
-      if(!cat){ renderProducts(_all); return; }
-      renderProducts(_all.filter(p => {
+      if(!cat){ _currentFiltered=null; renderProducts(_all); return; }
+      const filtered = _all.filter(p => {
         const n = p.name.toLowerCase()+' '+(p.description||'').toLowerCase();
         if(cat==='crypto') return (p.payment_methods||[]).includes('CRYPTO')&&!(p.payment_methods||[]).includes('CREDITCARD');
         return n.includes(cat);
-      }));
+      });
+      _currentFiltered = filtered;
+      renderProducts(filtered);
     }
 
     let _all = [];
@@ -823,7 +825,8 @@
         trendScroll.innerHTML = top5.map(p=>{
           const ri = _all.indexOf(p);
           const thumb = p.thumbnail_url?`<img src="${sanitize(p.thumbnail_url)}" alt="" loading="lazy">`:`<div class="card-thumb-ph">&#127918;</div>`;
-          return `<div class="trending-card" onclick="openCheckout(${ri})"><div class="trending-thumb">${thumb}</div><div class="trending-title">${sanitize(p.name)}</div></div>`;
+          const tp = typeof p.price==='number' ? `$${p.price.toFixed(2)}` : `$${sanitize(String(p.price))}`;
+          return `<div class="trending-card" onclick="openCheckout(${ri})"><div class="trending-thumb">${thumb}</div><div class="trending-info"><div class="trending-name">${sanitize(p.name)}</div><div class="trending-price">${tp}</div></div></div>`;
         }).join('');
         trendSec.style.display='block';
       } else if(trendSec){ trendSec.style.display='none'; }
@@ -900,6 +903,9 @@
         // Trigger stat counter
         const statEl=document.getElementById('stat-products');
         animateCount(statEl, _all.length);
+        // Update stab All count
+        const stabCountEl=document.getElementById('stab-count-all');
+        if(stabCountEl) stabCountEl.textContent=_all.length;
         // Schedule ad popup after products are ready
         scheduleAdPopup();
         // Wire up scroll reveal on dynamically added cards
@@ -1033,8 +1039,6 @@
       finally{btn.disabled=false;btn.classList.remove('loading');}
     });
   </script>
-
-  <div id="toast-stack"></div>
 
   <!-- CART OVERLAY + DRAWER -->
   <div class="cart-overlay" id="cart-overlay"></div>
@@ -1483,8 +1487,6 @@
         min>1 ? `$${(p.price*min).toFixed(2)} (×${min})` : `$${p.price.toFixed(2)}`;
       document.getElementById('adpop-cta').onclick = ()=>{ closeAdPopup(); openCheckout(_adIdx); };
       adpop.classList.add('show');
-      document.getElementById('chat-fab').classList.add('raised');
-      document.getElementById('chat-window').classList.add('raised');
       // Auto-dismiss after 12s
       _adTimer = setTimeout(closeAdPopup, 12000);
     }
@@ -1492,8 +1494,6 @@
     function closeAdPopup(){
       clearTimeout(_adTimer);
       adpop.classList.remove('show');
-      document.getElementById('chat-fab').classList.remove('raised');
-      document.getElementById('chat-window').classList.remove('raised');
       // Show next popup after 40s
       setTimeout(showAdPopup, 40000);
     }
@@ -1515,7 +1515,7 @@
       }catch{}
     }
     pingVisitor(); setInterval(pingVisitor,20000);
-    window.addEventListener('beforeunload',()=>{ if(_sid)navigator.sendBeacon('/api/visitors/leave',JSON.stringify({sid:_sid})); });
+    window.addEventListener('beforeunload',()=>{ if(_sid)navigator.sendBeacon('/api/visitors/leave',new Blob([JSON.stringify({sid:_sid})],{type:'application/json'})); });
   </script>
 
   <!-- AI SUPPORT CHAT JS -->
@@ -2084,17 +2084,16 @@
       win.classList.add('open');
       opened = true;
       notif.style.display = 'none';
-      document.getElementById('adpop').classList.add('chat-shifted');
       if(msgs.children.length === 0){
         botReply(`Hey! 👋 Welcome to <strong>AbyssHub Support</strong>.<br>Ask me anything about products, payments, delivery, or cheats — or tap a quick topic below.`);
       }
       setTimeout(()=>input.focus(), 250);
     }
-    function closeChat(){ win.classList.remove('open'); document.getElementById('adpop').classList.remove('chat-shifted'); }
+    function closeChat(){ win.classList.remove('open'); }
 
     fab.addEventListener('click', ()=> win.classList.contains('open') ? closeChat() : openChat());
     closeBtn.addEventListener('click', closeChat);
-    sendBtn.addEventListener('click', send);
+    sendBtn.addEventListener('click', ()=> send());
     input.addEventListener('keydown', e=>{ if(e.key==='Enter') send(); });
     suggestions.forEach(btn => btn.addEventListener('click', ()=>{
       if(!opened) openChat();
@@ -2400,6 +2399,7 @@
     document.getElementById('reg-pw2').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('reg-btn').click(); });
     document.getElementById('verify-code').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('verify-btn').click(); });
     document.getElementById('reset-pw').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('reset-btn').click(); });
+    document.getElementById('forgot-email').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('forgot-btn').click(); });
   })();
   </script>
 
