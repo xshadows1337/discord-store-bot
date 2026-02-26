@@ -82,6 +82,8 @@
     .card-stock.low { background:rgba(230,57,70,.88); }
     .card-stock.hot { background:rgba(255,144,0,.9); color:#000; }
     .card-badge { position:absolute; top:6px; left:6px; background:var(--orange); color:#000; font-size:.62rem; font-weight:900; padding:1px 5px; border-radius:2px; letter-spacing:.06em; }
+    .card-badge-new { position:absolute; top:6px; right:6px; background:var(--red); color:#fff; font-size:.62rem; font-weight:900; padding:1px 6px; border-radius:2px; letter-spacing:.1em; animation:badge-pop .4s ease both; }
+    @keyframes badge-pop { from{opacity:0;transform:scale(.6);}to{opacity:1;transform:scale(1);} }
     .card-info { padding:.75rem .85rem .85rem; }
     .card-title { font-size:.88rem; font-weight:700; line-height:1.35; margin-bottom:.3rem; }
     .card-desc { font-size:.75rem; color:var(--muted); line-height:1.45; margin-bottom:.5rem; }
@@ -422,11 +424,12 @@
           ? (min>1 ? `$${(p.price*min).toFixed(2)} (×${min})` : `$${p.price.toFixed(2)}`)
           : `$${sanitize(String(p.price))}`;
         const methods = (p.payment_methods??[]).map(m=>{ const me=PAYMENT_LABELS[m]??{cls:'',label:sanitize(m)}; return `<span class="card-tag ${me.cls}">${me.label}</span>`; }).join('');
+        const newBadge = p.new ? `<span class="card-badge-new">NEW</span>` : '';
         const thumb = p.thumbnail_url
           ? `<img src="${sanitize(p.thumbnail_url)}" alt="" loading="lazy">`
-          : `<div class="card-thumb-ph">🎮</div>`;
+          : `<div class="card-thumb-ph">&#127918;</div>`;
         return `<div class="product-card reveal" onclick="openCheckout(${ri})" style="transition-delay:${(products.indexOf(p)%4)*0.07}s">
-          <div class="card-thumb">${thumb}<span class="card-badge">INSTANT</span>${stockBadge(p.stock)}</div>
+          <div class="card-thumb">${thumb}<span class="card-badge">INSTANT</span>${newBadge}${stockBadge(p.stock)}</div>
           <div class="card-info">
             <div class="card-title">${sanitize(p.name)}</div>
             <div class="card-desc">${sanitize(p.description??p.requirements??'')}</div>

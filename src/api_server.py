@@ -170,6 +170,7 @@ async def start_api_server(secret: str, port: int = 8080):
                     'payment_methods': p.get('payment_methods', []),
                     'thumbnail_url':   p.get('thumbnail_url', ''),
                     'stock':           stock,
+                    'new':             p.get('new', False),
                 })
             return web.json_response(safe)
         except FileNotFoundError:
