@@ -72,6 +72,10 @@ class aclient(discord.Client):
     async def on_ready(self):
         await self.wait_until_ready()
         if not self.synced:
+            # Register the Discord client with the support relay module
+            from utils.support_relay import set_discord_client
+            set_discord_client(self)
+
             guild_id = config['discord_guild_id']
             guild_obj = discord.Object(id=guild_id)
             logger.info(f"Syncing commands to guild {guild_id}...")
@@ -119,14 +123,26 @@ class aclient(discord.Client):
         from commands.tickets.views.ticket_channel_view import TicketChannelView
         self.add_view(TicketPanelView())
         self.add_view(TicketChannelView())
-        # Start the live-push API server
+        # Start the web/API server immediately on bot startup
         api_secret = os.environ.get('BOT_API_SECRET') or config.get('bot_api_secret', '')
         api_port = int(os.environ.get('PORT', 8080))
         if api_secret:
             from api_server import start_api_server
             await start_api_server(api_secret, api_port)
         else:
-            logger.warning("BOT_API_SECRET not set — API live-push disabled")
+            logger.warning("BOT_API_SECRET not set — API server disabled")
+
+    async def on_message(self, message: discord.Message):
+        """Forward staff replies in web-ticket channels to the support relay."""
+        if message.author.bot:
+            return
+        try:
+            from utils.support_relay import get_ticket_by_channel, push_staff_message
+            ticket = get_ticket_by_channel(message.channel.id)
+            if ticket and not ticket.closed:
+                push_staff_message(message.channel.id, message.author.display_name, message.content)
+        except Exception:
+            pass
         
     @tasks.loop(seconds=10.0, reconnect=True)
     @logger.catch(onerror=lambda _: logger.exception(_))
