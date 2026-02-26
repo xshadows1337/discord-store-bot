@@ -1,7 +1,12 @@
+import hashlib
+import hmac
 import json
+import os
 from pathlib import Path
 from aiohttp import web
 from loguru import logger
+
+NOWPAYMENTS_IPN_SECRET = os.environ.get('NOWPAYMENTS_IPN_SECRET', '')
 
 # Resolve paths relative to this file so they work regardless of CWD
 _HERE = Path(__file__).parent
@@ -113,6 +118,59 @@ async def start_api_server(secret: str, port: int = 8080):
             logger.error(f"Checkout error: {exc}")
             return web.Response(status=500, text="Internal error")
 
+    # ── NOWPayments IPN ──────────────────────────────────────────────────────────
+
+    async def nowpayments_ipn(request):
+        """
+        NOWPayments Instant Payment Notification handler.
+        Receives payment status updates and syncs the local DB immediately.
+        """
+        body_bytes = await request.read()
+
+        # Verify HMAC-SHA512 signature if IPN secret is configured
+        if NOWPAYMENTS_IPN_SECRET:
+            sig = request.headers.get('x-nowpayments-sig', '')
+            expected = hmac.new(
+                NOWPAYMENTS_IPN_SECRET.encode(),
+                body_bytes,
+                hashlib.sha512
+            ).hexdigest()
+            if not hmac.compare_digest(sig.lower(), expected.lower()):
+                logger.warning("NOWPayments IPN: invalid signature")
+                return web.Response(status=401, text="Invalid signature")
+
+        try:
+            data = json.loads(body_bytes)
+        except Exception:
+            return web.Response(status=400, text="Invalid JSON")
+
+        invoice_id   = str(data.get('invoice_id') or data.get('order_id', ''))
+        now_status   = data.get('payment_status', '')
+        STATUS_MAP = {
+            'waiting':        'New',
+            'confirming':     'Processing',
+            'confirmed':      'Processing',
+            'sending':        'Processing',
+            'finished':       'Settled',
+            'failed':         'Expired',
+            'refunded':       'Expired',
+            'expired':        'Expired',
+            'partially_paid': 'Expired',
+        }
+        internal_status = STATUS_MAP.get(now_status)
+        if not internal_status:
+            logger.info(f"NOWPayments IPN: unhandled status '{now_status}' for invoice {invoice_id}")
+            return web.Response(status=200, text="OK")
+
+        try:
+            from utils.db_functions import setOrderStatusById
+            setOrderStatusById(invoice_id, internal_status)
+            logger.info(f"NOWPayments IPN: invoice {invoice_id} → {internal_status}")
+        except Exception as exc:
+            logger.error(f"NOWPayments IPN DB update failed: {exc}")
+
+        return web.Response(status=200, text="OK")
+
     # ── Bot API ───────────────────────────────────────────────────────────────
 
     async def health(request):
@@ -158,6 +216,9 @@ async def start_api_server(secret: str, port: int = 8080):
     # Static asset serving (CSS, JS, images if added later)
     if _STATIC_DIR.exists():
         app.router.add_static('/static/', path=str(_STATIC_DIR), name='static')
+
+    # NOWPayments IPN
+    app.router.add_post('/api/nowpayments/ipn', nowpayments_ipn)
 
     # Bot API routes
     app.router.add_get('/health',        health)
