@@ -16,7 +16,9 @@ import aiohttp
 from loguru import logger
 
 # ── Config ────────────────────────────────────────────────────────────────────
-_DB_PATH = Path(__file__).parent.parent / 'users.db'
+_DATA_DIR = Path(os.environ.get('DATA_DIR', Path(__file__).parent.parent))
+_DATA_DIR.mkdir(parents=True, exist_ok=True)  # ensure volume mount point exists
+_DB_PATH = _DATA_DIR / 'users.db'
 _JWT_SECRET = os.environ.get('JWT_SECRET', secrets.token_hex(32))
 _JWT_TTL = 7 * 24 * 3600   # 7 days
 

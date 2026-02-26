@@ -1,8 +1,12 @@
+import os
 import sqlite3
+from pathlib import Path
 from .crypto_api import getOrderById
 
+_ORDERS_DB = str(Path(os.environ.get('DATA_DIR', Path(__file__).parent.parent)) / 'orders.db')
+
 def initDB():
-    conn = sqlite3.connect('orders.db')
+    conn = sqlite3.connect(_ORDERS_DB)
     try:
         cursor = conn.cursor()
         cursor.execute("""
@@ -31,7 +35,7 @@ def initDB():
 initDB()
 
 def insertOrder(original_id, order_id, amount, checkoutLink, status, expirationTime, item, buyeremail, quantity, discordid, method):
-    conn = sqlite3.connect('orders.db')
+    conn = sqlite3.connect(_ORDERS_DB)
     
     try:
         cursor = conn.cursor()
@@ -53,7 +57,7 @@ def insertOrder(original_id, order_id, amount, checkoutLink, status, expirationT
     
     
 def getOrdersByDiscordId(discordid):
-    conn = sqlite3.connect('orders.db')
+    conn = sqlite3.connect(_ORDERS_DB)
     
     try:
         cursor = conn.cursor()
@@ -77,7 +81,7 @@ def getOrdersByDiscordId(discordid):
 #getOrdersByDiscordId(299195277187743744)
 
 def getAllNewOrders():
-    conn = sqlite3.connect('orders.db')
+    conn = sqlite3.connect(_ORDERS_DB)
     try:
         cursor = conn.cursor()
         
@@ -97,7 +101,7 @@ def getAllNewOrders():
         conn.close()
         
 def getOutOfStockOrders():
-    conn = sqlite3.connect('orders.db')
+    conn = sqlite3.connect(_ORDERS_DB)
     try:
         cursor = conn.cursor()
         
@@ -117,7 +121,7 @@ def getOutOfStockOrders():
         conn.close()
         
 def setOrderStatusById(originalid, status):
-    conn = sqlite3.connect('orders.db')
+    conn = sqlite3.connect(_ORDERS_DB)
     
     try:
         cursor = conn.cursor()
@@ -139,7 +143,7 @@ def setOrderStatusById(originalid, status):
         
         
 def getOrderById(order_id):
-    conn = sqlite3.connect('orders.db')
+    conn = sqlite3.connect(_ORDERS_DB)
     
     try:
         cursor = conn.cursor()

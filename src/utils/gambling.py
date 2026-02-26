@@ -20,7 +20,9 @@ from pathlib import Path
 
 from loguru import logger
 
-_DB_PATH = Path(__file__).parent.parent / 'users.db'
+_DATA_DIR = Path(os.environ.get('DATA_DIR', Path(__file__).parent.parent))
+_DATA_DIR.mkdir(parents=True, exist_ok=True)
+_DB_PATH = _DATA_DIR / 'users.db'
 
 COIN_RATE = 10  # coins per $1 USD  (1 coin = $0.10)
 

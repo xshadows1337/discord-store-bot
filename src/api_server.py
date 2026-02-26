@@ -20,7 +20,9 @@ _event_counter: int = 0
 _EVENTS_MAX = 100                  # keep last 100 events
 
 # ── Store DB (promo codes, vouches, spin limits) ───────────────────────────────
-_STORE_DB = Path(__file__).parent / 'store.db'
+_DATA_DIR = Path(os.environ.get('DATA_DIR', Path(__file__).parent))
+_DATA_DIR.mkdir(parents=True, exist_ok=True)
+_STORE_DB = _DATA_DIR / 'store.db'
 _SPIN_SEGMENTS = [5, 10, 5, 15, 5, 10, 5, 5]  # 8 wheel segments (discount %)
 
 def _init_store_db():

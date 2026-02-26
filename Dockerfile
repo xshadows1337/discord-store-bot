@@ -10,7 +10,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ .
 
 # Create directories that may be needed at runtime
-RUN mkdir -p delivered_orders products
+# /data is the persistent volume mount point (set DATA_DIR=/data in Railway)
+RUN mkdir -p delivered_orders products /data
+
+# Default data directory — override with DATA_DIR=/data env var in Railway
+ENV DATA_DIR=/data
 
 # Run the bot
 CMD ["python", "main.py"]

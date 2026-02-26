@@ -3,6 +3,9 @@ import sqlite3
 import requests
 import uuid
 from datetime import datetime, timedelta
+from pathlib import Path
+
+_ORDERS_DB = str(Path(os.environ.get('DATA_DIR', Path(__file__).parent.parent)) / 'orders.db')
 
 # ── NOWPayments configuration ─────────────────────────────────────────────────
 NOWPAYMENTS_API_KEY = os.environ.get('NOWPAYMENTS_API_KEY', '')
@@ -44,7 +47,7 @@ def getOrderById(invoice_id):
     # Pull the stored metadata from the local DB
     local_row = {}
     try:
-        conn = sqlite3.connect('orders.db')
+        conn = sqlite3.connect(_ORDERS_DB)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM orders WHERE originalid = ?", (str(invoice_id),))
         row = cursor.fetchone()
