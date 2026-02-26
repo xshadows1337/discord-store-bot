@@ -2170,8 +2170,8 @@
       <div class="auth-panel active" id="panel-login">
         <div class="auth-msg" id="login-msg"></div>
         <div class="form-group">
-          <label for="login-email">Email</label>
-          <input class="form-input" type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+          <label for="login-email">Username or Email</label>
+          <input class="form-input" type="text" id="login-email" placeholder="Username or email" autocomplete="username">
         </div>
         <div class="form-group pw-wrap">
           <label for="login-pw">Password</label>
@@ -2229,10 +2229,10 @@
       <!-- FORGOT PASSWORD -->
       <div class="auth-panel" id="panel-forgot" style="display:none;">
         <div class="auth-msg" id="forgot-msg"></div>
-        <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;">Enter your email to receive a password reset code.</p>
+        <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;">Enter your username or email to receive a password reset code.</p>
         <div class="form-group">
-          <label for="forgot-email">Email</label>
-          <input class="form-input" type="email" id="forgot-email" placeholder="you@example.com" autocomplete="email">
+          <label for="forgot-email">Username or Email</label>
+          <input class="form-input" type="text" id="forgot-email" placeholder="Username or email" autocomplete="username">
         </div>
         <button class="auth-submit" id="forgot-btn">Send Reset Code</button>
         <div class="auth-footer-row">
@@ -2244,8 +2244,8 @@
       <div class="auth-panel" id="panel-reset" style="display:none;">
         <div class="auth-msg" id="reset-msg"></div>
         <div class="form-group">
-          <label for="reset-email">Email</label>
-          <input class="form-input" type="email" id="reset-email" placeholder="you@example.com" autocomplete="email">
+          <label for="reset-email">Username or Email</label>
+          <input class="form-input" type="text" id="reset-email" placeholder="Username or email" autocomplete="username">
         </div>
         <div class="form-group">
           <label for="reset-code">Reset Code</label>
@@ -3462,11 +3462,11 @@
     // ── Login ─────────────────────────────────────────────────────────────
     document.getElementById('login-btn').addEventListener('click', async()=>{
       const btn = document.getElementById('login-btn'); btn.disabled = true;
-      const email = document.getElementById('login-email').value.trim();
+      const identifier = document.getElementById('login-email').value.trim();
       const pw = document.getElementById('login-pw').value;
-      if(!email||!pw){ authMsg('login-msg','Email and password are required.','error'); btn.disabled=false; return; }
+      if(!identifier||!pw){ authMsg('login-msg','Username/email and password are required.','error'); btn.disabled=false; return; }
       try{
-        const r = await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pw})});
+        const r = await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({identifier,password:pw})});
         const d = await r.json();
         if(d.ok){
           localStorage.setItem('abysshub_token', d.token);
@@ -3476,7 +3476,6 @@
         } else {
           // If not verified, show verify panel
           if((d.msg||'').toLowerCase().includes('verify')){
-            document.getElementById('verify-email').value = email;
             authMsg('login-msg', d.msg,'error');
             setTimeout(()=>showPanel('verify'), 1200);
           } else {
@@ -3490,13 +3489,13 @@
     // ── Forgot ────────────────────────────────────────────────────────────
     document.getElementById('forgot-btn').addEventListener('click', async()=>{
       const btn = document.getElementById('forgot-btn'); btn.disabled = true;
-      const email = document.getElementById('forgot-email').value.trim();
-      if(!email){ authMsg('forgot-msg','Enter your email.','error'); btn.disabled=false; return; }
+      const identifier = document.getElementById('forgot-email').value.trim();
+      if(!identifier){ authMsg('forgot-msg','Enter your username or email.','error'); btn.disabled=false; return; }
       try{
-        const r = await fetch('/api/auth/forgot',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+        const r = await fetch('/api/auth/forgot',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({identifier})});
         const d = await r.json();
-        authMsg('forgot-msg', d.msg||'If that email exists, a code was sent.','success');
-        document.getElementById('reset-email').value = email;
+        authMsg('forgot-msg', d.msg||'If that account exists, a code was sent.','success');
+        document.getElementById('reset-email').value = identifier;
         setTimeout(()=>showPanel('reset'), 2000);
       } catch{ authMsg('forgot-msg','Network error.','error'); }
       btn.disabled = false;
@@ -3505,12 +3504,12 @@
     // ── Reset ─────────────────────────────────────────────────────────────
     document.getElementById('reset-btn').addEventListener('click', async()=>{
       const btn = document.getElementById('reset-btn'); btn.disabled = true;
-      const email = document.getElementById('reset-email').value.trim();
+      const identifier = document.getElementById('reset-email').value.trim();
       const code = document.getElementById('reset-code').value.trim();
       const pw = document.getElementById('reset-pw').value;
-      if(!email||!code||!pw){ authMsg('reset-msg','All fields are required.','error'); btn.disabled=false; return; }
+      if(!identifier||!code||!pw){ authMsg('reset-msg','All fields are required.','error'); btn.disabled=false; return; }
       try{
-        const r = await fetch('/api/auth/reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,code,password:pw})});
+        const r = await fetch('/api/auth/reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({identifier,code,password:pw})});
         const d = await r.json();
         if(d.ok){
           authMsg('reset-msg','Password reset! You can now log in.','success');

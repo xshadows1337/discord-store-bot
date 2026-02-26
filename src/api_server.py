@@ -841,10 +841,10 @@ async def start_api_server(secret: str, port: int = 8080):
             body = await request.json()
         except Exception:
             return web.Response(status=400, text='Invalid JSON')
-        email    = (body.get('email') or '').strip()
-        password = body.get('password') or ''
+        identifier = (body.get('identifier') or body.get('email') or '').strip()
+        password   = body.get('password') or ''
         from utils.auth import login_user
-        ok, msg, token = login_user(email, password)
+        ok, msg, token = login_user(identifier, password)
         if not ok:
             return web.json_response({'ok': False, 'msg': msg}, status=401)
         return web.json_response({'ok': True, 'username': msg, 'token': token})
@@ -857,26 +857,26 @@ async def start_api_server(secret: str, port: int = 8080):
             body = await request.json()
         except Exception:
             return web.Response(status=400, text='Invalid JSON')
-        email = (body.get('email') or '').strip()
+        identifier = (body.get('identifier') or body.get('email') or '').strip()
         from utils.auth import request_password_reset, send_reset_email
-        ok, msg, code = request_password_reset(email)
-        if code:
+        ok, msg, code, to_email = request_password_reset(identifier)
+        if code and to_email:
             try:
-                await send_reset_email(email, code)
+                await send_reset_email(to_email, code)
             except Exception as e:
                 logger.error(f'Failed to send reset email: {e}')
-        return web.json_response({'ok': True, 'msg': 'If that email exists, a reset code has been sent.'})
+        return web.json_response({'ok': True, 'msg': 'If that account exists, a reset code has been sent to its email.'})
 
     async def auth_reset(request):
         try:
             body = await request.json()
         except Exception:
             return web.Response(status=400, text='Invalid JSON')
-        email    = (body.get('email') or '').strip()
-        code     = (body.get('code') or '').strip()
-        password = body.get('password') or ''
+        identifier = (body.get('identifier') or body.get('email') or '').strip()
+        code       = (body.get('code') or '').strip()
+        password   = body.get('password') or ''
         from utils.auth import reset_password
-        ok, msg = reset_password(email, code, password)
+        ok, msg = reset_password(identifier, code, password)
         return web.json_response({'ok': ok, 'msg': msg}, status=200 if ok else 422)
 
     async def auth_me(request):

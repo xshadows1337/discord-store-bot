@@ -134,14 +134,17 @@ def register_user(username: str, email: str, password: str) -> tuple[bool, str, 
             return False, 'Email already registered.', None
         return False, 'Registration failed.', None
 
-def login_user(email: str, password: str) -> tuple[bool, str, str | None]:
-    """Returns (success, message, token)."""
+def login_user(identifier: str, password: str) -> tuple[bool, str, str | None]:
+    """Accepts username or email. Returns (success, message, token)."""
     db = _get_db()
-    row = db.execute('SELECT * FROM users WHERE email = ?', (email.lower(),)).fetchone()
+    row = db.execute(
+        'SELECT * FROM users WHERE email = ? OR username = ?',
+        (identifier.lower(), identifier),
+    ).fetchone()
     if not row:
-        return False, 'Invalid email or password.', None
+        return False, 'Invalid username/email or password.', None
     if not _verify_password(password, row['password_hash'], row['salt']):
-        return False, 'Invalid email or password.', None
+        return False, 'Invalid username/email or password.', None
     if not row['email_verified']:
         return False, 'Please verify your email first. Check your inbox.', None
     token = create_token(row['id'], row['username'])
@@ -163,24 +166,31 @@ def verify_email(email: str, code: str) -> tuple[bool, str, str | None, str | No
     token = create_token(row['id'], row['username'])
     return True, 'Email verified successfully.', token, row['username']
 
-def request_password_reset(email: str) -> tuple[bool, str, str | None]:
-    """Returns (success, message, reset_code)."""
+def request_password_reset(identifier: str) -> tuple[bool, str, str | None, str | None]:
+    """Accepts username or email. Returns (success, message, reset_code, email_to_send_to)."""
     db = _get_db()
-    row = db.execute('SELECT * FROM users WHERE email = ?', (email.lower(),)).fetchone()
+    row = db.execute(
+        'SELECT * FROM users WHERE email = ? OR username = ?',
+        (identifier.lower(), identifier),
+    ).fetchone()
     if not row:
-        # Don't reveal whether email exists
-        return True, 'If that email exists, a reset code has been sent.', None
+        # Don't reveal whether account exists
+        return True, 'If that account exists, a reset code has been sent to its email.', None, None
     code = secrets.token_hex(3).upper()
     db.execute(
         'UPDATE users SET reset_code = ?, reset_expiry = ? WHERE id = ?',
         (code, time.time() + 900, row['id']),  # 15 min expiry
     )
     db.commit()
-    return True, 'Reset code sent.', code
+    return True, 'Reset code sent.', code, row['email']
 
-def reset_password(email: str, code: str, new_password: str) -> tuple[bool, str]:
+def reset_password(identifier: str, code: str, new_password: str) -> tuple[bool, str]:
+    """Accepts username or email as identifier."""
     db = _get_db()
-    row = db.execute('SELECT * FROM users WHERE email = ?', (email.lower(),)).fetchone()
+    row = db.execute(
+        'SELECT * FROM users WHERE email = ? OR username = ?',
+        (identifier.lower(), identifier),
+    ).fetchone()
     if not row:
         return False, 'Invalid reset request.'
     if not row['reset_code'] or row['reset_code'].upper() != code.upper():
