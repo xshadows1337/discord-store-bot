@@ -293,12 +293,14 @@
     .adpop-cta:hover { background:var(--orange2); }
 
     /* ── AI SUPPORT CHAT ─────────────────────────────────────────────────── */
-    #chat-fab { position:fixed; bottom:1.5rem; right:1.5rem; z-index:1400; width:52px; height:52px; border-radius:50%; background:var(--orange); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 18px rgba(255,144,0,.45); transition:transform .2s, background .15s; }
+    #chat-fab { position:fixed; bottom:1.5rem; right:1.5rem; z-index:1400; width:52px; height:52px; border-radius:50%; background:var(--orange); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 18px rgba(255,144,0,.45); transition:bottom .35s cubic-bezier(.22,1,.36,1), transform .2s, background .15s; }
     #chat-fab:hover { transform:scale(1.08); background:var(--orange2); }
+    #chat-fab.raised { bottom:20rem; }
     #chat-fab svg { width:26px; height:26px; fill:#000; }
     #chat-fab .chat-notif { position:absolute; top:-3px; right:-3px; width:18px; height:18px; background:#e63946; border-radius:50%; font-size:.62rem; font-weight:900; color:#fff; display:flex; align-items:center; justify-content:center; border:2px solid var(--bg); }
-    #chat-window { position:fixed; bottom:5.5rem; right:1.5rem; z-index:1400; width:340px; max-height:520px; background:var(--surface); border:1px solid var(--border); border-radius:10px; box-shadow:0 12px 40px rgba(0,0,0,.6); display:flex; flex-direction:column; transform:scale(.92) translateY(16px); opacity:0; pointer-events:none; transition:transform .25s cubic-bezier(.22,1,.36,1), opacity .2s; transform-origin:bottom right; }
+    #chat-window { position:fixed; bottom:5.5rem; right:1.5rem; z-index:1400; width:340px; max-height:520px; background:var(--surface); border:1px solid var(--border); border-radius:10px; box-shadow:0 12px 40px rgba(0,0,0,.6); display:flex; flex-direction:column; transform:scale(.92) translateY(16px); opacity:0; pointer-events:none; transition:bottom .35s cubic-bezier(.22,1,.36,1), transform .25s cubic-bezier(.22,1,.36,1), opacity .2s; transform-origin:bottom right; }
     #chat-window.open { transform:none; opacity:1; pointer-events:all; }
+    #chat-window.raised { bottom:24rem; }
     .chat-head { background:#000; border-radius:10px 10px 0 0; padding:.75rem 1rem; display:flex; align-items:center; gap:.65rem; border-bottom:1px solid var(--border); }
     .chat-head-avatar { width:34px; height:34px; border-radius:50%; background:var(--orange); display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:900; color:#000; flex-shrink:0; }
     .chat-head-info { flex:1; }
@@ -1057,6 +1059,8 @@
         min>1 ? `$${(p.price*min).toFixed(2)} (×${min})` : `$${p.price.toFixed(2)}`;
       document.getElementById('adpop-cta').onclick = ()=>{ closeAdPopup(); openCheckout(_adIdx); };
       adpop.classList.add('show');
+      document.getElementById('chat-fab').classList.add('raised');
+      document.getElementById('chat-window').classList.add('raised');
       // Auto-dismiss after 12s
       _adTimer = setTimeout(closeAdPopup, 12000);
     }
@@ -1064,6 +1068,8 @@
     function closeAdPopup(){
       clearTimeout(_adTimer);
       adpop.classList.remove('show');
+      document.getElementById('chat-fab').classList.remove('raised');
+      document.getElementById('chat-window').classList.remove('raised');
       // Show next popup after 40s
       setTimeout(showAdPopup, 40000);
     }
