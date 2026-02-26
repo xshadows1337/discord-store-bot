@@ -368,6 +368,7 @@
       .chat-head-status { font-size:.64rem; }
       /* Ad popup */
       .adpop { width:220px; right:calc(.75rem + 44px + .5rem); bottom:.85rem; }
+      .adpop.chat-open { right:calc(.75rem + 44px + .5rem); }
       .adpop-body { padding:.55rem; }
       .adpop-name { font-size:.74rem; }
       .adpop-price { font-size:.88rem; margin-bottom:.45rem; }
@@ -520,9 +521,10 @@
       background:var(--card); border:1px solid var(--orange); border-radius:var(--radius);
       box-shadow:0 8px 32px rgba(0,0,0,.6); overflow:hidden;
       transform:translateY(120%); opacity:0;
-      transition:transform .4s cubic-bezier(.22,1,.36,1), opacity .4s ease;
+      transition:transform .4s cubic-bezier(.22,1,.36,1), opacity .4s ease, right .35s ease;
       pointer-events:none; }
     .adpop.show { transform:none; opacity:1; pointer-events:all; }
+    .adpop.chat-open { right:calc(1.5rem + 340px + .75rem); }
     .adpop-label { background:var(--orange); color:#000; font-size:.62rem; font-weight:900;
       padding:2px 8px; letter-spacing:.1em; text-transform:uppercase; display:flex;
       align-items:center; justify-content:space-between; }
@@ -2338,12 +2340,13 @@
       win.classList.add('open');
       opened = true;
       notif.style.display = 'none';
+      const ap = document.getElementById('adpop'); if(ap) ap.classList.add('chat-open');
       if(msgs.children.length === 0){
         botReply(`Hey! 👋 Welcome to <strong>AbyssHub Support</strong>.<br>Ask me anything about products, payments, delivery, or cheats — or tap a quick topic below.`);
       }
       setTimeout(()=>input.focus(), 250);
     }
-    function closeChat(){ win.classList.remove('open'); }
+    function closeChat(){ win.classList.remove('open'); const ap = document.getElementById('adpop'); if(ap) ap.classList.remove('chat-open'); }
 
     function updateChatCount(){
       const remaining = 200 - input.value.length;
