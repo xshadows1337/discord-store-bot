@@ -807,7 +807,7 @@
     <div class="agegate-box">
       <div class="agegate-logo">ABYSS<span class="hub">HUB</span></div>
       <h2>Age Verification Required</h2>
-      <p>This site sells restricted digital goods. You must be <strong>18 years of age or older</strong> to enter and agree to our <a href="#" onclick="return false">Terms of Service</a>.</p>
+      <p>This site sells restricted digital goods. You must be <strong>18 years of age or older</strong> to enter and agree to our <a href="#" onclick="event.preventDefault();openLegalModal('tos')" style="color:var(--orange)">Terms of Service</a>.</p>
       <p style="color:#555;font-size:.78rem;">AbyssHub sells digital game keys, software, and external tools for educational purposes only.</p>
       <div class="agegate-check-row" onclick="document.getElementById('agegate-cb').click()">
         <input type="checkbox" id="agegate-cb">
@@ -1343,10 +1343,10 @@
       </div>
       <div class="footer-col">
         <h4>Payments</h4>
-        <a href="#">Bitcoin (BTC)</a>
-        <a href="#">Litecoin (LTC)</a>
-        <a href="#">ETH / USDC (Base)</a>
-        <a href="#">Credit / Debit Card</a>
+        <a href="#" onclick="event.preventDefault();filterCat(event,'');document.getElementById('products').scrollIntoView({behavior:'smooth'})">Bitcoin (BTC)</a>
+        <a href="#" onclick="event.preventDefault();filterCat(event,'');document.getElementById('products').scrollIntoView({behavior:'smooth'})">Litecoin (LTC)</a>
+        <a href="#" onclick="event.preventDefault();filterCat(event,'');document.getElementById('products').scrollIntoView({behavior:'smooth'})">ETH / USDC (Base)</a>
+        <a href="#" onclick="event.preventDefault();filterCat(event,'');document.getElementById('products').scrollIntoView({behavior:'smooth'})">Credit / Debit Card</a>
       </div>
       <div class="footer-col">
         <h4>Legal</h4>
@@ -1485,8 +1485,11 @@
 
     function filterCat(e, cat) {
       e.preventDefault();
-      document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
-      e.target.classList.add('active');
+      // Activate the matching pill (not necessarily e.target, which may be a sidebar/footer link)
+      document.querySelectorAll('.cat-pill').forEach(p => {
+        const pillCat = p.getAttribute('onclick').match(/filterCat\(event,'([^']*)'/)?.[1] ?? '';
+        p.classList.toggle('active', pillCat === (cat ?? ''));
+      });
       document.getElementById('products').scrollIntoView({behavior:'smooth'});
       // Clear search when switching category
       const si = document.getElementById('search-input'); if(si) si.value='';
@@ -1775,9 +1778,24 @@
       document.getElementById('interstitial-ad').classList.remove('show');
     }
 
+    function _setPromoGroupVisibility(method){
+      const pg = document.getElementById('promo-group');
+      if(!pg) return;
+      const isCrypto = method === 'CRYPTO';
+      pg.style.opacity = isCrypto ? '' : '.45';
+      pg.style.pointerEvents = isCrypto ? '' : 'none';
+      const hint = pg.querySelector('.promo-msg');
+      if(hint && !isCrypto){ hint.textContent = 'Promo codes apply to crypto only.'; hint.className = 'promo-msg err'; }
+      if(hint && isCrypto && hint.textContent === 'Promo codes apply to crypto only.'){ hint.textContent = ''; hint.className = 'promo-msg'; }
+    }
+
     function openCheckout(idx) {
       const p = _all[idx]; if(!p) return;
       _activeProduct = p;
+      // Reset any leftover promo state
+      if(typeof _promoCode !== 'undefined'){ _promoCode = ''; _promoDiscount = 0; }
+      const pf = document.getElementById('modal-promo'); if(pf) pf.value = '';
+      const pm = document.getElementById('promo-msg'); if(pm){ pm.textContent = ''; pm.className = 'promo-msg'; }
       document.getElementById('modal-email').value = localStorage.getItem('abysshub_last_email') || '';
       document.getElementById('modal-qty').value=p.min_order_amount??1;
       document.getElementById('modal-qty').min=p.min_order_amount??1;
@@ -1790,6 +1808,7 @@
       const _lastM = localStorage.getItem('abysshub_last_method');
       _activeMethod = (_lastM && methods.includes(_lastM)) ? _lastM : (methods[0]??'CRYPTO');
       document.querySelectorAll('.method-tab').forEach(t=>t.classList.toggle('active',t.dataset.method===_activeMethod));
+      _setPromoGroupVisibility(_activeMethod);
       const minQty=p.min_order_amount&&p.min_order_amount>1;
       document.getElementById('modal-min-label').textContent=minQty?`(min ${p.min_order_amount})`:'';
       updateTotal();
@@ -1820,7 +1839,7 @@
     }
     function setModalError(msg){ const el=document.getElementById('modal-error'); el.textContent=msg; el.classList.toggle('show',!!msg); }
 
-    document.querySelectorAll('.method-tab').forEach(tab=>{ tab.addEventListener('click',()=>{ if(tab.disabled)return; _activeMethod=tab.dataset.method; localStorage.setItem('abysshub_last_method',_activeMethod); document.querySelectorAll('.method-tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); }); });
+    document.querySelectorAll('.method-tab').forEach(tab=>{ tab.addEventListener('click',()=>{ if(tab.disabled)return; _activeMethod=tab.dataset.method; localStorage.setItem('abysshub_last_method',_activeMethod); document.querySelectorAll('.method-tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); _setPromoGroupVisibility(_activeMethod); if(typeof _promoCode!=='undefined'&&_promoCode){ _promoCode='';_promoDiscount=0; const pf=document.getElementById('modal-promo');if(pf)pf.value=''; const pm=document.getElementById('promo-msg');if(pm){pm.textContent='';pm.className='promo-msg';} updateTotal(); } }); });
     document.getElementById('modal-qty').addEventListener('input',()=>{ setModalError(''); updateTotal(); });
     document.getElementById('modal-email').addEventListener('input',()=>setModalError(''));
     document.getElementById('checkout-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCheckout();});
@@ -3458,12 +3477,6 @@
       } catch { msgEl.textContent='Network error.'; msgEl.className='promo-msg err'; }
     }
     document.getElementById('modal-promo').addEventListener('keydown', e=>{ if(e.key==='Enter') applyPromo(); });
-    // Hide promo group for card payments
-    document.querySelectorAll('.method-tab').forEach(t=>t.addEventListener('click',()=>{
-      const pg = document.getElementById('promo-group');
-      if(t.dataset.method==='CREDITCARD'){ pg.style.opacity='.45'; pg.style.pointerEvents='none'; }
-      else { pg.style.opacity=''; pg.style.pointerEvents=''; }
-    }));
 
     // ── SPIN WHEEL ──────────────────────────────────────────────────────────
     const _spinLabels  = ['5%','10%','5%','15%','5%','10%','5%','5%'];
