@@ -160,6 +160,56 @@
     .discord-icon { width:16px; height:16px; fill:currentColor; flex-shrink:0; }
     @media(max-width:640px){ nav{gap:.75rem;} .nav-search{display:none;} .statsbar{gap:1.5rem;} .promo{flex-direction:column;text-align:center;} }
 
+    /* CART */
+    .cart-icon-btn { position:relative; background:none; border:none; cursor:pointer; color:#ccc; padding:.3rem; display:flex; align-items:center; transition:color .15s; }
+    .cart-icon-btn:hover { color:var(--orange); }
+    .cart-icon-btn svg { width:22px; height:22px; fill:currentColor; }
+    .cart-count { position:absolute; top:-4px; right:-5px; background:var(--orange); color:#000; font-size:.6rem; font-weight:900; min-width:16px; height:16px; border-radius:8px; display:flex; align-items:center; justify-content:center; padding:0 3px; opacity:0; transform:scale(0); transition:all .2s cubic-bezier(.22,1,.36,1); }
+    .cart-count.has-items { opacity:1; transform:scale(1); }
+    .cart-overlay { position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.6); opacity:0; pointer-events:none; transition:opacity .25s; }
+    .cart-overlay.open { opacity:1; pointer-events:all; }
+    .cart-drawer { position:fixed; top:0; right:0; bottom:0; z-index:501; width:min(420px,100vw); background:var(--surface); border-left:1px solid var(--border); display:flex; flex-direction:column; transform:translateX(100%); transition:transform .3s cubic-bezier(.22,1,.36,1); box-shadow:-8px 0 32px rgba(0,0,0,.5); }
+    .cart-drawer.open { transform:none; }
+    .cart-header { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.25rem; border-bottom:1px solid var(--border); }
+    .cart-header h3 { font-size:1rem; font-weight:900; font-family:'Arial Black',Arial,sans-serif; }
+    .cart-header-close { background:none; border:none; color:var(--muted); font-size:1.5rem; cursor:pointer; line-height:1; transition:color .15s; }
+    .cart-header-close:hover { color:var(--text); }
+    .cart-items { flex:1; overflow-y:auto; padding:.75rem 1.25rem; display:flex; flex-direction:column; gap:.75rem; }
+    .cart-empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--muted); font-size:.88rem; gap:.5rem; padding:2rem; text-align:center; }
+    .cart-item { display:flex; gap:.75rem; align-items:center; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:.65rem; }
+    .cart-item-img { width:64px; height:40px; border-radius:3px; object-fit:cover; flex-shrink:0; background:#111; }
+    .cart-item-img-ph { width:64px; height:40px; border-radius:3px; background:linear-gradient(135deg,#111,#1e1100); display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
+    .cart-item-info { flex:1; min-width:0; }
+    .cart-item-name { font-size:.78rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:.2rem; }
+    .cart-item-price { font-size:.75rem; color:var(--orange); font-weight:700; }
+    .cart-item-controls { display:flex; align-items:center; gap:.4rem; flex-shrink:0; }
+    .cart-qty-btn { width:24px; height:24px; background:var(--surface); border:1px solid var(--border); border-radius:3px; color:var(--text); font-size:.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:700; transition:border-color .15s; }
+    .cart-qty-btn:hover { border-color:var(--orange); }
+    .cart-qty-val { min-width:22px; text-align:center; font-size:.82rem; font-weight:700; }
+    .cart-item-remove { background:none; border:none; color:#555; cursor:pointer; font-size:.95rem; padding:0 2px; transition:color .15s; }
+    .cart-item-remove:hover { color:var(--red); }
+    .cart-footer { border-top:1px solid var(--border); padding:1rem 1.25rem; }
+    .cart-subtotal { display:flex; justify-content:space-between; align-items:center; margin-bottom:.25rem; }
+    .cart-subtotal-label { font-size:.8rem; color:var(--muted); }
+    .cart-subtotal-val { font-size:1.25rem; font-weight:900; color:var(--orange); font-family:'Arial Black',Arial,sans-serif; }
+    .cart-note { font-size:.72rem; color:var(--muted); margin-bottom:.85rem; }
+    .cart-checkout-btn { width:100%; padding:.7rem; background:var(--orange); color:#000; border:none; border-radius:3px; font-size:.9rem; font-weight:900; cursor:pointer; font-family:inherit; transition:background .15s; }
+    .cart-checkout-btn:hover { background:var(--orange2); }
+    .cart-checkout-btn:disabled { opacity:.4; cursor:not-allowed; }
+    .btn-add-cart { flex:1; padding:.52rem; border-radius:3px; font-size:.82rem; font-weight:700; background:var(--surface); color:var(--text); border:1.5px solid var(--border); cursor:pointer; font-family:inherit; transition:all .15s; }
+    .btn-add-cart:hover { border-color:var(--orange); color:var(--orange); }
+    .btn-add-cart.added { border-color:var(--green); color:var(--green); }
+    .card-btns { display:flex; gap:.5rem; margin-top:.7rem; }
+    /* CART CHECKOUT MODAL */
+    .cco-items { max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:.5rem; margin-bottom:1rem; }
+    .cco-row { display:flex; align-items:center; justify-content:space-between; background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:.55rem .75rem; font-size:.82rem; }
+    .cco-row-name { font-weight:700; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-right:.5rem; }
+    .cco-row-price { color:var(--orange); font-weight:700; flex-shrink:0; }
+    .cco-pay-link { display:flex; align-items:center; justify-content:space-between; background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:.55rem .75rem; margin-bottom:.4rem; }
+    .cco-pay-link-name { font-size:.78rem; color:var(--muted); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-right:.5rem; }
+    .cco-pay-link-btn { background:var(--orange); color:#000; border:none; border-radius:3px; font-size:.75rem; font-weight:700; padding:.3rem .7rem; cursor:pointer; flex-shrink:0; }
+    .cco-pay-link-btn:hover { background:var(--orange2); }
+
     /* BG CANVAS */
     #bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.45; }
     body > *:not(#bg-canvas) { position:relative; z-index:1; }
@@ -227,6 +277,10 @@
       <a href="#features">Why Us</a>
       <a href="https://discord.gg/Y69UbMUEfu" class="nav-btn" target="_blank" rel="noopener">Join Discord</a>
     </div>
+    <button class="cart-icon-btn" id="cart-open-btn" aria-label="Open cart">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6zm0 0M3 6h18M16 10a4 4 0 01-8 0"/></svg>
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
   </nav>
 
   <!-- CATEGORIES -->
@@ -434,7 +488,10 @@
             <div class="card-title">${sanitize(p.name)}</div>
             <div class="card-desc">${sanitize(p.description??p.requirements??'')}</div>
             <div class="card-meta"><span class="card-price">${price}</span><div class="card-tags">${methods}</div></div>
-            <button class="btn-buy" onclick="event.stopPropagation();openCheckout(${ri})">Buy Now →</button>
+            <div class="card-btns">
+              <button class="btn-add-cart" onclick="event.stopPropagation();addToCart(${ri},this)">+ Cart</button>
+              <button class="btn-buy" style="flex:1.5" onclick="event.stopPropagation();openCheckout(${ri})">Buy Now →</button>
+            </div>
           </div>
         </div>`;
       }).join('');
@@ -514,6 +571,61 @@
     });
   </script>
 
+  <!-- CART OVERLAY + DRAWER -->
+  <div class="cart-overlay" id="cart-overlay"></div>
+  <div class="cart-drawer" id="cart-drawer" role="dialog" aria-label="Shopping cart">
+    <div class="cart-header">
+      <h3>Cart <span id="cart-header-count" style="color:var(--muted);font-weight:400;font-size:.82rem;"></span></h3>
+      <button class="cart-header-close" id="cart-close-btn">&times;</button>
+    </div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-footer" id="cart-footer" style="display:none">
+      <div class="cart-subtotal">
+        <span class="cart-subtotal-label">Subtotal</span>
+        <span class="cart-subtotal-val" id="cart-subtotal">$0.00</span>
+      </div>
+      <p class="cart-note">Each product creates a separate payment. You'll get all links after checkout.</p>
+      <button class="cart-checkout-btn" id="cart-checkout-btn">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <!-- CART CHECKOUT MODAL -->
+  <div class="modal-overlay" id="cart-modal">
+    <div class="modal" role="dialog" aria-modal="true" style="max-width:500px">
+      <button class="modal-close" id="cart-modal-close">&times;</button>
+      <h2 id="cart-modal-title">Checkout</h2>
+      <p class="modal-sub" id="cart-modal-sub">Enter your details to pay for all items.</p>
+      <div id="cart-modal-body">
+        <div class="cco-items" id="cco-items"></div>
+        <div class="modal-total" style="margin-bottom:1rem">
+          <span class="modal-total-label">Total</span>
+          <span class="modal-total-value" id="cco-total">$0.00</span>
+        </div>
+        <div class="form-group">
+          <label>Payment Method</label>
+          <div class="method-tabs">
+            <button class="method-tab active" id="cco-tab-crypto" data-method="CRYPTO">&#8383; Crypto</button>
+            <button class="method-tab" id="cco-tab-card" data-method="CREDITCARD">&#128179; Card</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="cco-email">Email Address</label>
+          <input class="form-input" type="email" id="cco-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="modal-error" id="cco-error"></div>
+        <button class="btn-checkout" id="cco-submit">
+          <span class="btn-spinner"></span>
+          <span class="btn-label">Create Payment Links →</span>
+        </button>
+      </div>
+      <div id="cart-modal-links" style="display:none">
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:.85rem;">Open each payment link to complete your order. Each delivers instantly after payment.</p>
+        <div id="cco-links-list"></div>
+        <button class="btn-checkout" style="margin-top:.75rem" onclick="closeCartModal();cartClear();"><span class="btn-label">Done</span></button>
+      </div>
+    </div>
+  </div>
+
   <!-- AD POPUP -->
   <div class="adpop" id="adpop">
     <div class="adpop-label">Featured Deal <button class="adpop-close" id="adpop-close" aria-label="Close">&times;</button></div>
@@ -587,6 +699,112 @@
       }
       requestAnimationFrame(step);
     }
+
+    // ── CART ──────────────────────────────────────────────────────────────────
+    let _cart = JSON.parse(localStorage.getItem('abysshub_cart') || '[]');
+
+    function cartSave(){ localStorage.setItem('abysshub_cart', JSON.stringify(_cart)); }
+    function cartClear(){ _cart=[]; cartSave(); renderCart(); }
+
+    function addToCart(idx, btn){
+      const p = _all[idx]; if(!p) return;
+      const min = p.min_order_amount||1;
+      const existing = _cart.find(c=>c.idx===idx);
+      if(existing){ existing.qty = Math.min(existing.qty+min, 9999); }
+      else { _cart.push({idx, name:p.name, price:p.price, min_qty:min, qty:min, thumbnail_url:p.thumbnail_url||'', payment_methods:p.payment_methods||['CRYPTO','CREDITCARD']}); }
+      cartSave(); renderCart();
+      if(btn){ btn.textContent='✓ Added'; btn.classList.add('added'); setTimeout(()=>{ btn.textContent='+ Cart'; btn.classList.remove('added'); },1400); }
+      openCart();
+    }
+
+    function cartRemove(idx){ _cart=_cart.filter(c=>c.idx!==idx); cartSave(); renderCart(); }
+    function cartSetQty(idx, qty){
+      const item=_cart.find(c=>c.idx===idx); if(!item) return;
+      const newQty=Math.max(item.min_qty, parseInt(qty)||item.min_qty);
+      item.qty=newQty; cartSave(); renderCart();
+    }
+
+    function cartTotal(){ return _cart.reduce((s,c)=>s+c.price*c.qty,0); }
+
+    function renderCart(){
+      const el=document.getElementById('cart-items');
+      const footer=document.getElementById('cart-footer');
+      const countBadge=document.getElementById('cart-count');
+      const total=_cart.reduce((s,c)=>s+c.qty,0);
+      countBadge.textContent=total;
+      countBadge.classList.toggle('has-items',total>0);
+      document.getElementById('cart-header-count').textContent=total?`(${total} item${total!==1?'s':''})`:'(empty)';
+      document.getElementById('cart-subtotal').textContent=`$${cartTotal().toFixed(2)}`;
+      footer.style.display=_cart.length?'':'none';
+      if(!_cart.length){ el.innerHTML='<div class="cart-empty"><div style="font-size:2rem">🛒</div><div>Your cart is empty.</div><a href="#products" style="color:var(--orange);font-size:.8rem;" onclick="closeCart()">Browse products</a></div>'; return; }
+      el.innerHTML=_cart.map(c=>{
+        const thumb=c.thumbnail_url
+          ? `<img class="cart-item-img" src="${sanitize(c.thumbnail_url)}" alt="" loading="lazy">`
+          : `<div class="cart-item-img-ph">🎮</div>`;
+        return `<div class="cart-item">${thumb}<div class="cart-item-info"><div class="cart-item-name">${sanitize(c.name)}</div><div class="cart-item-price">$${(c.price*c.qty).toFixed(2)} <span style="color:var(--muted);font-size:.7rem;font-weight:400">(${c.qty} × $${c.price.toFixed(2)})</span></div></div><div class="cart-item-controls"><button class="cart-qty-btn" onclick="cartSetQty(${c.idx},${c.qty-c.min_qty})">−</button><span class="cart-qty-val">${c.qty}</span><button class="cart-qty-btn" onclick="cartSetQty(${c.idx},${c.qty+c.min_qty})">+</button><button class="cart-item-remove" onclick="cartRemove(${c.idx})" title="Remove">🗑</button></div></div>`;
+      }).join('');
+    }
+
+    function openCart(){ document.getElementById('cart-drawer').classList.add('open'); document.getElementById('cart-overlay').classList.add('open'); }
+    function closeCart(){ document.getElementById('cart-drawer').classList.remove('open'); document.getElementById('cart-overlay').classList.remove('open'); }
+
+    document.getElementById('cart-open-btn').addEventListener('click', openCart);
+    document.getElementById('cart-close-btn').addEventListener('click', closeCart);
+    document.getElementById('cart-overlay').addEventListener('click', closeCart);
+    document.getElementById('cart-checkout-btn').addEventListener('click', openCartCheckout);
+
+    function openCartCheckout(){
+      if(!_cart.length) return;
+      closeCart();
+      document.getElementById('cco-items').innerHTML=_cart.map(c=>`<div class="cco-row"><span class="cco-row-name">${sanitize(c.name)} ×${c.qty}</span><span class="cco-row-price">$${(c.price*c.qty).toFixed(2)}</span></div>`).join('');
+      document.getElementById('cco-total').textContent=`$${cartTotal().toFixed(2)}`;
+      document.getElementById('cco-email').value='';
+      document.getElementById('cco-error').textContent=''; document.getElementById('cco-error').classList.remove('show');
+      let _ccoMethod='CRYPTO';
+      const allMethods=['CRYPTO','CREDITCARD'].filter(m=>_cart.every(c=>(c.payment_methods||[]).includes(m)));
+      _ccoMethod=allMethods[0]||'CRYPTO';
+      document.getElementById('cco-tab-crypto').disabled=!_cart.every(c=>(c.payment_methods||[]).includes('CRYPTO'));
+      document.getElementById('cco-tab-card').disabled=!_cart.every(c=>(c.payment_methods||[]).includes('CREDITCARD'));
+      document.querySelectorAll('#cart-modal .method-tab').forEach(t=>{
+        t.classList.toggle('active',t.dataset.method===_ccoMethod);
+        t.onclick=function(){ if(this.disabled)return; _ccoMethod=this.dataset.method; document.querySelectorAll('#cart-modal .method-tab').forEach(x=>x.classList.remove('active')); this.classList.add('active'); };
+      });
+      document.getElementById('cart-modal-title').textContent='Checkout';
+      document.getElementById('cart-modal-sub').textContent=`${_cart.length} product${_cart.length!==1?'s':''} — delivered instantly after payment.`;
+      document.getElementById('cart-modal-body').style.display='';
+      document.getElementById('cart-modal-links').style.display='none';
+      document.getElementById('cart-modal').classList.add('open');
+      setTimeout(()=>document.getElementById('cco-email').focus(),50);
+
+      document.getElementById('cco-submit').onclick = async()=>{
+        const email=document.getElementById('cco-email').value.trim();
+        if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ setCcoError('Please enter a valid email address.'); return; }
+        setCcoError('');
+        const btn=document.getElementById('cco-submit'); btn.disabled=true; btn.classList.add('loading');
+        const links=[];
+        try{
+          for(const item of _cart){
+            const res=await fetch('/api/create-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product:item.name,quantity:item.qty,email,method:_ccoMethod})});
+            if(res.status===429){ setCcoError('Too many requests — please wait a moment.'); return; }
+            if(!res.ok){ setCcoError(await res.text()||`Failed for: ${item.name}`); return; }
+            const {redirect_url}=await res.json();
+            links.push({name:item.name, url:redirect_url});
+          }
+          document.getElementById('cart-modal-body').style.display='none';
+          document.getElementById('cart-modal-links').style.display='';
+          document.getElementById('cart-modal-title').textContent='Payment Links Ready';
+          document.getElementById('cco-links-list').innerHTML=links.map(l=>`<div class="cco-pay-link"><span class="cco-pay-link-name">${sanitize(l.name)}</span><button class="cco-pay-link-btn" onclick="window.open('${l.url}','_blank')">Pay Now →</button></div>`).join('');
+        } catch{ setCcoError('Network error. Please try again.'); }
+        finally{ btn.disabled=false; btn.classList.remove('loading'); }
+      };
+    }
+
+    function closeCartModal(){ document.getElementById('cart-modal').classList.remove('open'); }
+    function setCcoError(msg){ const e=document.getElementById('cco-error'); e.textContent=msg; e.classList.toggle('show',!!msg); }
+    document.getElementById('cart-modal-close').addEventListener('click', closeCartModal);
+    document.getElementById('cart-modal').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeCartModal(); });
+
+    renderCart();
 
     // ── AD POPUP ─────────────────────────────────────────────────────────────
     const adpop    = document.getElementById('adpop');
