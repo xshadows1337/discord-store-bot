@@ -2242,7 +2242,7 @@
         </div>
         <button class="auth-submit" id="verify-btn">Verify Email</button>
         <div class="auth-footer-row">
-          <button class="auth-link" id="back-to-login-v">← Back to Login</button>
+          <button class="auth-link" id="resend-verify-btn">Resend code</button> · <button class="auth-link" id="back-to-login-v">← Back to Login</button>
         </div>
       </div>
 
@@ -3447,12 +3447,25 @@
         const r = await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,email,password:pw,confirm:pw2})});
         const d = await r.json();
         if(d.ok){
-          authMsg('reg-msg','Account created! Check your email for a verification code.','success');
+          authMsg('reg-msg', d.msg, d.email_failed ? 'error' : 'success');
           document.getElementById('verify-email').value = email;
-          setTimeout(()=>showPanel('verify'), 1500);
+          setTimeout(()=>showPanel('verify'), 1800);
         } else { authMsg('reg-msg', d.msg||'Registration failed.','error'); }
       } catch{ authMsg('reg-msg','Network error.','error'); }
       btn.disabled = false;
+    });
+
+    // ── Resend verify ──────────────────────────────────────────────────────
+    document.getElementById('resend-verify-btn').addEventListener('click', async()=>{
+      const btn = document.getElementById('resend-verify-btn'); btn.disabled = true; btn.textContent = 'Sending…';
+      const email = document.getElementById('verify-email').value.trim();
+      if(!email){ authMsg('verify-msg','Enter your email above first.','error'); btn.disabled=false; btn.textContent='Resend code'; return; }
+      try{
+        const r = await fetch('/api/auth/resend-verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+        const d = await r.json();
+        authMsg('verify-msg', d.msg||(d.ok?'Code sent!':'Failed.'), d.ok?'success':'error');
+      } catch{ authMsg('verify-msg','Network error.','error'); }
+      btn.disabled=false; btn.textContent='Resend code';
     });
 
     // ── Verify ────────────────────────────────────────────────────────────

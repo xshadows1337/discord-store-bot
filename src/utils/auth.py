@@ -12,7 +12,8 @@ import sqlite3
 import time
 from pathlib import Path
 
-import aiohttp
+import asyncio
+import requests as _requests
 from loguru import logger
 
 # ── Config ────────────────────────────────────────────────────────────────────
@@ -116,6 +117,15 @@ def register_user(username: str, email: str, password: str) -> tuple[bool, str, 
     if '@' not in email or '.' not in email:
         return False, 'Invalid email address.', None
 
+    # Explicit pre-checks (friendlier than relying solely on IntegrityError)
+    existing = db.execute(
+        'SELECT id, username, email FROM users WHERE username = ? OR email = ?',
+        (username, email.lower()),
+    ).fetchone()
+    if existing:
+        if existing['username'].lower() == username.lower():
+            return False, 'Username already taken.', None
+        return False, 'Email already registered.', None
     pw_hash, salt = _hash_password(password)
     verify_code = secrets.token_hex(3).upper()  # 6-char hex code
 
@@ -216,6 +226,20 @@ def get_user_by_id(user_id: int) -> dict | None:
 
 # ── Mailgun email sending ────────────────────────────────────────────────────
 
+def resend_verify_email(email: str) -> tuple[bool, str, str | None]:
+    """Generate a fresh verify code and return it for sending. Returns (ok, msg, code)."""
+    db = _get_db()
+    row = db.execute('SELECT * FROM users WHERE email = ?', (email.lower(),)).fetchone()
+    if not row:
+        return False, 'Email not found.', None
+    if row['email_verified']:
+        return False, 'Email is already verified. Please log in.', None
+    code = secrets.token_hex(3).upper()
+    db.execute('UPDATE users SET verify_code = ? WHERE id = ?', (code, row['id']))
+    db.commit()
+    return True, 'Verification code resent.', code
+
+
 async def send_verification_email(to_email: str, code: str):
     html = f'''
     <div style="background:#111;color:#fff;font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:2rem;border:1px solid #333;border-radius:8px;">
@@ -231,7 +255,7 @@ async def send_verification_email(to_email: str, code: str):
       <div style="text-align:center;margin-top:1.5rem;color:#333;font-size:.7rem;">&copy; 2026 AbyssHub</div>
     </div>
     '''
-    await _send_mailgun(to_email, 'AbyssHub — Verify your email', html)
+    return await _send_mailgun(to_email, 'AbyssHub — Verify your email', html)
 
 async def send_reset_email(to_email: str, code: str):
     html = f'''
@@ -248,23 +272,31 @@ async def send_reset_email(to_email: str, code: str):
       <div style="text-align:center;margin-top:1.5rem;color:#333;font-size:.7rem;">&copy; 2026 AbyssHub</div>
     </div>
     '''
-    await _send_mailgun(to_email, 'AbyssHub — Password Reset Code', html)
+    return await _send_mailgun(to_email, 'AbyssHub — Password Reset Code', html)
 
-async def _send_mailgun(to: str, subject: str, html: str):
+async def _send_mailgun(to: str, subject: str, html: str) -> bool:
+    """Send via Mailgun using requests in a thread executor. Returns True on success."""
     url = f'https://api.mailgun.net/v3/{MAILGUN_DOMAIN}/messages'
-    try:
-        auth = aiohttp.BasicAuth('api', MAILGUN_API_KEY)
-        async with aiohttp.ClientSession(auth=auth) as session:
-            async with session.post(url, data={
-                'from': MAILGUN_FROM,
-                'to': to,
-                'subject': subject,
-                'html': html,
-            }) as resp:
-                if resp.status >= 400:
-                    body = await resp.text()
-                    logger.error(f'Mailgun error ({resp.status}): {body}')
-                else:
-                    logger.info(f'Email sent to {to}: {subject}')
-    except Exception as e:
-        logger.error(f'Mailgun send failed: {e}')
+    def _do_send():
+        try:
+            resp = _requests.post(
+                url,
+                auth=('api', MAILGUN_API_KEY),
+                data={
+                    'from': MAILGUN_FROM,
+                    'to': to,
+                    'subject': subject,
+                    'html': html,
+                },
+                timeout=15,
+            )
+            if resp.status_code >= 400:
+                logger.error(f'Mailgun error ({resp.status_code}): {resp.text}')
+                return False
+            logger.info(f'Email sent to {to}: {subject}')
+            return True
+        except Exception as exc:
+            logger.error(f'Mailgun send failed: {exc}')
+            return False
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, _do_send)

@@ -815,12 +815,16 @@ async def start_api_server(secret: str, port: int = 8080):
         ok, msg, uid = register_user(username, email, password)
         if not ok:
             return web.json_response({'ok': False, 'msg': msg}, status=422)
-        # Send verification email
+        # Send verification email — if it fails, tell the user to use resend
+        email_sent = False
         try:
-            await send_verification_email(email, msg)  # msg is the verify code on success
+            email_sent = await send_verification_email(email, msg)  # msg is verify code
         except Exception as e:
             logger.error(f'Failed to send verify email: {e}')
-        return web.json_response({'ok': True, 'msg': 'Account created! Check your email for a verification code.'})
+        if email_sent:
+            return web.json_response({'ok': True, 'msg': 'Account created! Check your email for a verification code.'})
+        else:
+            return web.json_response({'ok': True, 'email_failed': True, 'msg': 'Account created but we could not send the verification email. Click \'Resend code\' on the verify screen.'})
 
     async def auth_verify(request):
         try:
@@ -896,12 +900,37 @@ async def start_api_server(secret: str, port: int = 8080):
             return web.json_response({'ok': False}, status=401)
         return web.json_response({'ok': True, 'user': user})
 
-    app.router.add_post('/api/auth/register', auth_register)
-    app.router.add_post('/api/auth/verify',   auth_verify)
-    app.router.add_post('/api/auth/login',    auth_login)
-    app.router.add_post('/api/auth/forgot',   auth_forgot)
-    app.router.add_post('/api/auth/reset',    auth_reset)
-    app.router.add_get('/api/auth/me',        auth_me)
+    async def auth_resend_verify(request):
+        ip = _get_ip(request)
+        if _sliding_window(_rate_co, ip, _CO_WINDOW, _CO_MAX):
+            return web.Response(status=429, text='Too many requests.')
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+        email = (body.get('email') or '').strip()
+        if not email:
+            return web.json_response({'ok': False, 'msg': 'Email is required.'}, status=422)
+        from utils.auth import resend_verify_email, send_verification_email
+        ok, msg, code = resend_verify_email(email)
+        if not ok:
+            return web.json_response({'ok': False, 'msg': msg}, status=422)
+        email_sent = False
+        try:
+            email_sent = await send_verification_email(email, code)
+        except Exception as e:
+            logger.error(f'Failed to resend verify email: {e}')
+        if email_sent:
+            return web.json_response({'ok': True, 'msg': 'Verification code resent! Check your inbox.'})
+        return web.json_response({'ok': False, 'msg': 'Could not send email. Check your email address or try again later.'}, status=503)
+
+    app.router.add_post('/api/auth/register',      auth_register)
+    app.router.add_post('/api/auth/verify',        auth_verify)
+    app.router.add_post('/api/auth/resend-verify', auth_resend_verify)
+    app.router.add_post('/api/auth/login',         auth_login)
+    app.router.add_post('/api/auth/forgot',        auth_forgot)
+    app.router.add_post('/api/auth/reset',         auth_reset)
+    app.router.add_get('/api/auth/me',             auth_me)
 
     # ── Gambling & Coins ────────────────────────────────────────────────────
 
