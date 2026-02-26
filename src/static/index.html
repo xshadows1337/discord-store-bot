@@ -26,7 +26,7 @@
     nav { background: #000; border-bottom: 3px solid var(--orange); height: 60px; display: flex; align-items: center; padding: 0 1.5rem; gap: 1.5rem; position: sticky; top: 0; z-index: 100; }
     .nav-logo { font-size: 1.5rem; font-weight: 900; text-decoration: none; color: #fff; font-family: 'Arial Black',Arial,sans-serif; flex-shrink: 0; }
     .nav-logo .hub { background: var(--orange); color: #000; border-radius: 4px; padding: 1px 8px 2px; margin-left: 3px; font-weight: 900; }
-    .nav-search { flex: 1; max-width: 480px; display: flex; }
+    .nav-search { flex: 1; max-width: 480px; display: flex; margin: 0 auto; }
     .nav-search input { flex: 1; background: #1a1a1a; border: 1px solid #444; border-right: none; color: #fff; padding: .45rem .85rem; font-size: .88rem; border-radius: 3px 0 0 3px; outline: none; }
     .nav-search input::placeholder { color: #666; }
     .nav-search input:focus { border-color: var(--orange); }
@@ -111,7 +111,7 @@
     .product-card:hover .card-thumb img { transform:scale(1.06); }
     .card-thumb-ph { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:2.5rem; background:linear-gradient(135deg,#0e0e0e,#1e1100); }
     /* PH-style hover overlay */
-    .card-hover-bar { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,.72) 0%,transparent 55%); opacity:0; transition:opacity .22s; display:flex; align-items:flex-end; padding:.6rem; gap:.4rem; }
+    .card-hover-bar { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,.72) 0%,transparent 55%); opacity:0; transition:opacity .22s; display:flex; align-items:flex-end; padding:.6rem; gap:.4rem; z-index:3; }
     .product-card:hover .card-hover-bar { opacity:1; }
     .chb-btn { background:rgba(255,255,255,.15); backdrop-filter:blur(4px); border:1px solid rgba(255,255,255,.18); color:#fff; border-radius:3px; font-size:.68rem; font-weight:700; padding:.25rem .55rem; cursor:pointer; font-family:inherit; transition:background .12s; white-space:nowrap; }
     .chb-btn:hover { background:var(--orange); color:#000; border-color:var(--orange); }
@@ -122,9 +122,8 @@
     .card-stock.low { background:rgba(230,57,70,.9); }
     .card-stock.hot { background:rgba(255,144,0,.9); color:#000; }
     .card-badge { position:absolute; top:6px; left:6px; background:var(--orange); color:#000; font-size:.6rem; font-weight:900; padding:2px 6px; border-radius:2px; letter-spacing:.06em; z-index:1; }
-    .card-badge-ud { position:absolute; top:6px; left:6px; background:#1a1a1a; border:1px solid var(--green); color:var(--green); font-size:.6rem; font-weight:900; padding:2px 6px; border-radius:2px; letter-spacing:.06em; z-index:1; }
+    .card-badge-ud { position:absolute; top:26px; left:6px; background:#1a1a1a; border:1px solid var(--green); color:var(--green); font-size:.6rem; font-weight:900; padding:2px 6px; border-radius:2px; letter-spacing:.06em; z-index:1; }
     .card-badge-new { position:absolute; top:6px; right:6px; background:var(--red); color:#fff; font-size:.6rem; font-weight:900; padding:2px 6px; border-radius:2px; letter-spacing:.1em; animation:badge-pop .4s ease both; z-index:1; }
-    .card-duration { position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,.82); color:#fff; font-size:.66rem; font-weight:700; padding:2px 6px; border-radius:2px; z-index:1; letter-spacing:.04em; }
     @keyframes badge-pop { from{opacity:0;transform:scale(.6);}to{opacity:1;transform:scale(1);} }
     .card-info { padding:.65rem .8rem .75rem; }
     .card-title { font-size:.86rem; font-weight:700; line-height:1.35; margin-bottom:.2rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
@@ -146,6 +145,84 @@
     .products-placeholder { grid-column:1/-1; text-align:center; padding:3rem; color:var(--muted); font-size:.9rem; }
     .spinner { width:28px; height:28px; border:3px solid #333; border-top-color:var(--orange); border-radius:50%; animation:spin .7s linear infinite; margin:0 auto 1rem; }
     @keyframes spin { to{transform:rotate(360deg);} }
+
+    /* GAMBLING SECTION */
+    .gambling-section { max-width:900px; margin:2rem auto; padding:0 1.5rem; }
+    .gamble-balance-bar { display:flex; align-items:center; justify-content:space-between; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:.65rem 1rem; margin-bottom:1rem; flex-wrap:wrap; gap:.5rem; }
+    .gamble-bal-left { display:flex; align-items:center; gap:.5rem; }
+    .gamble-coin-icon { font-size:1.4rem; }
+    .gamble-bal-amount { font-size:1.3rem; font-weight:900; color:var(--orange); }
+    .gamble-bal-label { font-size:.8rem; color:var(--muted); }
+    .gamble-bal-right { display:flex; gap:.4rem; }
+    .gamble-deposit-btn { background:var(--orange); color:#000; border:none; padding:.4rem .85rem; border-radius:3px; font-weight:700; font-size:.78rem; cursor:pointer; font-family:inherit; transition:background .15s; }
+    .gamble-deposit-btn:hover { background:var(--orange2); }
+    .gamble-history-btn { background:var(--surface); color:var(--muted); border:1px solid var(--border); padding:.4rem .85rem; border-radius:3px; font-weight:600; font-size:.78rem; cursor:pointer; font-family:inherit; transition:all .15s; }
+    .gamble-history-btn:hover { border-color:var(--orange); color:var(--orange); }
+    .gamble-tabs { display:flex; gap:.3rem; margin-bottom:1rem; background:var(--surface); border-radius:var(--radius); padding:.25rem; border:1px solid var(--border); }
+    .gamble-tab { flex:1; background:none; border:none; color:var(--muted); padding:.55rem .5rem; border-radius:4px; font-size:.82rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all .15s; }
+    .gamble-tab:hover { color:var(--text); }
+    .gamble-tab.active { background:var(--orange); color:#000; }
+    .gamble-game { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; }
+    .gamble-game-inner { display:flex; gap:1.5rem; align-items:flex-start; }
+    @media(max-width:640px){ .gamble-game-inner { flex-direction:column; } }
+    .gamble-controls { flex:1; min-width:0; }
+    .gamble-lbl { display:block; font-size:.72rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:.3rem; }
+    .gamble-input { background:#1a1a1a; border:1px solid #444; color:#fff; padding:.45rem .7rem; font-size:.88rem; border-radius:3px; outline:none; width:auto; font-family:inherit; }
+    .gamble-input:focus { border-color:var(--orange); }
+    .gamble-input-row { display:flex; gap:.35rem; align-items:center; margin-bottom:.3rem; }
+    .gamble-input-row .gamble-input { flex:1; }
+    .gamble-quick { background:var(--surface); border:1px solid var(--border); color:var(--muted); padding:.4rem .6rem; border-radius:3px; font-size:.75rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all .12s; }
+    .gamble-quick:hover { border-color:var(--orange); color:var(--orange); }
+    .gamble-payout { font-size:.78rem; color:var(--muted); margin:.5rem 0; }
+    .gamble-payout span { color:var(--orange); font-weight:700; }
+    .gamble-play-btn { width:100%; margin-top:.6rem; padding:.6rem; border-radius:4px; font-size:.88rem; font-weight:800; background:linear-gradient(135deg,var(--orange),#e67e00); color:#000; border:none; cursor:pointer; font-family:inherit; transition:transform .1s,opacity .15s; letter-spacing:.02em; }
+    .gamble-play-btn:hover { opacity:.9; transform:scale(1.01); }
+    .gamble-play-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+    .gamble-cashout-btn { background:linear-gradient(135deg,var(--green),#2ab06f); }
+    .gamble-result { font-size:.82rem; padding:.45rem .6rem; border-radius:4px; margin-top:.5rem; text-align:center; font-weight:700; min-height:0; transition:all .2s; }
+    .gamble-result.win { background:rgba(61,220,132,.12); color:var(--green); }
+    .gamble-result.loss { background:rgba(230,57,70,.12); color:var(--red); }
+    /* Coin flip animation */
+    .cf-coin { width:100px; height:100px; margin:0 auto 1rem; perspective:600px; }
+    .cf-coin-inner { position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d; }
+    .cf-coin-inner.flip { animation:coinFlipAnim .8s ease-in-out; }
+    .cf-side { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:2rem; font-weight:900; backface-visibility:hidden; }
+    .cf-heads { background:linear-gradient(135deg,#ffb347,#ff9000); color:#000; }
+    .cf-tails { background:linear-gradient(135deg,#444,#222); color:#fff; border:2px solid #555; transform:rotateY(180deg); }
+    @keyframes coinFlipAnim { 0%{transform:rotateY(0)}50%{transform:rotateY(900deg)}100%{transform:rotateY(1800deg)} }
+    @keyframes coinFlipToTails { 0%{transform:rotateY(0)}50%{transform:rotateY(900deg)}100%{transform:rotateY(1980deg)} }
+    .cf-choice-row { display:flex; gap:.35rem; margin-bottom:.3rem; }
+    .cf-choice { flex:1; background:var(--surface); border:1px solid var(--border); color:var(--muted); padding:.45rem .5rem; border-radius:4px; font-size:.8rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all .15s; text-align:center; }
+    .cf-choice:hover { border-color:var(--orange); color:var(--text); }
+    .cf-choice.active { background:var(--orange); color:#000; border-color:var(--orange); }
+    /* Dice */
+    .dice-visual { margin-bottom:1rem; }
+    .dice-bar-track { position:relative; height:20px; background:#333; border-radius:10px; overflow:visible; }
+    .dice-bar-fill { height:100%; background:linear-gradient(90deg,var(--green),#6dff6d); border-radius:10px 0 0 10px; transition:width .2s; }
+    .dice-bar-marker { position:absolute; top:-4px; width:3px; height:28px; background:#fff; border-radius:2px; transition:left .2s; transform:translateX(-50%); }
+    .dice-bar-roll { position:absolute; top:-6px; width:12px; height:32px; background:var(--orange); border-radius:6px; transform:translateX(-50%); z-index:2; display:none; transition:left .3s; }
+    .dice-labels { display:flex; justify-content:space-between; font-size:.65rem; color:var(--muted); margin-top:.25rem; }
+    .dice-slider { width:100%; accent-color:var(--orange); }
+    .dice-info-row { display:flex; justify-content:space-between; font-size:.76rem; color:var(--muted); margin:.3rem 0; flex-wrap:wrap; gap:.3rem; }
+    .dice-info-row strong { color:var(--text); }
+    /* Mines */
+    .mines-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:4px; width:220px; flex-shrink:0; }
+    .mine-tile { aspect-ratio:1; background:var(--surface); border:1px solid var(--border); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:1rem; cursor:pointer; transition:all .15s; user-select:none; }
+    .mine-tile:hover:not(.revealed):not(.boom) { border-color:var(--orange); background:#333; }
+    .mine-tile.revealed { background:rgba(61,220,132,.15); border-color:var(--green); color:var(--green); cursor:default; }
+    .mine-tile.boom { background:rgba(230,57,70,.2); border-color:var(--red); color:var(--red); cursor:default; animation:shake .4s; }
+    .mine-tile.mine-show { background:rgba(230,57,70,.08); border-color:#555; color:var(--red); cursor:default; }
+    @keyframes shake { 0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)} }
+    .mines-info { display:flex; flex-direction:column; gap:.35rem; font-size:.82rem; color:var(--muted); margin-bottom:.5rem; }
+    .mines-info strong { color:var(--orange); }
+    /* History */
+    .gamble-history { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-top:1rem; max-height:300px; overflow-y:auto; }
+    .gh-row { display:flex; justify-content:space-between; align-items:center; padding:.4rem 0; border-bottom:1px solid var(--border); font-size:.78rem; }
+    .gh-row:last-child { border-bottom:none; }
+    .gh-game { color:var(--muted); font-weight:600; text-transform:uppercase; font-size:.68rem; }
+    .gh-bet { color:var(--text); }
+    .gh-payout.win { color:var(--green); font-weight:700; }
+    .gh-payout.loss { color:var(--red); font-weight:700; }
 
     /* TRENDING ROW */
     .trending-row { margin-bottom:2rem; }
@@ -318,6 +395,13 @@
       .footer-col p { font-size:.68rem; }
       .footer-bottom { flex-direction:column; text-align:center; gap:.3rem; font-size:.64rem; }
       footer { padding:1.5rem .75rem .75rem; }
+      /* Gambling */
+      .gambling-section { padding:0 .75rem; }
+      .gamble-balance-bar { padding:.5rem .65rem; }
+      .gamble-bal-amount { font-size:1rem; }
+      .mines-grid { width:180px; gap:3px; }
+      .mine-tile { font-size:.8rem; }
+      .gamble-game { padding:.75rem; }
       /* Modals */
       .modal-overlay { padding:.5rem; }
       .modal { max-width:100%; padding:1.15rem; }
@@ -1031,6 +1115,7 @@
     <div class="nav-links">
       <a href="#products">Products</a>
       <a href="#" onclick="event.preventDefault();openOrderLookup()">Orders</a>
+      <a href="#gambling">Casino</a>
       <a href="#faq">FAQ</a>
       <a href="#features">Why Us</a>
       <div id="nav-auth-area">
@@ -1208,6 +1293,155 @@
     </div>
     <div style="text-align:center;margin-top:1.25rem">
       <button style="background:none;border:1px solid var(--border);color:var(--muted);padding:.45rem 1.25rem;border-radius:4px;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'" onclick="openVouch()">Share Your Experience &rarr;</button>
+    </div>
+  </div>
+
+  <!-- GAMBLING SECTION -->
+  <div class="gambling-section reveal" id="gambling" style="scroll-margin-top:100px;">
+    <div class="sec-header"><h2>&#127920; Casino — Gamble &amp; Win Coins</h2><p style="color:var(--muted);font-size:.82rem;margin-top:.35rem;">Deposit real money → get coins → gamble or spend on products. $1 = 100 coins.</p></div>
+
+    <!-- Auth gate -->
+    <div id="gamble-auth-gate" style="text-align:center;padding:2rem 1rem;">
+      <p style="color:var(--muted);margin-bottom:1rem;">You must be logged in to play.</p>
+      <button class="btn-buy" style="width:auto;padding:.55rem 1.5rem;" onclick="openAuthModal('login')">Login / Register</button>
+    </div>
+
+    <!-- Gambling app (hidden until logged in) -->
+    <div id="gamble-app" style="display:none;">
+      <!-- Balance bar -->
+      <div class="gamble-balance-bar">
+        <div class="gamble-bal-left">
+          <span class="gamble-coin-icon">&#129689;</span>
+          <span class="gamble-bal-amount" id="gamble-balance">0</span>
+          <span class="gamble-bal-label">coins</span>
+        </div>
+        <div class="gamble-bal-right">
+          <button class="gamble-deposit-btn" onclick="openDepositModal()">&#43; Deposit</button>
+          <button class="gamble-history-btn" onclick="toggleGambleHistory()">&#128240; History</button>
+        </div>
+      </div>
+
+      <!-- Game tabs -->
+      <div class="gamble-tabs">
+        <button class="gamble-tab active" data-game="coinflip" onclick="switchGame('coinflip',this)">&#129689; Coin Flip</button>
+        <button class="gamble-tab" data-game="dice" onclick="switchGame('dice',this)">&#127922; Dice</button>
+        <button class="gamble-tab" data-game="mines" onclick="switchGame('mines',this)">&#128163; Mines</button>
+      </div>
+
+      <!-- ── COIN FLIP ─────────────────────────────────────────────── -->
+      <div class="gamble-game" id="game-coinflip">
+        <div class="gamble-game-inner">
+          <div class="cf-coin" id="cf-coin">
+            <div class="cf-side cf-heads">H</div>
+            <div class="cf-side cf-tails">T</div>
+          </div>
+          <div class="gamble-controls">
+            <label class="gamble-lbl">Bet Amount</label>
+            <div class="gamble-input-row">
+              <input type="number" id="cf-bet" class="gamble-input" min="10" value="100" placeholder="Min 10">
+              <button class="gamble-quick" onclick="document.getElementById('cf-bet').value=Math.floor(parseInt(document.getElementById('gamble-balance').textContent)/2)||10">½</button>
+              <button class="gamble-quick" onclick="document.getElementById('cf-bet').value=document.getElementById('gamble-balance').textContent">Max</button>
+            </div>
+            <label class="gamble-lbl" style="margin-top:.6rem;">Pick Side</label>
+            <div class="cf-choice-row">
+              <button class="cf-choice active" id="cf-heads" onclick="cfPick('heads')">&#129689; Heads</button>
+              <button class="cf-choice" id="cf-tails" onclick="cfPick('tails')">&#127765; Tails</button>
+            </div>
+            <div class="gamble-payout">Win: <span id="cf-payout">2.00×</span> — Potential: <span id="cf-potential">200</span> coins</div>
+            <button class="gamble-play-btn" id="cf-play" onclick="playCoinflip()">Flip Coin</button>
+            <div class="gamble-result" id="cf-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── DICE ROLL ─────────────────────────────────────────────── -->
+      <div class="gamble-game" id="game-dice" style="display:none;">
+        <div class="gamble-game-inner">
+          <div class="dice-visual">
+            <div class="dice-bar-track">
+              <div class="dice-bar-fill" id="dice-fill" style="width:50%"></div>
+              <div class="dice-bar-marker" id="dice-marker" style="left:50%"></div>
+              <div class="dice-bar-roll" id="dice-roll-marker" style="display:none;"></div>
+            </div>
+            <div class="dice-labels"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
+          </div>
+          <div class="gamble-controls">
+            <label class="gamble-lbl">Bet Amount</label>
+            <div class="gamble-input-row">
+              <input type="number" id="dice-bet" class="gamble-input" min="10" value="100" placeholder="Min 10">
+              <button class="gamble-quick" onclick="document.getElementById('dice-bet').value=Math.floor(parseInt(document.getElementById('gamble-balance').textContent)/2)||10">½</button>
+              <button class="gamble-quick" onclick="document.getElementById('dice-bet').value=document.getElementById('gamble-balance').textContent">Max</button>
+            </div>
+            <label class="gamble-lbl" style="margin-top:.6rem;">Target Number</label>
+            <input type="range" id="dice-target" min="5" max="95" value="50" class="dice-slider" oninput="updateDice()">
+            <div class="dice-info-row">
+              <span>Target: <strong id="dice-target-val">50</strong></span>
+              <span>Multiplier: <strong id="dice-mult">1.96×</strong></span>
+              <span>Win Chance: <strong id="dice-chance">50%</strong></span>
+            </div>
+            <label class="gamble-lbl" style="margin-top:.6rem;">Direction</label>
+            <div class="cf-choice-row">
+              <button class="cf-choice active" id="dice-over" onclick="dicePick('over')">&#9650; Roll Over</button>
+              <button class="cf-choice" id="dice-under" onclick="dicePick('under')">&#9660; Roll Under</button>
+            </div>
+            <button class="gamble-play-btn" onclick="playDice()">Roll Dice</button>
+            <div class="gamble-result" id="dice-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MINES ─────────────────────────────────────────────────── -->
+      <div class="gamble-game" id="game-mines" style="display:none;">
+        <div class="gamble-game-inner">
+          <div class="mines-grid" id="mines-grid"></div>
+          <div class="gamble-controls">
+            <div id="mines-setup">
+              <label class="gamble-lbl">Bet Amount</label>
+              <div class="gamble-input-row">
+                <input type="number" id="mines-bet" class="gamble-input" min="10" value="100" placeholder="Min 10">
+                <button class="gamble-quick" onclick="document.getElementById('mines-bet').value=Math.floor(parseInt(document.getElementById('gamble-balance').textContent)/2)||10">½</button>
+                <button class="gamble-quick" onclick="document.getElementById('mines-bet').value=document.getElementById('gamble-balance').textContent">Max</button>
+              </div>
+              <label class="gamble-lbl" style="margin-top:.6rem;">Number of Mines</label>
+              <div class="gamble-input-row">
+                <input type="number" id="mines-count" class="gamble-input" min="1" max="24" value="5">
+              </div>
+              <button class="gamble-play-btn" onclick="startMines()">Start Game</button>
+            </div>
+            <div id="mines-active" style="display:none;">
+              <div class="mines-info">
+                <div>Multiplier: <strong id="mines-mult">1.00×</strong></div>
+                <div>Potential: <strong id="mines-potential">0</strong> coins</div>
+                <div>Safe tiles left: <strong id="mines-safe">20</strong></div>
+              </div>
+              <button class="gamble-play-btn gamble-cashout-btn" onclick="cashoutMines()">Cash Out</button>
+            </div>
+            <div class="gamble-result" id="mines-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- History panel -->
+      <div class="gamble-history" id="gamble-history" style="display:none;">
+        <h3 style="font-size:.9rem;margin-bottom:.5rem;">Recent Games</h3>
+        <div id="gamble-history-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deposit Modal -->
+  <div class="modal-overlay" id="deposit-overlay" onclick="if(event.target===this)closeDepositModal()">
+    <div class="modal-box" style="max-width:400px;">
+      <button class="modal-close" onclick="closeDepositModal()">&times;</button>
+      <h2 style="font-size:1.1rem;margin-bottom:.3rem;">&#129689; Deposit Coins</h2>
+      <p style="color:var(--muted);font-size:.78rem;margin-bottom:1rem;">$1 = 100 coins. Pay with crypto.</p>
+      <label class="gamble-lbl">Amount (USD)</label>
+      <input type="number" id="deposit-amount" class="gamble-input" min="1" max="500" value="5" style="width:100%;margin-bottom:.5rem;" oninput="document.getElementById('deposit-coins-preview').textContent=Math.floor((parseFloat(this.value)||0)*100)">
+      <div style="color:var(--orange);font-size:.85rem;font-weight:700;margin-bottom:.75rem;">You'll receive <span id="deposit-coins-preview">500</span> coins</div>
+      <label class="gamble-lbl">Email (for receipt)</label>
+      <input type="email" id="deposit-email" class="gamble-input" style="width:100%;margin-bottom:1rem;" placeholder="your@email.com">
+      <button class="gamble-play-btn" style="width:100%;" onclick="processDeposit()">Pay with Crypto</button>
+      <div class="gamble-result" id="deposit-result" style="margin-top:.5rem;"></div>
     </div>
   </div>
 
@@ -1571,10 +1805,9 @@
         return `<div class="product-card reveal${oos?' oos':''}" style="transition-delay:${(products.indexOf(p)%4)*0.07}s"${clickAttr}>
           <div class="card-thumb">
             ${thumb}
-            <span class="card-badge">INSTANT</span>
+            <span class="card-badge">${dur}</span>
             ${newBadge}
             ${stockBadge(p.stock)}
-            <span class="card-duration">${dur}</span>
             ${udBadge}
             <div class="card-hover-bar">
               <button class="chb-btn" onclick="event.stopPropagation();addToCart(${ri},this)">+ Cart</button>
@@ -2123,9 +2356,14 @@
     function addToCart(idx, btn){
       const p = _all[idx]; if(!p) return;
       const min = p.min_order_amount||1;
+      const maxStock = (p.stock!==undefined && p.stock!==null) ? p.stock : 9999;
+      if(maxStock<=0){ if(btn){ btn.textContent='✗ OOS'; setTimeout(()=>{ btn.textContent='+ Cart'; },1200); } return; }
       const existing = _cart.find(c=>c.idx===idx);
-      if(existing){ existing.qty = Math.min(existing.qty+min, 9999); }
-      else { _cart.push({idx, name:p.name, price:p.price, min_qty:min, qty:min, thumbnail_url:p.thumbnail_url||'', payment_methods:p.payment_methods||['CRYPTO','CREDITCARD']}); }
+      if(existing){
+        if(existing.qty>=maxStock){ if(btn){ btn.textContent='Max stock'; btn.classList.add('added'); setTimeout(()=>{ btn.textContent='+ Cart'; btn.classList.remove('added'); },1400); } return; }
+        existing.qty = Math.min(existing.qty+min, maxStock);
+      }
+      else { _cart.push({idx, name:p.name, price:p.price, min_qty:min, qty:Math.min(min, maxStock), stock:maxStock, thumbnail_url:p.thumbnail_url||'', payment_methods:p.payment_methods||['CRYPTO','CREDITCARD']}); }
       cartSave(); renderCart();
       if(btn){ btn.textContent='✓ Added'; btn.classList.add('added'); setTimeout(()=>{ btn.textContent='+ Cart'; btn.classList.remove('added'); },1400); }
       openCart();
@@ -2134,7 +2372,9 @@
     function cartRemove(idx){ _cart=_cart.filter(c=>c.idx!==idx); cartSave(); renderCart(); }
     function cartSetQty(idx, qty){
       const item=_cart.find(c=>c.idx===idx); if(!item) return;
-      const newQty=Math.max(item.min_qty, parseInt(qty)||item.min_qty);
+      const p = _all[idx];
+      const maxStock = (p && p.stock!==undefined && p.stock!==null) ? p.stock : (item.stock||9999);
+      const newQty=Math.min(Math.max(item.min_qty, parseInt(qty)||item.min_qty), maxStock);
       item.qty=newQty; cartSave(); renderCart();
     }
 
@@ -3205,8 +3445,15 @@
         const r = await fetch('/api/auth/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,code})});
         const d = await r.json();
         if(d.ok){
-          authMsg('verify-msg','Email verified! You can now log in.','success');
-          setTimeout(()=>showPanel('login'), 1500);
+          if(d.token && d.username){
+            localStorage.setItem('abysshub_token', d.token);
+            localStorage.setItem('abysshub_user', d.username);
+            authMsg('verify-msg','Email verified! Logging you in…','success');
+            setTimeout(()=>{ updateNavAuth(); closeAuth(); }, 1000);
+          } else {
+            authMsg('verify-msg','Email verified! You can now log in.','success');
+            setTimeout(()=>showPanel('login'), 1500);
+          }
         } else { authMsg('verify-msg', d.msg||'Verification failed.','error'); }
       } catch{ authMsg('verify-msg','Network error.','error'); }
       btn.disabled = false;
@@ -3681,6 +3928,322 @@
     window.openVouch = openVouch;
     window.closeVouch = closeVouch;
     window.submitVouch = submitVouch;
+
+    // ── GAMBLING SYSTEM ─────────────────────────────────────────────────
+
+    let _gambleChoice = 'heads';
+    let _diceDirection = 'over';
+
+    function _authHeaders(){
+      const t = localStorage.getItem('abysshub_token');
+      return t ? {'Authorization':'Bearer '+t, 'Content-Type':'application/json'} : null;
+    }
+
+    async function refreshGambleBalance(){
+      const h = _authHeaders();
+      if(!h) return;
+      try{
+        const r = await fetch('/api/coins/balance',{headers:h});
+        const d = await r.json();
+        if(d.ok) document.getElementById('gamble-balance').textContent = d.balance;
+      } catch{}
+    }
+
+    // Show/hide gambling UI based on auth state
+    function updateGambleAuth(){
+      const token = localStorage.getItem('abysshub_token');
+      const gate = document.getElementById('gamble-auth-gate');
+      const app = document.getElementById('gamble-app');
+      if(token){
+        gate.style.display='none'; app.style.display='block';
+        refreshGambleBalance();
+        initMinesGrid();
+      } else {
+        gate.style.display='block'; app.style.display='none';
+      }
+    }
+
+    // Hook into nav auth updates
+    const _origUpdateNavAuth = updateNavAuth;
+    window.updateNavAuth = function(){
+      _origUpdateNavAuth();
+      updateGambleAuth();
+    };
+    // Init on page load
+    setTimeout(updateGambleAuth, 500);
+
+    function switchGame(game, btn){
+      document.querySelectorAll('.gamble-tab').forEach(t=>t.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.gamble-game').forEach(g=>g.style.display='none');
+      document.getElementById('game-'+game).style.display='block';
+    }
+
+    // ── Coin Flip ───────────────────────────────────────────────────────
+    function cfPick(side){
+      _gambleChoice = side;
+      document.getElementById('cf-heads').classList.toggle('active', side==='heads');
+      document.getElementById('cf-tails').classList.toggle('active', side==='tails');
+      updateCfPotential();
+    }
+
+    function updateCfPotential(){
+      const bet = parseInt(document.getElementById('cf-bet').value)||0;
+      document.getElementById('cf-potential').textContent = bet*2;
+    }
+    document.getElementById('cf-bet').addEventListener('input', updateCfPotential);
+
+    async function playCoinflip(){
+      const h = _authHeaders();
+      if(!h) return openAuthModal('login');
+      const btn = document.getElementById('cf-play');
+      btn.disabled = true;
+      const bet = parseInt(document.getElementById('cf-bet').value)||0;
+      try{
+        const r = await fetch('/api/gamble/coinflip',{method:'POST',headers:h,body:JSON.stringify({bet,choice:_gambleChoice})});
+        const d = await r.json();
+        if(!d.ok){ showGambleResult('cf-result', d.msg||'Error', false); btn.disabled=false; return; }
+        // Animate coin
+        const coin = document.getElementById('cf-coin');
+        coin.innerHTML = '<div class="cf-coin-inner" id="cf-coin-inner"><div class="cf-side cf-heads">H</div><div class="cf-side cf-tails">T</div></div>';
+        const inner = document.getElementById('cf-coin-inner');
+        const isHeads = d.outcome === 'heads';
+        inner.style.animation = isHeads ? 'coinFlipAnim .8s ease-in-out' : 'coinFlipToTails .8s ease-in-out';
+        inner.style.animationFillMode = 'forwards';
+        setTimeout(()=>{
+          document.getElementById('gamble-balance').textContent = d.balance;
+          if(d.won){
+            showGambleResult('cf-result', `🎉 ${d.outcome.toUpperCase()}! You won ${d.payout} coins!`, true);
+          } else {
+            showGambleResult('cf-result', `💀 ${d.outcome.toUpperCase()}! You lost ${bet} coins.`, false);
+          }
+          btn.disabled = false;
+        }, 900);
+      } catch{ showGambleResult('cf-result','Network error.', false); btn.disabled=false; }
+    }
+
+    // ── Dice ────────────────────────────────────────────────────────────
+    function dicePick(dir){
+      _diceDirection = dir;
+      document.getElementById('dice-over').classList.toggle('active', dir==='over');
+      document.getElementById('dice-under').classList.toggle('active', dir==='under');
+      updateDice();
+    }
+
+    function updateDice(){
+      const target = parseInt(document.getElementById('dice-target').value);
+      const dir = _diceDirection;
+      const winChance = dir==='over' ? (100-target) : (target-1);
+      const mult = winChance > 0 ? Math.min((98/winChance), 50).toFixed(2) : '0.00';
+      document.getElementById('dice-target-val').textContent = target;
+      document.getElementById('dice-mult').textContent = mult + '×';
+      document.getElementById('dice-chance').textContent = winChance + '%';
+      // Visual bar
+      if(dir==='over'){
+        document.getElementById('dice-fill').style.width = target+'%';
+        document.getElementById('dice-fill').style.background = 'linear-gradient(90deg,#e63946,#ff6666)';
+      } else {
+        document.getElementById('dice-fill').style.width = target+'%';
+        document.getElementById('dice-fill').style.background = 'linear-gradient(90deg,#3ddc84,#6dff6d)';
+      }
+      document.getElementById('dice-marker').style.left = target+'%';
+    }
+
+    async function playDice(){
+      const h = _authHeaders();
+      if(!h) return openAuthModal('login');
+      const bet = parseInt(document.getElementById('dice-bet').value)||0;
+      const target = parseInt(document.getElementById('dice-target').value);
+      try{
+        const r = await fetch('/api/gamble/dice',{method:'POST',headers:h,body:JSON.stringify({bet,target,direction:_diceDirection})});
+        const d = await r.json();
+        if(!d.ok){ showGambleResult('dice-result', d.msg||'Error', false); return; }
+        // Show roll marker
+        const marker = document.getElementById('dice-roll-marker');
+        marker.style.display = 'block';
+        marker.style.left = d.roll + '%';
+        document.getElementById('gamble-balance').textContent = d.balance;
+        if(d.won){
+          showGambleResult('dice-result', `🎲 Rolled ${d.roll}! You won ${d.payout} coins (${d.multiplier}×)!`, true);
+        } else {
+          showGambleResult('dice-result', `🎲 Rolled ${d.roll}. You lost ${bet} coins.`, false);
+        }
+        setTimeout(()=>{ marker.style.display='none'; }, 3000);
+      } catch{ showGambleResult('dice-result','Network error.', false); }
+    }
+
+    // ── Mines ───────────────────────────────────────────────────────────
+    let _minesActive = false;
+
+    function initMinesGrid(){
+      const grid = document.getElementById('mines-grid');
+      if(!grid) return;
+      grid.innerHTML = '';
+      for(let i=0;i<25;i++){
+        const tile = document.createElement('div');
+        tile.className = 'mine-tile';
+        tile.dataset.idx = i;
+        tile.textContent = '?';
+        tile.addEventListener('click', ()=> revealMine(i, tile));
+        grid.appendChild(tile);
+      }
+    }
+
+    async function startMines(){
+      const h = _authHeaders();
+      if(!h) return openAuthModal('login');
+      const bet = parseInt(document.getElementById('mines-bet').value)||0;
+      const mines = parseInt(document.getElementById('mines-count').value)||5;
+      try{
+        const r = await fetch('/api/gamble/mines/start',{method:'POST',headers:h,body:JSON.stringify({bet,mines})});
+        const d = await r.json();
+        if(!d.ok){ showGambleResult('mines-result', d.msg||'Error', false); return; }
+        _minesActive = true;
+        document.getElementById('gamble-balance').textContent = d.balance;
+        document.getElementById('mines-setup').style.display='none';
+        document.getElementById('mines-active').style.display='block';
+        document.getElementById('mines-mult').textContent = '1.00×';
+        document.getElementById('mines-potential').textContent = bet;
+        document.getElementById('mines-safe').textContent = 25 - mines;
+        document.getElementById('mines-result').textContent = '';
+        document.getElementById('mines-result').className = 'gamble-result';
+        initMinesGrid();
+      } catch{ showGambleResult('mines-result','Network error.', false); }
+    }
+
+    async function revealMine(idx, tile){
+      if(!_minesActive || tile.classList.contains('revealed') || tile.classList.contains('boom')) return;
+      const h = _authHeaders();
+      if(!h) return;
+      try{
+        const r = await fetch('/api/gamble/mines/reveal',{method:'POST',headers:h,body:JSON.stringify({tile:idx})});
+        const d = await r.json();
+        if(!d.ok){ showGambleResult('mines-result', d.msg||'Error', false); return; }
+        if(d.mine){
+          // Hit a mine — game over
+          tile.classList.add('boom');
+          tile.textContent = '💣';
+          _minesActive = false;
+          document.getElementById('gamble-balance').textContent = d.balance;
+          // Show all mines
+          if(d.mines) d.mines.forEach(m=>{
+            const t = document.querySelector(`.mine-tile[data-idx="${m}"]`);
+            if(t && !t.classList.contains('boom')){ t.classList.add('mine-show'); t.textContent = '💣'; }
+          });
+          document.getElementById('mines-setup').style.display='block';
+          document.getElementById('mines-active').style.display='none';
+          showGambleResult('mines-result', `💥 BOOM! Hit a mine. You lost your bet.`, false);
+        } else {
+          tile.classList.add('revealed');
+          tile.textContent = '💎';
+          document.getElementById('mines-mult').textContent = d.multiplier + '×';
+          document.getElementById('mines-potential').textContent = d.potential_payout;
+          document.getElementById('mines-safe').textContent = d.safe_remaining;
+          if(d.safe_remaining === 0){
+            // All safe tiles revealed — auto cashout
+            cashoutMines();
+          }
+        }
+      } catch{ showGambleResult('mines-result','Network error.', false); }
+    }
+
+    async function cashoutMines(){
+      if(!_minesActive) return;
+      const h = _authHeaders();
+      if(!h) return;
+      try{
+        const r = await fetch('/api/gamble/mines/cashout',{method:'POST',headers:h});
+        const d = await r.json();
+        if(!d.ok){ showGambleResult('mines-result', d.msg||'Error', false); return; }
+        _minesActive = false;
+        document.getElementById('gamble-balance').textContent = d.balance;
+        // Show all mines
+        if(d.mines) d.mines.forEach(m=>{
+          const t = document.querySelector(`.mine-tile[data-idx="${m}"]`);
+          if(t){ t.classList.add('mine-show'); t.textContent = '💣'; }
+        });
+        document.getElementById('mines-setup').style.display='block';
+        document.getElementById('mines-active').style.display='none';
+        showGambleResult('mines-result', `💰 Cashed out! ${d.payout} coins (${d.multiplier}×)`, true);
+      } catch{ showGambleResult('mines-result','Network error.', false); }
+    }
+
+    // ── Helpers ─────────────────────────────────────────────────────────
+    function showGambleResult(id, msg, won){
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.className = 'gamble-result ' + (won ? 'win' : 'loss');
+    }
+
+    function toggleGambleHistory(){
+      const panel = document.getElementById('gamble-history');
+      if(panel.style.display === 'none'){
+        panel.style.display = 'block';
+        loadGambleHistory();
+      } else {
+        panel.style.display = 'none';
+      }
+    }
+
+    async function loadGambleHistory(){
+      const h = _authHeaders();
+      if(!h) return;
+      try{
+        const r = await fetch('/api/gamble/history',{headers:h});
+        const d = await r.json();
+        if(!d.ok) return;
+        const list = document.getElementById('gamble-history-list');
+        if(!d.history.length){ list.innerHTML='<div style="color:var(--muted);font-size:.8rem;text-align:center;padding:.5rem;">No games yet.</div>'; return; }
+        list.innerHTML = d.history.map(h=>{
+          const won = h.payout > 0;
+          const time = new Date(h.created_at*1000).toLocaleString();
+          return `<div class="gh-row"><span class="gh-game">${h.game}</span><span class="gh-bet">${h.bet} coins</span><span class="gh-payout ${won?'win':'loss'}">${won?'+'+h.payout:'-'+h.bet}</span><span style="color:var(--muted);font-size:.65rem;">${time}</span></div>`;
+        }).join('');
+      } catch{}
+    }
+
+    // ── Deposit ─────────────────────────────────────────────────────────
+    function openDepositModal(){
+      document.getElementById('deposit-overlay').classList.add('open');
+      document.getElementById('deposit-result').textContent = '';
+      document.getElementById('deposit-result').className = 'gamble-result';
+    }
+    function closeDepositModal(){
+      document.getElementById('deposit-overlay').classList.remove('open');
+    }
+
+    async function processDeposit(){
+      const h = _authHeaders();
+      if(!h) return openAuthModal('login');
+      const amount = parseFloat(document.getElementById('deposit-amount').value)||0;
+      const email = document.getElementById('deposit-email').value.trim();
+      if(amount < 1){ showGambleResult('deposit-result','Minimum $1.', false); return; }
+      if(!email){ showGambleResult('deposit-result','Enter your email.', false); return; }
+      try{
+        const r = await fetch('/api/coins/deposit',{method:'POST',headers:h,body:JSON.stringify({amount,email})});
+        const d = await r.json();
+        if(d.ok && d.redirect_url){
+          showGambleResult('deposit-result','Redirecting to payment…', true);
+          setTimeout(()=>{ window.open(d.redirect_url, '_blank'); }, 500);
+        } else {
+          showGambleResult('deposit-result', d.msg||'Failed to create payment.', false);
+        }
+      } catch{ showGambleResult('deposit-result','Network error.', false); }
+    }
+
+    window.switchGame = switchGame;
+    window.cfPick = cfPick;
+    window.playCoinflip = playCoinflip;
+    window.dicePick = dicePick;
+    window.updateDice = updateDice;
+    window.playDice = playDice;
+    window.startMines = startMines;
+    window.cashoutMines = cashoutMines;
+    window.toggleGambleHistory = toggleGambleHistory;
+    window.openDepositModal = openDepositModal;
+    window.closeDepositModal = closeDepositModal;
+    window.processDeposit = processDeposit;
+
   })();
   </script>
 

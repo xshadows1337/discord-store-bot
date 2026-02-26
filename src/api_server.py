@@ -824,8 +824,12 @@ async def start_api_server(secret: str, port: int = 8080):
         email = (body.get('email') or '').strip()
         code  = (body.get('code') or '').strip()
         from utils.auth import verify_email
-        ok, msg = verify_email(email, code)
-        return web.json_response({'ok': ok, 'msg': msg}, status=200 if ok else 422)
+        ok, msg, token, username = verify_email(email, code)
+        resp = {'ok': ok, 'msg': msg}
+        if ok and token:
+            resp['token'] = token
+            resp['username'] = username
+        return web.json_response(resp, status=200 if ok else 422)
 
     async def auth_login(request):
         ip = _get_ip(request)
@@ -892,6 +896,183 @@ async def start_api_server(secret: str, port: int = 8080):
     app.router.add_post('/api/auth/forgot',   auth_forgot)
     app.router.add_post('/api/auth/reset',    auth_reset)
     app.router.add_get('/api/auth/me',        auth_me)
+
+    # ── Gambling & Coins ────────────────────────────────────────────────────
+
+    def _auth_user(request):
+        """Helper: verify JWT from Authorization header. Returns (uid, username) or None."""
+        auth_header = request.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return None
+        from utils.auth import verify_token
+        data = verify_token(auth_header[7:])
+        if not data:
+            return None
+        return data.get('uid'), data.get('usr')
+
+    async def coins_balance(request):
+        auth = _auth_user(request)
+        if not auth:
+            return web.json_response({'ok': False}, status=401)
+        from utils.gambling import get_balance
+        return web.json_response({'ok': True, 'balance': get_balance(auth[0])})
+
+    async def coins_deposit(request):
+        """Create a crypto payment for coins. $1 = 100 coins."""
+        auth = _auth_user(request)
+        if not auth:
+            return web.json_response({'ok': False}, status=401)
+        ip = _get_ip(request)
+        if _sliding_window(_rate_co, ip, _CO_WINDOW, _CO_MAX):
+            return web.Response(status=429, text='Too many requests.')
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+        amount_usd = float(body.get('amount', 0))
+        if amount_usd < 1 or amount_usd > 500:
+            return web.json_response({'ok': False, 'msg': 'Deposit must be $1-$500.'}, status=422)
+        email = body.get('email', '').strip()
+        if not email:
+            return web.json_response({'ok': False, 'msg': 'Email required.'}, status=422)
+        # Create crypto checkout for coin deposit
+        try:
+            import asyncio as _aio
+            loop = _aio.get_running_loop()
+            from utils.crypto_api import createOrder
+            order = await loop.run_in_executor(
+                None, lambda: createOrder(amount_usd, 1, email, f'AbyssHub Coins — {int(amount_usd * 100)} coins')
+            )
+            if not order:
+                return web.Response(status=502, text='Failed to create payment.')
+            checkout_link = order.get('checkoutLink') or order.get('checkoutLinkWithCustomCSS')
+            if not checkout_link:
+                return web.Response(status=502, text='Failed to get payment link.')
+            # Store pending deposit info in store.db
+            conn = _sql.connect(str(_STORE_DB))
+            conn.execute('''CREATE TABLE IF NOT EXISTS pending_deposits (
+                id TEXT PRIMARY KEY, user_id INTEGER NOT NULL, coins INTEGER NOT NULL,
+                amount_usd REAL NOT NULL, status TEXT DEFAULT 'pending', created_at INTEGER NOT NULL
+            )''')
+            order_id = order.get('id') or order.get('invoiceId') or str(uuid.uuid4())
+            coins = int(amount_usd * 100)
+            conn.execute(
+                'INSERT OR REPLACE INTO pending_deposits (id, user_id, coins, amount_usd, status, created_at) VALUES (?,?,?,?,?,?)',
+                (str(order_id), auth[0], coins, amount_usd, 'pending', int(time.time()))
+            )
+            conn.commit()
+            conn.close()
+            return web.json_response({'ok': True, 'redirect_url': checkout_link, 'coins': coins})
+        except Exception as e:
+            logger.error(f'Coin deposit error: {e}')
+            return web.Response(status=500, text='Internal error')
+
+    async def coins_credit_manual(request):
+        """Manual coin credit (admin or webhook callback). For testing: POST with user_id + coins."""
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+        admin_key = body.get('admin_key', '')
+        expected = os.environ.get('ADMIN_KEY', 'abysshub_admin_2026')
+        if not hmac.compare_digest(admin_key, expected):
+            return web.json_response({'ok': False}, status=403)
+        user_id = int(body.get('user_id', 0))
+        coins = int(body.get('coins', 0))
+        if user_id <= 0 or coins <= 0:
+            return web.json_response({'ok': False, 'msg': 'Invalid user_id or coins.'}, status=422)
+        from utils.gambling import add_coins
+        new_bal = add_coins(user_id, coins, 'Manual credit (admin)')
+        return web.json_response({'ok': True, 'balance': new_bal})
+
+    async def coins_history(request):
+        auth = _auth_user(request)
+        if not auth:
+            return web.json_response({'ok': False}, status=401)
+        from utils.gambling import get_transactions
+        return web.json_response({'ok': True, 'transactions': get_transactions(auth[0])})
+
+    async def gamble_coinflip(request):
+        auth = _auth_user(request)
+        if not auth:
+            return web.json_response({'ok': False}, status=401)
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+        bet = int(body.get('bet', 0))
+        choice = (body.get('choice') or '').lower()
+        from utils.gambling import coinflip
+        result = coinflip(auth[0], bet, choice)
+        return web.json_response(result)
+
+    async def gamble_dice(request):
+        auth = _auth_user(request)
+        if not auth:
+            return web.json_response({'ok': False}, status=401)
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+        bet = int(body.get('bet', 0))
+        target = int(body.get('target', 50))
+        direction = (body.get('direction') or '').lower()
+        from utils.gambling import dice_roll
+        result = dice_roll(auth[0], bet, target, direction)
+        return web.json_response(result)
+
+    async def gamble_mines_start(request):
+        auth = _auth_user(request)
+        if not auth:
+            return web.json_response({'ok': False}, status=401)
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+        bet = int(body.get('bet', 0))
+        mine_count = int(body.get('mines', 5))
+        from utils.gambling import mines_start
+        result = mines_start(auth[0], bet, mine_count)
+        return web.json_response(result)
+
+    async def gamble_mines_reveal(request):
+        auth = _auth_user(request)
+        if not auth:
+            return web.json_response({'ok': False}, status=401)
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+        tile = int(body.get('tile', -1))
+        from utils.gambling import mines_reveal
+        result = mines_reveal(auth[0], tile)
+        return web.json_response(result)
+
+    async def gamble_mines_cashout(request):
+        auth = _auth_user(request)
+        if not auth:
+            return web.json_response({'ok': False}, status=401)
+        from utils.gambling import mines_cashout
+        result = mines_cashout(auth[0])
+        return web.json_response(result)
+
+    async def gamble_history(request):
+        auth = _auth_user(request)
+        if not auth:
+            return web.json_response({'ok': False}, status=401)
+        from utils.gambling import get_history
+        return web.json_response({'ok': True, 'history': get_history(auth[0])})
+
+    app.router.add_get('/api/coins/balance',       coins_balance)
+    app.router.add_post('/api/coins/deposit',      coins_deposit)
+    app.router.add_post('/api/coins/credit',       coins_credit_manual)
+    app.router.add_get('/api/coins/history',       coins_history)
+    app.router.add_post('/api/gamble/coinflip',    gamble_coinflip)
+    app.router.add_post('/api/gamble/dice',        gamble_dice)
+    app.router.add_post('/api/gamble/mines/start', gamble_mines_start)
+    app.router.add_post('/api/gamble/mines/reveal',gamble_mines_reveal)
+    app.router.add_post('/api/gamble/mines/cashout',gamble_mines_cashout)
+    app.router.add_get('/api/gamble/history',      gamble_history)
 
     # ── Live Support Relay ──────────────────────────────────────────────────
 
