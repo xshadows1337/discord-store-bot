@@ -322,6 +322,13 @@
       .footer-grid { grid-template-columns:repeat(2,1fr); gap:1.25rem; }
     }
     @media(max-width:640px){
+      /* iOS: prevent auto-zoom on input focus — all inputs must be >= 16px */
+      input, select, textarea, .form-input, .promo-input, #chat-input { font-size:16px !important; }
+      /* Promo row: stack vertically so Apply button isn't cramped */
+      .promo-row { flex-direction:column; gap:.4rem; }
+      .promo-apply { width:100%; padding:.55rem; font-size:.85rem; }
+      /* Method tabs: larger touch targets */
+      .method-tab { min-height:44px; font-size:.78rem; }
       /* Nav */
       nav { gap:.5rem; padding:0 .75rem; height:54px; }
       .nav-search { display:none; }
@@ -1664,7 +1671,7 @@
       </div>
       <div class="form-group">
         <label for="modal-qty">Quantity <span id="modal-min-label" style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;font-size:.72rem;"></span></label>
-        <input class="form-input" type="number" id="modal-qty" value="1" min="1" step="1">
+        <input class="form-input" type="number" id="modal-qty" value="1" min="1" step="1" inputmode="numeric">
       </div>
       <div class="form-group" id="promo-group">
         <label style="font-size:.75rem;display:flex;align-items:center;gap:.35rem">&#127920; Promo Code <span style="color:var(--muted);font-weight:400;font-size:.68rem">(crypto only)</span></label>
