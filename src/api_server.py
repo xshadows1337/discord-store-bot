@@ -941,7 +941,7 @@ async def start_api_server(secret: str, port: int = 8080):
             loop = _aio.get_running_loop()
             from utils.crypto_api import createOrder
             order = await loop.run_in_executor(
-                None, lambda: createOrder(amount_usd, 1, email, f'AbyssHub Coins — {int(amount_usd * 100)} coins')
+                None, lambda: createOrder(amount_usd, 1, email, f'AbyssHub Coins — {int(amount_usd * 10)} coins')
             )
             if not order:
                 return web.Response(status=502, text='Failed to create payment.')
@@ -955,7 +955,7 @@ async def start_api_server(secret: str, port: int = 8080):
                 amount_usd REAL NOT NULL, status TEXT DEFAULT 'pending', created_at INTEGER NOT NULL
             )''')
             order_id = order.get('id') or order.get('invoiceId') or str(uuid.uuid4())
-            coins = int(amount_usd * 100)
+            coins = int(amount_usd * 10)
             conn.execute(
                 'INSERT OR REPLACE INTO pending_deposits (id, user_id, coins, amount_usd, status, created_at) VALUES (?,?,?,?,?,?)',
                 (str(order_id), auth[0], coins, amount_usd, 'pending', int(time.time()))

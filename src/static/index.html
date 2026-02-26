@@ -1338,7 +1338,7 @@
           <div class="gamble-controls">
             <label class="gamble-lbl">Bet Amount</label>
             <div class="gamble-input-row">
-              <input type="number" id="cf-bet" class="gamble-input" min="10" value="100" placeholder="Min 10">
+              <input type="number" id="cf-bet" class="gamble-input" min="2" value="5" placeholder="Min 2">
               <button class="gamble-quick" onclick="document.getElementById('cf-bet').value=Math.floor(parseInt(document.getElementById('gamble-balance').textContent)/2)||10">½</button>
               <button class="gamble-quick" onclick="document.getElementById('cf-bet').value=document.getElementById('gamble-balance').textContent">Max</button>
             </div>
@@ -1368,7 +1368,7 @@
           <div class="gamble-controls">
             <label class="gamble-lbl">Bet Amount</label>
             <div class="gamble-input-row">
-              <input type="number" id="dice-bet" class="gamble-input" min="10" value="100" placeholder="Min 10">
+              <input type="number" id="dice-bet" class="gamble-input" min="2" value="5" placeholder="Min 2">
               <button class="gamble-quick" onclick="document.getElementById('dice-bet').value=Math.floor(parseInt(document.getElementById('gamble-balance').textContent)/2)||10">½</button>
               <button class="gamble-quick" onclick="document.getElementById('dice-bet').value=document.getElementById('gamble-balance').textContent">Max</button>
             </div>
@@ -1398,7 +1398,7 @@
             <div id="mines-setup">
               <label class="gamble-lbl">Bet Amount</label>
               <div class="gamble-input-row">
-                <input type="number" id="mines-bet" class="gamble-input" min="10" value="100" placeholder="Min 10">
+                <input type="number" id="mines-bet" class="gamble-input" min="2" value="5" placeholder="Min 2">
                 <button class="gamble-quick" onclick="document.getElementById('mines-bet').value=Math.floor(parseInt(document.getElementById('gamble-balance').textContent)/2)||10">½</button>
                 <button class="gamble-quick" onclick="document.getElementById('mines-bet').value=document.getElementById('gamble-balance').textContent">Max</button>
               </div>
@@ -1434,10 +1434,10 @@
     <div class="modal-box" style="max-width:400px;">
       <button class="modal-close" onclick="closeDepositModal()">&times;</button>
       <h2 style="font-size:1.1rem;margin-bottom:.3rem;">&#129689; Deposit Coins</h2>
-      <p style="color:var(--muted);font-size:.78rem;margin-bottom:1rem;">$1 = 100 coins. Pay with crypto.</p>
+      <p style="color:var(--muted);font-size:.78rem;margin-bottom:1rem;">$1 = 10 coins &nbsp;(1 coin = $0.10). Pay with crypto.</p>
       <label class="gamble-lbl">Amount (USD)</label>
-      <input type="number" id="deposit-amount" class="gamble-input" min="1" max="500" value="5" style="width:100%;margin-bottom:.5rem;" oninput="document.getElementById('deposit-coins-preview').textContent=Math.floor((parseFloat(this.value)||0)*100)">
-      <div style="color:var(--orange);font-size:.85rem;font-weight:700;margin-bottom:.75rem;">You'll receive <span id="deposit-coins-preview">500</span> coins</div>
+      <input type="number" id="deposit-amount" class="gamble-input" min="1" max="500" value="5" style="width:100%;margin-bottom:.5rem;" oninput="document.getElementById('deposit-coins-preview').textContent=Math.floor((parseFloat(this.value)||0)*10)">
+      <div style="color:var(--orange);font-size:.85rem;font-weight:700;margin-bottom:.75rem;">You'll receive <span id="deposit-coins-preview">50</span> coins</div>
       <label class="gamble-lbl">Email (for receipt)</label>
       <input type="email" id="deposit-email" class="gamble-input" style="width:100%;margin-bottom:1rem;" placeholder="your@email.com">
       <button class="gamble-play-btn" style="width:100%;" onclick="processDeposit()">Pay with Crypto</button>
@@ -3537,6 +3537,8 @@
       }
       // sync sidebar user area
       updateSidebarUser();
+      // sync gambling balance
+      if(typeof updateGambleAuth === 'function') updateGambleAuth();
     }
     function updateSidebarUser(){
       const username = localStorage.getItem('abysshub_user');
@@ -3949,11 +3951,12 @@
       } catch{}
     }
 
-    // Show/hide gambling UI based on auth state
+    // Show/hide gambling UI based on auth state (called from updateNavAuth directly)
     function updateGambleAuth(){
       const token = localStorage.getItem('abysshub_token');
       const gate = document.getElementById('gamble-auth-gate');
       const app = document.getElementById('gamble-app');
+      if(!gate || !app) return;
       if(token){
         gate.style.display='none'; app.style.display='block';
         refreshGambleBalance();
@@ -3962,13 +3965,8 @@
         gate.style.display='block'; app.style.display='none';
       }
     }
+    window.updateGambleAuth = updateGambleAuth;
 
-    // Hook into nav auth updates
-    const _origUpdateNavAuth = updateNavAuth;
-    window.updateNavAuth = function(){
-      _origUpdateNavAuth();
-      updateGambleAuth();
-    };
     // Init on page load
     setTimeout(updateGambleAuth, 500);
 

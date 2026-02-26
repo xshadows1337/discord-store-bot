@@ -2,7 +2,7 @@
 AbyssHub Gambling System
 Coin-based economy: deposit real money → coins → gamble → spend coins on products.
 
-Coin rate: $1 = 100 coins
+Coin rate: $1 = 10 coins  (1 coin = $0.10)
 
 Games:
   - Coin Flip: 2× or 0×  (48% win)
@@ -22,7 +22,7 @@ from loguru import logger
 
 _DB_PATH = Path(__file__).parent.parent / 'users.db'
 
-COIN_RATE = 100  # coins per $1 USD
+COIN_RATE = 10  # coins per $1 USD  (1 coin = $0.10)
 
 # ── DB helpers ────────────────────────────────────────────────────────────────
 
@@ -125,8 +125,8 @@ def coinflip(user_id: int, bet: int, choice: str) -> dict:
     choice: 'heads' or 'tails'
     House edge ~4%: win probability = 48%
     """
-    if bet < 10:
-        return {'ok': False, 'msg': 'Minimum bet is 10 coins.'}
+    if bet < 2:
+        return {'ok': False, 'msg': 'Minimum bet is 2 coins ($0.20).'}
     if choice not in ('heads', 'tails'):
         return {'ok': False, 'msg': 'Choose heads or tails.'}
 
@@ -156,8 +156,8 @@ def dice_roll(user_id: int, bet: int, target: int, direction: str) -> dict:
     Roll 1-100. Bet over or under a target.
     Payout = 98 / win_probability  (2% house edge)
     """
-    if bet < 10:
-        return {'ok': False, 'msg': 'Minimum bet is 10 coins.'}
+    if bet < 2:
+        return {'ok': False, 'msg': 'Minimum bet is 2 coins ($0.20).'}
     if target < 5 or target > 95:
         return {'ok': False, 'msg': 'Target must be between 5 and 95.'}
     if direction not in ('over', 'under'):
@@ -197,8 +197,8 @@ def dice_roll(user_id: int, bet: int, target: int, direction: str) -> dict:
 _active_mines: dict[int, dict] = {}  # user_id → game state
 
 def mines_start(user_id: int, bet: int, mine_count: int = 5) -> dict:
-    if bet < 10:
-        return {'ok': False, 'msg': 'Minimum bet is 10 coins.'}
+    if bet < 2:
+        return {'ok': False, 'msg': 'Minimum bet is 2 coins ($0.20).'}
     if mine_count < 1 or mine_count > 24:
         return {'ok': False, 'msg': 'Mine count must be 1-24.'}
     if user_id in _active_mines:
