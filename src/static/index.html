@@ -157,9 +157,50 @@
 
     .discord-icon { width:16px; height:16px; fill:currentColor; flex-shrink:0; }
     @media(max-width:640px){ nav{gap:.75rem;} .nav-search{display:none;} .statsbar{gap:1.5rem;} .promo{flex-direction:column;text-align:center;} }
+
+    /* BG CANVAS */
+    #bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.45; }
+    body > *:not(#bg-canvas) { position:relative; z-index:1; }
+
+    /* HERO ANIMATIONS */
+    .hero-tag  { animation: fade-down .55s ease both; }
+    .hero h1   { animation: fade-up  .65s .12s ease both; }
+    .hero p    { animation: fade-up  .65s .24s ease both; }
+    .hero-btns { animation: fade-up  .65s .36s ease both; }
+    @keyframes fade-down { from{opacity:0;transform:translateY(-14px);}to{opacity:1;transform:none;} }
+    @keyframes fade-up   { from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;} }
+
+    /* SCROLL REVEAL */
+    .reveal { opacity:0; transform:translateY(22px); transition:opacity .55s ease, transform .55s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+    /* AD POPUP */
+    .adpop { position:fixed; bottom:1.25rem; right:1.25rem; z-index:1200; width:300px;
+      background:var(--card); border:1px solid var(--orange); border-radius:var(--radius);
+      box-shadow:0 8px 32px rgba(0,0,0,.6); overflow:hidden;
+      transform:translateY(120%); opacity:0;
+      transition:transform .4s cubic-bezier(.22,1,.36,1), opacity .4s ease;
+      pointer-events:none; }
+    .adpop.show { transform:none; opacity:1; pointer-events:all; }
+    .adpop-label { background:var(--orange); color:#000; font-size:.62rem; font-weight:900;
+      padding:2px 8px; letter-spacing:.1em; text-transform:uppercase; display:flex;
+      align-items:center; justify-content:space-between; }
+    .adpop-close { background:none; border:none; cursor:pointer; color:#000; font-size:1rem;
+      line-height:1; padding:0 2px; font-weight:900; }
+    .adpop-thumb { width:100%; height:120px; object-fit:cover; display:block; background:#111; }
+    .adpop-thumb-ph { width:100%; height:120px; background:linear-gradient(135deg,#111,#1e1100);
+      display:flex; align-items:center; justify-content:center; font-size:2.5rem; }
+    .adpop-body { padding:.75rem; }
+    .adpop-name { font-size:.82rem; font-weight:700; margin-bottom:.2rem; line-height:1.35; }
+    .adpop-price { font-size:1rem; font-weight:900; color:var(--orange); margin-bottom:.65rem; }
+    .adpop-cta { width:100%; padding:.5rem; background:var(--orange); color:#000; border:none;
+      border-radius:3px; font-weight:700; font-size:.82rem; cursor:pointer; font-family:inherit; }
+    .adpop-cta:hover { background:var(--orange2); }
   </style>
 </head>
 <body>
+
+  <canvas id="bg-canvas"></canvas>
 
   <!-- TOPBAR -->
   <div class="topbar">
@@ -214,7 +255,7 @@
 
   <!-- STATS -->
   <div class="statsbar">
-    <div class="sitem"><div class="snum" id="stat-products">—</div><div class="slbl">Products</div></div>
+    <div class="sitem"><div class="snum" id="stat-products" data-target="0">0</div><div class="slbl">Products</div></div>
     <div class="sitem"><div class="snum">Instant</div><div class="slbl">Delivery</div></div>
     <div class="sitem"><div class="snum">24/7</div><div class="slbl">Automated</div></div>
     <div class="sitem"><div class="snum">Undetected</div><div class="slbl">Cheats</div></div>
@@ -225,7 +266,7 @@
   <div class="main">
 
     <div id="products" style="scroll-margin-top:70px;">
-      <div class="sec-header">
+      <div class="sec-header reveal">
         <h2>All Products</h2>
         <span id="prod-count-label">Loading…</span>
       </div>
@@ -235,7 +276,7 @@
     </div>
 
     <!-- PROMO -->
-    <div class="promo">
+    <div class="promo reveal">
       <div>
         <h2>Need a <span>bulk deal</span> or custom order?</h2>
         <p>Hit us up on Discord for bulk pricing, custom amounts, or anything not listed in the shop.</p>
@@ -244,7 +285,7 @@
     </div>
 
     <!-- FEATURES -->
-    <div id="features">
+    <div id="features" class="reveal">
       <div class="sec-header"><h2>Why AbyssHub?</h2></div>
       <div class="features-row">
         <div class="feat"><div class="feat-icon">⚡</div><h3>Instant Delivery</h3><p>Keys and accounts sent to your Discord DMs seconds after payment confirms. No waiting.</p></div>
@@ -384,7 +425,7 @@
         const thumb = p.thumbnail_url
           ? `<img src="${sanitize(p.thumbnail_url)}" alt="" loading="lazy">`
           : `<div class="card-thumb-ph">🎮</div>`;
-        return `<div class="product-card" onclick="openCheckout(${ri})">
+        return `<div class="product-card reveal" onclick="openCheckout(${ri})" style="transition-delay:${(products.indexOf(p)%4)*0.07}s">
           <div class="card-thumb">${thumb}<span class="card-badge">INSTANT</span>${stockBadge(p.stock)}</div>
           <div class="card-info">
             <div class="card-title">${sanitize(p.name)}</div>
@@ -402,6 +443,13 @@
         const data = await res.json();
         _all = Array.isArray(data)?data:[];
         renderProducts(_all);
+        // Trigger stat counter
+        const statEl=document.getElementById('stat-products');
+        animateCount(statEl, _all.length);
+        // Schedule ad popup after products are ready
+        scheduleAdPopup();
+        // Wire up scroll reveal on dynamically added cards
+        setTimeout(()=>document.querySelectorAll('.reveal').forEach(el=>_revealObs.observe(el)), 100);
       } catch {
         document.getElementById('products-grid').innerHTML='<div class="products-placeholder">Could not load products. Try again later.</div>';
       }
@@ -461,6 +509,119 @@
       }catch{setModalError('Network error. Please check your connection.');}
       finally{btn.disabled=false;btn.classList.remove('loading');}
     });
+  </script>
+
+  <!-- AD POPUP -->
+  <div class="adpop" id="adpop">
+    <div class="adpop-label">Featured Deal <button class="adpop-close" id="adpop-close" aria-label="Close">&times;</button></div>
+    <div id="adpop-thumb-wrap"></div>
+    <div class="adpop-body">
+      <div class="adpop-name" id="adpop-name"></div>
+      <div class="adpop-price" id="adpop-price"></div>
+      <button class="adpop-cta" id="adpop-cta">Buy Now →</button>
+    </div>
+  </div>
+
+  <script>
+    // ── PARTICLE BACKGROUND ──────────────────────────────────────────────────
+    (function(){
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+      let W, H, particles;
+      function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+      function mkParticle(){
+        return { x:Math.random()*W, y:Math.random()*H,
+          vx:(Math.random()-.5)*.35, vy:(Math.random()-.5)*.35,
+          r:Math.random()*1.8+.6,
+          a:Math.random() };
+      }
+      function init(){ resize(); particles=Array.from({length:80},mkParticle); }
+      function draw(){
+        ctx.clearRect(0,0,W,H);
+        // draw lines between nearby particles
+        for(let i=0;i<particles.length;i++){
+          for(let j=i+1;j<particles.length;j++){
+            const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+            const dist=Math.sqrt(dx*dx+dy*dy);
+            if(dist<130){
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x,particles[i].y);
+              ctx.lineTo(particles[j].x,particles[j].y);
+              ctx.strokeStyle=`rgba(255,144,0,${(1-dist/130)*.18})`;
+              ctx.lineWidth=.6;
+              ctx.stroke();
+            }
+          }
+          const p=particles[i];
+          ctx.beginPath();
+          ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+          ctx.fillStyle=`rgba(255,144,0,${p.a*.5})`;
+          ctx.fill();
+          p.x+=p.vx; p.y+=p.vy;
+          if(p.x<0||p.x>W) p.vx*=-1;
+          if(p.y<0||p.y>H) p.vy*=-1;
+        }
+        requestAnimationFrame(draw);
+      }
+      window.addEventListener('resize',()=>{ resize(); });
+      init(); draw();
+    })();
+
+    // ── SCROLL REVEAL ────────────────────────────────────────────────────────
+    const _revealObs = new IntersectionObserver(entries=>{
+      entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+    },{threshold:.12});
+    document.querySelectorAll('.reveal').forEach(el=>_revealObs.observe(el));
+
+    // ── STAT COUNTER ROLLUP ──────────────────────────────────────────────────
+    function animateCount(el, target, duration=900){
+      const start=performance.now();
+      function step(now){
+        const p=Math.min((now-start)/duration,1);
+        el.textContent=Math.round(p*p*target);
+        if(p<1) requestAnimationFrame(step);
+        else el.textContent=target;
+      }
+      requestAnimationFrame(step);
+    }
+
+    // ── AD POPUP ─────────────────────────────────────────────────────────────
+    const adpop    = document.getElementById('adpop');
+    const adClose  = document.getElementById('adpop-close');
+    let _adTimer, _adIdx = -1;
+
+    function showAdPopup(){
+      if(!_all.length) return;
+      // Pick a product (cycle through them)
+      _adIdx = (_adIdx + 1) % _all.length;
+      const p = _all[_adIdx];
+      const wrap = document.getElementById('adpop-thumb-wrap');
+      if(p.thumbnail_url){
+        wrap.innerHTML=`<img class="adpop-thumb" src="${p.thumbnail_url}" alt="" loading="lazy">`;
+      } else {
+        wrap.innerHTML='<div class="adpop-thumb-ph">&#127918;</div>';
+      }
+      const min = p.min_order_amount||1;
+      document.getElementById('adpop-name').textContent  = p.name;
+      document.getElementById('adpop-price').textContent =
+        min>1 ? `$${(p.price*min).toFixed(2)} (×${min})` : `$${p.price.toFixed(2)}`;
+      document.getElementById('adpop-cta').onclick = ()=>{ closeAdPopup(); openCheckout(_adIdx); };
+      adpop.classList.add('show');
+      // Auto-dismiss after 12s
+      _adTimer = setTimeout(closeAdPopup, 12000);
+    }
+
+    function closeAdPopup(){
+      clearTimeout(_adTimer);
+      adpop.classList.remove('show');
+      // Show next popup after 40s
+      setTimeout(showAdPopup, 40000);
+    }
+
+    adClose.addEventListener('click', closeAdPopup);
+
+    // Fire first popup 8s after products load
+    function scheduleAdPopup(){ setTimeout(showAdPopup, 8000); }
   </script>
 
   <script>
