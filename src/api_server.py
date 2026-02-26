@@ -53,13 +53,22 @@ async def start_api_server(secret: str, port: int = 8080):
         )
 
     async def public_products(request):
-        """Return products.json publicly (no auth) for the website."""
+        """Return products.json publicly (no auth) for the website, with live stock counts."""
         try:
             with open('products.json', 'r', encoding='utf-8') as f:
                 data = json.load(f)
-            # Strip internal fields before exposing publicly
+            # Strip internal fields before exposing publicly; count stock from file
             safe = []
             for p in data:
+                stock = None
+                product_file = p.get('product_file', '')
+                if product_file:
+                    try:
+                        with open(product_file, 'r', encoding='utf-8', errors='ignore') as pf:
+                            lines = [l.strip() for l in pf if l.strip()]
+                        stock = len(lines)
+                    except Exception:
+                        stock = 0
                 safe.append({
                     'name':            p.get('name', ''),
                     'description':     p.get('description', ''),
@@ -68,6 +77,7 @@ async def start_api_server(secret: str, port: int = 8080):
                     'min_order_amount': p.get('min_order_amount', 1),
                     'payment_methods': p.get('payment_methods', []),
                     'thumbnail_url':   p.get('thumbnail_url', ''),
+                    'stock':           stock,
                 })
             return web.json_response(safe)
         except FileNotFoundError:
