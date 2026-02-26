@@ -1,3 +1,4 @@
+import asyncio
 import hashlib
 import hmac
 import json
@@ -214,17 +215,23 @@ async def start_api_server(secret: str, port: int = 8080):
 
     async def public_products(request):
         """Return products.json publicly (no auth) for the website, with live stock counts."""
-        try:
-            with open('products.json', 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            # Strip internal fields before exposing publicly; count stock from file
+        def _build_product_list():
+            """Synchronous work — runs in a thread so it never blocks the event loop."""
+            products_path = _HERE / 'products.json'
+            try:
+                with open(products_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+            except FileNotFoundError:
+                return []
             safe = []
             for p in data:
                 stock = None
                 product_file = p.get('product_file', '')
                 if product_file:
+                    # Resolve relative to src/ directory so paths always work
+                    pf_path = (_HERE / product_file) if not os.path.isabs(product_file) else Path(product_file)
                     try:
-                        with open(product_file, 'r', encoding='utf-8', errors='ignore') as pf:
+                        with open(pf_path, 'r', encoding='utf-8', errors='ignore') as pf:
                             lines = [l.strip() for l in pf if l.strip()]
                         stock = len(lines)
                     except Exception:
@@ -240,9 +247,11 @@ async def start_api_server(secret: str, port: int = 8080):
                     'stock':           stock,
                     'new':             p.get('new', False),
                 })
+            return safe
+
+        try:
+            safe = await asyncio.to_thread(_build_product_list)
             return web.json_response(safe)
-        except FileNotFoundError:
-            return web.json_response([])
         except Exception as exc:
             logger.error(f"Error serving public products: {exc}")
             return web.Response(status=500, text="Internal error")

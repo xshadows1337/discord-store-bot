@@ -951,23 +951,29 @@
     }
 
     async function loadProducts() {
+      const controller = new AbortController();
+      const _timeout = setTimeout(() => controller.abort(), 10000);
       try {
-        const res = await fetch('/api/public/products');
+        const res = await fetch('/api/public/products', { signal: controller.signal });
+        clearTimeout(_timeout);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         _all = Array.isArray(data)?data:[];
         renderProducts(_all);
         // Trigger stat counter
         const statEl=document.getElementById('stat-products');
-        animateCount(statEl, _all.length);
+        if(typeof animateCount==='function') animateCount(statEl, _all.length);
         // Update stab All count
         const stabCountEl=document.getElementById('stab-count-all');
         if(stabCountEl) stabCountEl.textContent=_all.length;
         // Schedule ad popup after products are ready
-        scheduleAdPopup();
+        if(typeof scheduleAdPopup==='function') scheduleAdPopup();
         // Wire up scroll reveal on dynamically added cards
-        setTimeout(()=>{ observeReveal(); }, 80);
-      } catch {
-        document.getElementById('products-grid').innerHTML='<div class="products-placeholder">Could not load products. Try again later.</div>';
+        setTimeout(()=>{ if(typeof observeReveal==='function') observeReveal(); }, 80);
+      } catch(err) {
+        clearTimeout(_timeout);
+        const msg = err.name==='AbortError' ? 'Request timed out. Please refresh.' : 'Could not load products. Try again later.';
+        document.getElementById('products-grid').innerHTML=`<div class="products-placeholder">${msg}</div>`;
       }
     }
     loadProducts();
