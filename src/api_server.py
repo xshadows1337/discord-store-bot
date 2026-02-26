@@ -335,6 +335,10 @@ async def start_api_server(secret: str, port: int = 8080):
         if quantity < min_qty:
             return web.json_response({'error': f'Minimum order quantity is {min_qty}'}, status=422)
 
+        stock = product.get('stock', 0)
+        if quantity > stock:
+            return web.json_response({'error': f'Only {stock} in stock. Please lower your quantity.'}, status=422)
+
         # Validate promo code for CRYPTO payments
         promo_discount = 0
         if promo_code and method == 'CRYPTO':

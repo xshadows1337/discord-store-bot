@@ -2033,6 +2033,7 @@
       document.getElementById('modal-email').value = localStorage.getItem('abysshub_last_email') || '';
       document.getElementById('modal-qty').value=p.min_order_amount??1;
       document.getElementById('modal-qty').min=p.min_order_amount??1;
+      document.getElementById('modal-qty').max=p.stock??1;
       setModalError('');
       const img=document.getElementById('modal-img'); img.src=p.thumbnail_url||''; img.style.display=p.thumbnail_url?'':'none';
       document.getElementById('modal-name').textContent=p.name;
@@ -2074,7 +2075,16 @@
     function setModalError(msg){ const el=document.getElementById('modal-error'); el.textContent=msg; el.classList.toggle('show',!!msg); }
 
     document.querySelectorAll('.method-tab').forEach(tab=>{ tab.addEventListener('click',()=>{ if(tab.disabled)return; _activeMethod=tab.dataset.method; localStorage.setItem('abysshub_last_method',_activeMethod); document.querySelectorAll('.method-tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); _setPromoGroupVisibility(_activeMethod); if(typeof _promoCode!=='undefined'&&_promoCode){ _promoCode='';_promoDiscount=0; const pf=document.getElementById('modal-promo');if(pf)pf.value=''; const pm=document.getElementById('promo-msg');if(pm){pm.textContent='';pm.className='promo-msg';} updateTotal(); } }); });
-    document.getElementById('modal-qty').addEventListener('input',()=>{ setModalError(''); updateTotal(); });
+    document.getElementById('modal-qty').addEventListener('input',()=>{
+      setModalError('');
+      if(_activeProduct){
+        const maxStock=_activeProduct.stock??1;
+        const inp=document.getElementById('modal-qty');
+        const v=parseInt(inp.value,10)||1;
+        if(v>maxStock){ inp.value=maxStock; }
+      }
+      updateTotal();
+    });
     document.getElementById('modal-email').addEventListener('input',()=>setModalError(''));
     document.getElementById('checkout-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCheckout();});
     document.getElementById('modal-close-btn').addEventListener('click',closeCheckout);
@@ -2085,8 +2095,10 @@
       const email=document.getElementById('modal-email').value.trim();
       const qty=parseInt(document.getElementById('modal-qty').value,10);
       const min=_activeProduct.min_order_amount??1;
+      const maxStock=_activeProduct.stock??1;
       if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setModalError('Please enter a valid email address.');return;}
       if(!qty||qty<min){setModalError(`Minimum order quantity is ${min}.`);return;}
+      if(qty>maxStock){setModalError(`Only ${maxStock} in stock. Please lower your quantity.`);return;}
       setModalError('');
       const btn=document.getElementById('modal-submit'); btn.disabled=true; btn.classList.add('loading');
       try {
