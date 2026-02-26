@@ -40,11 +40,17 @@ async def start_api_server(secret: str, port: int = 8080):
     # ── Website ──────────────────────────────────────────────────────────────
 
     async def index(request):
-        """Serve the store landing page."""
+        """Serve the store landing page (no-cache so updates are always live)."""
         index_file = _STATIC_DIR / 'index.html'
         if not index_file.exists():
             return web.Response(status=404, text="index.html not found")
-        return web.FileResponse(index_file)
+        content = index_file.read_bytes()
+        return web.Response(
+            body=content,
+            content_type='text/html',
+            charset='utf-8',
+            headers={'Cache-Control': 'no-store, no-cache, must-revalidate'},
+        )
 
     async def public_products(request):
         """Return products.json publicly (no auth) for the website."""
