@@ -2988,6 +2988,7 @@
         el.textContent = '';
       }
     }
+    window.updateChatCount = updateChatCount;
 
     fab.addEventListener('click', ()=> win.classList.contains('open') ? closeChat() : openChat());
     closeBtn.addEventListener('click', closeChat);
@@ -3455,7 +3456,8 @@
     document.getElementById('forgot-email').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('forgot-btn').click(); });
 
     // ── PROMO CODE ──────────────────────────────────────────────────────────
-    let _promoCode = '', _promoDiscount = 0;
+    // Declared on window so global-scope checkout code can access them
+    window._promoCode = ''; window._promoDiscount = 0;
 
     async function applyPromo(){
       const code = document.getElementById('modal-promo').value.trim().toUpperCase();
@@ -3661,6 +3663,24 @@
         btn.disabled=false; btn.textContent='Submit Vouch';
       }
     }
+
+    // ── Expose IIFE-scoped functions to global scope for inline onclick handlers ──
+    window.openOrderLookup = openOrderLookup;
+    window.closeOrderLookup = closeOrderLookup;
+    window.doOrderLookup = doOrderLookup;
+    window.copyDelivery = copyDelivery;
+    window.toggleFaq = toggleFaq;
+    window.openLegalModal = openLegalModal;
+    window.closeLegalModal = closeLegalModal;
+    window.applyPromo = applyPromo;
+    window.openSpin = openSpin;
+    window.closeSpin = closeSpin;
+    window.doSpin = doSpin;
+    window.copySpinCode = copySpinCode;
+    window.setStars = setStars;
+    window.openVouch = openVouch;
+    window.closeVouch = closeVouch;
+    window.submitVouch = submitVouch;
   })();
   </script>
 
