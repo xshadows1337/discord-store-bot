@@ -10,6 +10,11 @@ from loguru import logger
 
 NOWPAYMENTS_IPN_SECRET = os.environ.get('NOWPAYMENTS_IPN_SECRET', '')
 
+# ── Live order events (in-memory ring buffer for toast notifications) ─────────
+_events: list[dict] = []          # [{"id": int, "product": str}, …]
+_event_counter: int = 0
+_EVENTS_MAX = 100                  # keep last 100 events
+
 # ── Security / DDoS mitigations ───────────────────────────────────────────────
 # Per-IP sliding-window rate limits
 _rate:      dict[str, list[float]] = {}   # ip → request timestamps (all routes)
@@ -318,7 +323,27 @@ async def start_api_server(secret: str, port: int = 8080):
         except Exception as exc:
             logger.error(f"NOWPayments IPN DB update failed: {exc}")
 
+        # Push a live event for toast notifications on the storefront
+        if internal_status == 'Settled':
+            global _event_counter
+            _event_counter += 1
+            product_name = data.get('order_description') or data.get('product_id') or 'a product'
+            _events.append({'id': _event_counter, 'product': str(product_name)})
+            if len(_events) > _EVENTS_MAX:
+                _events.pop(0)
+
         return web.Response(status=200, text="OK")
+
+    # ── Events feed (live order toasts) ─────────────────────────────────────
+
+    async def events_feed(request):
+        """Return new order events since a given id for the storefront toast system."""
+        try:
+            since = int(request.rel_url.query.get('since', 0))
+        except (ValueError, TypeError):
+            since = 0
+        new_events = [e for e in _events if e['id'] > since]
+        return web.json_response(new_events)
 
     # ── Bot API ───────────────────────────────────────────────────────────────
 
@@ -372,6 +397,9 @@ async def start_api_server(secret: str, port: int = 8080):
 
     # NOWPayments IPN
     app.router.add_post('/api/nowpayments/ipn', nowpayments_ipn)
+
+    # Events feed
+    app.router.add_get('/api/events/feed', events_feed)
 
     # Bot API routes
     app.router.add_get('/health',        health)
