@@ -628,6 +628,59 @@
     /* Chat char counter */
     .chat-char-count { font-size:.65rem; color:var(--muted); text-align:right; padding:0 .85rem .15rem; margin-top:-.25rem; }
     .chat-char-count.warn { color:#e63946; }
+
+    /* ── ORDER LOOKUP MODAL ────────────────────────────────────────────── */
+    .order-result { margin-top:1rem; }
+    .order-status-row { display:flex; justify-content:space-between; align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:.65rem .85rem; margin-bottom:.5rem; }
+    .order-status-label { font-size:.72rem; color:var(--muted); text-transform:uppercase; font-weight:700; letter-spacing:.06em; }
+    .order-status-val { font-size:.88rem; font-weight:700; }
+    .order-status-val.settled { color:#3ddc84; }
+    .order-status-val.new, .order-status-val.processing { color:var(--orange); }
+    .order-status-val.expired, .order-status-val.oos { color:#e63946; }
+    .order-delivery-box { background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:.75rem; margin-top:.75rem; }
+    .order-delivery-box h4 { font-size:.78rem; color:var(--orange); margin-bottom:.45rem; text-transform:uppercase; letter-spacing:.06em; }
+    .order-delivery-content { background:#0a0a0a; border:1px solid #222; border-radius:3px; padding:.6rem .75rem; font-size:.82rem; color:var(--text); white-space:pre-wrap; word-break:break-all; max-height:200px; overflow-y:auto; font-family:'Courier New',monospace; }
+    .order-copy-btn { margin-top:.45rem; padding:.35rem .75rem; background:var(--orange); color:#000; border:none; border-radius:3px; font-size:.75rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .order-copy-btn:hover { background:var(--orange2); }
+
+    /* ── FAQ ACCORDION ─────────────────────────────────────────────────── */
+    .faq-section { max-width:800px; margin:0 auto; padding:2rem 1.5rem; }
+    .faq-section .sec-header { margin-bottom:1.5rem; }
+    .faq-item { border:1px solid var(--border); border-radius:var(--radius); margin-bottom:.55rem; overflow:hidden; background:var(--card); }
+    .faq-q { display:flex; align-items:center; justify-content:space-between; padding:.85rem 1rem; cursor:pointer; font-size:.88rem; font-weight:700; color:var(--text); transition:background .15s; gap:.75rem; }
+    .faq-q:hover { background:rgba(255,144,0,.06); }
+    .faq-q .faq-icon { flex-shrink:0; font-size:1rem; transition:transform .25s; color:var(--orange); }
+    .faq-item.open .faq-q .faq-icon { transform:rotate(45deg); }
+    .faq-a { max-height:0; overflow:hidden; transition:max-height .3s ease, padding .3s ease; padding:0 1rem; font-size:.82rem; color:var(--muted); line-height:1.65; }
+    .faq-item.open .faq-a { max-height:500px; padding:.15rem 1rem .85rem; }
+
+    /* ── REVIEWS ───────────────────────────────────────────────────────── */
+    .reviews-section { max-width:1000px; margin:0 auto; padding:2rem 1.5rem; }
+    .reviews-section .sec-header { margin-bottom:1.5rem; }
+    .reviews-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem; }
+    .review-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.15rem; }
+    .review-stars { color:var(--orange); font-size:.85rem; margin-bottom:.45rem; letter-spacing:1px; }
+    .review-text { font-size:.82rem; color:var(--muted); line-height:1.55; margin-bottom:.65rem; font-style:italic; }
+    .review-author { display:flex; align-items:center; gap:.5rem; }
+    .review-avatar { width:28px; height:28px; border-radius:50%; background:var(--orange); color:#000; display:flex; align-items:center; justify-content:center; font-size:.65rem; font-weight:900; flex-shrink:0; }
+    .review-name { font-size:.78rem; font-weight:700; color:var(--text); }
+    .review-date { font-size:.68rem; color:#555; }
+    .review-verified { font-size:.65rem; color:#3ddc84; font-weight:600; }
+
+    /* ── GUARANTEE BANNER ──────────────────────────────────────────────── */
+    .guarantee-banner { max-width:1300px; margin:1.5rem auto 0; background:linear-gradient(135deg,rgba(255,144,0,.08),rgba(255,144,0,.02)); border:1px solid rgba(255,144,0,.25); border-radius:var(--radius); padding:1.25rem 1.5rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+    .guarantee-icon { font-size:2rem; flex-shrink:0; }
+    .guarantee-text h3 { font-size:.92rem; font-weight:900; color:var(--text); margin-bottom:.15rem; }
+    .guarantee-text p { font-size:.78rem; color:var(--muted); line-height:1.5; }
+
+    /* ── LEGAL MODAL ───────────────────────────────────────────────────── */
+    .legal-modal { max-width:600px; max-height:80vh; overflow-y:auto; }
+    .legal-modal h2 { margin-bottom:.75rem; }
+    .legal-modal h3 { font-size:.88rem; color:var(--orange); margin:1rem 0 .35rem; }
+    .legal-modal p, .legal-modal li { font-size:.8rem; color:var(--muted); line-height:1.6; margin-bottom:.45rem; }
+    .legal-modal ul { padding-left:1.2rem; }
+    .legal-modal li { margin-bottom:.25rem; }
+    .legal-updated { font-size:.7rem; color:#555; margin-bottom:.75rem; }
   </style>
 </head>
 <body>
@@ -744,6 +797,8 @@
     </div>
     <div class="nav-links">
       <a href="#products">Products</a>
+      <a href="#" onclick="event.preventDefault();openOrderLookup()">Orders</a>
+      <a href="#faq">FAQ</a>
       <a href="#features">Why Us</a>
       <div id="nav-auth-area">
         <a href="#" id="nav-login-link" onclick="event.preventDefault();openAuthModal()" style="font-size:.85rem;font-weight:600;color:#ccc;text-decoration:none;">Login</a>
@@ -870,6 +925,107 @@
 
   </div>
 
+  <!-- GUARANTEE BANNER -->
+  <div class="guarantee-banner reveal">
+    <div class="guarantee-icon">🛡️</div>
+    <div class="guarantee-text">
+      <h3>Replacement Guarantee</h3>
+      <p>Every product is verified before sale. If your key, account, or code doesn't work, we'll replace it — no questions asked. Open a ticket on Discord and we'll sort it out within 30 minutes.</p>
+    </div>
+  </div>
+
+  <!-- REVIEWS -->
+  <div class="reviews-section reveal" id="reviews" style="scroll-margin-top:100px;">
+    <div class="sec-header"><h2>&#11088; What Customers Say</h2></div>
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="review-text">"Bought 200 Steam FA accounts, every single one worked. Delivery was literally instant through Discord DM. Best bulk prices I've found anywhere."</div>
+        <div class="review-author">
+          <div class="review-avatar">D</div>
+          <div><div class="review-name">dxrk#0001</div><div class="review-verified">&#10003; Verified Buyer</div></div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="review-text">"External cheat has been undetected for 3 months straight. No VAC ban, no issues. Lifetime key was 100% worth it."</div>
+        <div class="review-author">
+          <div class="review-avatar">Z</div>
+          <div><div class="review-name">zer0#4421</div><div class="review-verified">&#10003; Verified Buyer</div></div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+        <div class="review-text">"Xbox Game Pass code worked first try on redeem.microsoft.com. Paid with BTC, had the code in under a minute. Will buy again."</div>
+        <div class="review-author">
+          <div class="review-avatar">M</div>
+          <div><div class="review-name">mxke#7890</div><div class="review-verified">&#10003; Verified Buyer</div></div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="review-text">"Had an issue with one account, opened a ticket and got a replacement in 10 minutes. Support is actually insane for a shop this size."</div>
+        <div class="review-author">
+          <div class="review-avatar">J</div>
+          <div><div class="review-name">jxyce#2211</div><div class="review-verified">&#10003; Verified Buyer</div></div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="review-text">"Gambling redeems actually hit. Got way more value than what I paid. This store is legit, been buying for weeks now."</div>
+        <div class="review-author">
+          <div class="review-avatar">R</div>
+          <div><div class="review-name">rxsty#5500</div><div class="review-verified">&#10003; Verified Buyer</div></div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="review-text">"Monero payment was seamless. No KYC, no BS. Product in my DMs before I even closed the payment tab. 10/10 privacy."</div>
+        <div class="review-author">
+          <div class="review-avatar">K</div>
+          <div><div class="review-name">krypt0#1337</div><div class="review-verified">&#10003; Verified Buyer</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-section reveal" id="faq" style="scroll-margin-top:100px;">
+    <div class="sec-header"><h2>&#10067; Frequently Asked Questions</h2></div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>How does delivery work?</span><span class="faq-icon">+</span></div>
+      <div class="faq-a">After payment confirms, our Discord bot automatically sends your product (key, account, or file) to your Discord DMs. The entire process takes seconds — no human involvement needed. You'll also receive an email confirmation if you provided one.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>What payment methods do you accept?</span><span class="faq-icon">+</span></div>
+      <div class="faq-a">We accept <strong>100+ cryptocurrencies</strong> (BTC, ETH, LTC, USDC, XMR, SOL, and more) via NOWPayments, plus <strong>credit/debit cards</strong> via Stripe. Crypto is recommended for maximum privacy.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>What if my product doesn't work?</span><span class="faq-icon">+</span></div>
+      <div class="faq-a">We guarantee all products. If a key, account, or code is invalid, open a support ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> with your Order ID and a screenshot. We'll replace it within 30 minutes — no questions asked.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>Are the cheats safe to use?</span><span class="faq-icon">+</span></div>
+      <div class="faq-a">All our cheats are <strong>external</strong> — they run outside the game process, making them significantly harder for anti-cheat to detect. We only list cheats that are confirmed undetected, and we remove them immediately if a detection is reported. Check our Discord for the latest status.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>How do I check my order status?</span><span class="faq-icon">+</span></div>
+      <div class="faq-a">Click <strong>"Orders"</strong> in the navigation bar, enter your email and Order ID, and you'll see your order status. If it's settled, you can re-download your delivery directly from the site.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>Do I need an account to buy?</span><span class="faq-icon">+</span></div>
+      <div class="faq-a">Nope! You can checkout as a guest. Just enter your email at checkout and you'll receive your product. Creating an account is optional but gives you order history and faster checkout.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>Is my payment information safe?</span><span class="faq-icon">+</span></div>
+      <div class="faq-a">Absolutely. Card payments are processed by <strong>Stripe</strong> — we never see or store your card details. Crypto payments are fully anonymous. All connections are encrypted with HTTPS/TLS.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>Can I get a refund?</span><span class="faq-icon">+</span></div>
+      <div class="faq-a">Due to the digital nature of our products, all sales are final once delivered. However, if a product is defective or doesn't match the description, we will replace it free of charge. See our full <a href="#" onclick="event.preventDefault();openLegalModal('refund')">Refund Policy</a> for details.</div>
+    </div>
+  </div>
+
   <!-- FOOTER -->
   <footer id="footer" style="scroll-margin-top:100px;">
     <div class="footer-grid">
@@ -896,7 +1052,8 @@
         <h4>Support</h4>
         <a href="https://discord.gg/Y69UbMUEfu" target="_blank" rel="noopener">Discord Server</a>
         <a href="https://discord.gg/Y69UbMUEfu" target="_blank" rel="noopener">Open a Ticket</a>
-        <a href="https://discord.gg/Y69UbMUEfu" target="_blank" rel="noopener">Report an Issue</a>
+        <a href="#" onclick="event.preventDefault();openOrderLookup()">Order Lookup</a>
+        <a href="#faq">FAQ</a>
       </div>
       <div class="footer-col">
         <h4>Payments</h4>
@@ -907,10 +1064,10 @@
       </div>
       <div class="footer-col">
         <h4>Legal</h4>
-        <a href="#">Terms of Service</a>
-        <a href="#">Refund Policy</a>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Disclaimer</a>
+        <a href="#" onclick="event.preventDefault();openLegalModal('tos')">Terms of Service</a>
+        <a href="#" onclick="event.preventDefault();openLegalModal('refund')">Refund Policy</a>
+        <a href="#" onclick="event.preventDefault();openLegalModal('privacy')">Privacy Policy</a>
+        <a href="#" onclick="event.preventDefault();openLegalModal('disclaimer')">Disclaimer</a>
       </div>
     </div>
     <div class="footer-links-inline">
@@ -925,6 +1082,37 @@
       <span>All products are for educational purposes only.</span>
     </div>
   </footer>
+
+  <!-- ORDER LOOKUP MODAL -->
+  <div class="modal-overlay" id="order-lookup-modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ol-title">
+      <button class="modal-close" onclick="closeOrderLookup()" aria-label="Close">&times;</button>
+      <h2 id="ol-title">&#128270; Order Lookup</h2>
+      <p class="modal-sub">Enter your email and Order ID to check status or re-download your delivery.</p>
+      <div class="form-group">
+        <label for="ol-email">Email Address</label>
+        <input class="form-input" type="email" id="ol-email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="ol-orderid">Order ID</label>
+        <input class="form-input" type="text" id="ol-orderid" placeholder="e.g. 5941234567" autocomplete="off">
+      </div>
+      <div class="modal-error" id="ol-error"></div>
+      <button class="btn-checkout" id="ol-submit" onclick="doOrderLookup()">
+        <span class="btn-spinner"></span>
+        <span class="btn-label">Look Up Order</span>
+      </button>
+      <div class="order-result" id="ol-result" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- LEGAL MODALS -->
+  <div class="modal-overlay" id="legal-modal">
+    <div class="modal legal-modal" role="dialog" aria-modal="true">
+      <button class="modal-close" onclick="closeLegalModal()" aria-label="Close">&times;</button>
+      <div id="legal-modal-content"></div>
+    </div>
+  </div>
 
   <!-- SCROLL TO TOP -->
   <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">&#8679;</button>
@@ -2659,6 +2847,114 @@
         area.innerHTML = `<a href="#" id="nav-login-link" onclick="event.preventDefault();openAuthModal()" style="font-size:.85rem;font-weight:600;color:#ccc;text-decoration:none;">Login</a>`;
       }
     }
+
+    // ── ORDER LOOKUP ─────────────────────────────────────────────────────
+    function openOrderLookup(){
+      document.getElementById('order-lookup-modal').classList.add('open');
+      document.getElementById('ol-result').style.display='none';
+      document.getElementById('ol-error').classList.remove('show');
+      document.getElementById('ol-email').value='';
+      document.getElementById('ol-orderid').value='';
+      setTimeout(()=>document.getElementById('ol-email').focus(),200);
+    }
+    function closeOrderLookup(){ document.getElementById('order-lookup-modal').classList.remove('open'); }
+    document.getElementById('order-lookup-modal').addEventListener('click',e=>{ if(e.target.id==='order-lookup-modal') closeOrderLookup(); });
+    document.getElementById('ol-orderid').addEventListener('keydown',e=>{ if(e.key==='Enter') doOrderLookup(); });
+
+    async function doOrderLookup(){
+      const email = document.getElementById('ol-email').value.trim();
+      const orderId = document.getElementById('ol-orderid').value.trim();
+      const errEl = document.getElementById('ol-error');
+      const resEl = document.getElementById('ol-result');
+      const btn = document.getElementById('ol-submit');
+
+      errEl.classList.remove('show'); resEl.style.display='none';
+      if(!email||!orderId){ errEl.textContent='Please enter both email and Order ID.'; errEl.classList.add('show'); return; }
+
+      btn.classList.add('loading'); btn.disabled=true;
+      try{
+        const r = await fetch('/api/order/lookup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,order_id:orderId})});
+        const d = await r.json();
+        if(!r.ok){ errEl.textContent=d.error||'Order not found.'; errEl.classList.add('show'); return; }
+
+        const sc = d.status.toLowerCase().replace(/\s/g,'');
+        let html = `
+          <div class="order-status-row"><span class="order-status-label">Order ID</span><span class="order-status-val">${d.order_id}</span></div>
+          <div class="order-status-row"><span class="order-status-label">Product</span><span class="order-status-val">${d.product}</span></div>
+          <div class="order-status-row"><span class="order-status-label">Quantity</span><span class="order-status-val">${d.quantity}</span></div>
+          <div class="order-status-row"><span class="order-status-label">Amount</span><span class="order-status-val">$${d.amount}</span></div>
+          <div class="order-status-row"><span class="order-status-label">Method</span><span class="order-status-val">${d.method}</span></div>
+          <div class="order-status-row"><span class="order-status-label">Status</span><span class="order-status-val ${sc}">${d.status}</span></div>
+        `;
+        if(d.delivery){
+          html += `<div class="order-delivery-box"><h4>&#128230; Your Delivery</h4><div class="order-delivery-content" id="ol-delivery-text">${d.delivery.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div><button class="order-copy-btn" onclick="copyDelivery()">&#128203; Copy to Clipboard</button></div>`;
+        } else if(sc==='settled'){
+          html += `<div class="order-delivery-box"><h4>Delivery</h4><p style="font-size:.82rem;color:var(--muted)">Your product was delivered via Discord DM. Check your DMs from the AbyssHub bot. If you can't find it, open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.</p></div>`;
+        }
+        resEl.innerHTML = html;
+        resEl.style.display = 'block';
+      }catch(err){
+        errEl.textContent='Network error. Try again.'; errEl.classList.add('show');
+      }finally{
+        btn.classList.remove('loading'); btn.disabled=false;
+      }
+    }
+    function copyDelivery(){
+      const t = document.getElementById('ol-delivery-text');
+      if(!t) return;
+      navigator.clipboard.writeText(t.textContent).then(()=>{
+        const btn = t.parentElement.querySelector('.order-copy-btn');
+        if(btn){ btn.textContent='\u2705 Copied!'; setTimeout(()=>btn.textContent='\ud83d\udccb Copy to Clipboard',2000); }
+      });
+    }
+
+    // ── FAQ ACCORDION ────────────────────────────────────────────────────
+    function toggleFaq(el){
+      const item = el.parentElement;
+      const wasOpen = item.classList.contains('open');
+      // Close all
+      document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+      if(!wasOpen) item.classList.add('open');
+    }
+
+    // ── LEGAL MODALS ─────────────────────────────────────────────────────
+    const _legalContent = {
+      tos: `<h2>Terms of Service</h2><p class="legal-updated">Last updated: February 2026</p>
+        <h3>1. Acceptance</h3><p>By accessing AbyssHub (xshadows.shop), you agree to these Terms of Service. If you do not agree, do not use the site.</p>
+        <h3>2. Eligibility</h3><p>You must be at least 18 years old to use this site and purchase products.</p>
+        <h3>3. Products</h3><p>All products are digital goods delivered electronically. Product descriptions are provided as-is. We make no guarantees about third-party platform compatibility beyond what is stated.</p>
+        <h3>4. Payments</h3><p>All payments are processed through secure third-party processors (Stripe for cards, NOWPayments for cryptocurrency). We never store your payment details.</p>
+        <h3>5. Delivery</h3><p>Products are delivered automatically via Discord DM and/or email after payment confirmation. Delivery times depend on payment method confirmation speed.</p>
+        <h3>6. Replacements</h3><p>If a product is defective or does not match its description, we will replace it free of charge. Contact support on Discord with your Order ID and proof.</p>
+        <h3>7. Prohibited Use</h3><p>You agree not to:</p><ul><li>Resell products without authorization</li><li>Attempt to exploit, hack, or reverse-engineer the site</li><li>File fraudulent chargebacks</li><li>Use the site for illegal purposes in your jurisdiction</li></ul>
+        <h3>8. Limitation of Liability</h3><p>AbyssHub is not responsible for any consequences arising from the use of purchased products. All products are sold for educational purposes only.</p>
+        <h3>9. Changes</h3><p>We reserve the right to update these terms at any time. Continued use constitutes acceptance.</p>`,
+      refund: `<h2>Refund Policy</h2><p class="legal-updated">Last updated: February 2026</p>
+        <h3>General Policy</h3><p>All sales of digital products are <strong>final</strong> once delivery has been completed. Due to the nature of digital goods, we cannot accept returns.</p>
+        <h3>Replacements</h3><p>If a product you received is invalid, defective, or does not match the listing description, we will provide a <strong>free replacement</strong>. To request a replacement:</p>
+        <ul><li>Open a support ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a></li><li>Provide your Order ID</li><li>Include a screenshot of the error/issue</li></ul>
+        <p>Replacements are typically processed within 30 minutes.</p>
+        <h3>Chargebacks</h3><p>Filing a fraudulent chargeback will result in a permanent ban from the store and potential reporting to fraud prevention services.</p>
+        <h3>Out of Stock</h3><p>If your order cannot be fulfilled due to stock issues, you will be notified and offered either a replacement product or store credit.</p>`,
+      privacy: `<h2>Privacy Policy</h2><p class="legal-updated">Last updated: February 2026</p>
+        <h3>Data We Collect</h3><ul><li><strong>Email address</strong> — for order delivery and communication</li><li><strong>Discord ID</strong> — for automated product delivery</li><li><strong>IP address</strong> — for security and rate limiting (not stored long-term)</li></ul>
+        <h3>Data We Do NOT Collect</h3><ul><li>Payment card details (handled by Stripe)</li><li>Cryptocurrency wallet addresses (handled by NOWPayments)</li><li>Browsing history or tracking cookies</li></ul>
+        <h3>How We Use Data</h3><p>Your data is used solely for order processing and delivery. We do not sell, share, or trade your personal information with third parties.</p>
+        <h3>Data Security</h3><p>All connections are encrypted via HTTPS/TLS. Database access is restricted and secured.</p>
+        <h3>Data Retention</h3><p>Order records are retained for support purposes. You may request deletion of your data by contacting support.</p>
+        <h3>Contact</h3><p>For privacy-related inquiries, open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.</p>`,
+      disclaimer: `<h2>Disclaimer</h2><p class="legal-updated">Last updated: February 2026</p>
+        <h3>Educational Purpose</h3><p>All products sold on AbyssHub are intended for <strong>educational and research purposes only</strong>. We do not promote or encourage the use of products in violation of any game's, platform's, or service's terms of service.</p>
+        <h3>No Warranty</h3><p>Products are provided "as-is" without warranty of any kind. While we strive to ensure all products work as described, we cannot guarantee indefinite functionality, especially for products dependent on third-party updates.</p>
+        <h3>User Responsibility</h3><p>You are solely responsible for how you use products purchased from this store. AbyssHub assumes no liability for bans, suspensions, or other consequences resulting from product use.</p>
+        <h3>Third-Party Services</h3><p>We are not affiliated with Microsoft, Valve, Steam, Xbox, or any game developer/publisher. All trademarks belong to their respective owners.</p>`
+    };
+    function openLegalModal(type){
+      document.getElementById('legal-modal-content').innerHTML = _legalContent[type] || '';
+      document.getElementById('legal-modal').classList.add('open');
+    }
+    function closeLegalModal(){ document.getElementById('legal-modal').classList.remove('open'); }
+    document.getElementById('legal-modal').addEventListener('click',e=>{ if(e.target.id==='legal-modal') closeLegalModal(); });
 
     // Check on load
     updateNavAuth();

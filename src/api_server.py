@@ -482,6 +482,69 @@ async def start_api_server(secret: str, port: int = 8080):
     # VPN check
     app.router.add_get('/api/vpn-check', vpn_check)
 
+    # ── Order Lookup endpoint ───────────────────────────────────────────────
+
+    _order_lookup_rate: dict[str, list[float]] = {}
+
+    async def order_lookup(request):
+        """Public order lookup — email + order ID → status & delivery (if settled)."""
+        ip = _get_ip(request)
+        if _sliding_window(_order_lookup_rate, ip, 60, 10):
+            return web.Response(status=429, text='Too many requests. Try again later.')
+
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+
+        email = (body.get('email') or '').strip().lower()
+        order_id = (body.get('order_id') or '').strip()
+
+        if not email or not order_id:
+            return web.json_response({'error': 'Email and Order ID are required.'}, status=422)
+
+        try:
+            from utils.db_functions import getOrderById
+            order = getOrderById(order_id)
+        except Exception as exc:
+            logger.error(f"Order lookup DB error: {exc}")
+            return web.Response(status=500, text='Internal error')
+
+        if not order:
+            return web.json_response({'error': 'Order not found. Double-check your Order ID.'}, status=404)
+
+        # order tuple: (id, originalid, orderid, amount, checkoutlink, status, expirationtime, item, quantity, buyeremail, discordid, method)
+        stored_email = (order[9] or '').strip().lower()
+        if stored_email != email:
+            return web.json_response({'error': 'Order not found. Double-check your email address.'}, status=404)
+
+        status = order[5] or 'Unknown'
+        result = {
+            'order_id': order[2],
+            'product': order[7],
+            'quantity': order[8],
+            'amount': order[3],
+            'status': status,
+            'method': order[11],
+        }
+
+        # If settled, try to include the delivery content
+        if status == 'Settled':
+            delivery_file = _HERE / 'delivered_orders' / f'{order[2]}.txt'
+            if not delivery_file.exists():
+                # Also try originalid
+                delivery_file = _HERE / 'delivered_orders' / f'{order[1]}.txt'
+            if delivery_file.exists():
+                try:
+                    content = delivery_file.read_text(encoding='utf-8', errors='replace')
+                    result['delivery'] = content.strip()
+                except Exception:
+                    pass
+
+        return web.json_response(result)
+
+    app.router.add_post('/api/order/lookup', order_lookup)
+
     # ── Auth endpoints ──────────────────────────────────────────────────────
 
     async def auth_register(request):
