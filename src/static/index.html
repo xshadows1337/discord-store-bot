@@ -439,6 +439,26 @@
     .auth-user-name { font-size:.82rem; font-weight:700; color:var(--text); max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .auth-logout { background:none; border:1px solid var(--border); color:var(--muted); padding:.25rem .6rem; border-radius:3px; font-size:.7rem; font-weight:700; cursor:pointer; font-family:inherit; transition:border-color .15s,color .15s; }
     .auth-logout:hover { border-color:var(--orange); color:var(--orange); }
+
+    /* ── QOL ENHANCEMENTS ─────────────────────────────────────────────────── */
+    /* Out-of-stock card dimming */
+    .product-card.oos { opacity:.52; }
+    .product-card.oos .btn-buy { background:#444 !important; color:#777 !important; cursor:not-allowed !important; pointer-events:none; }
+    .product-card.oos .chb-btn.chb-main { background:#333 !important; color:#666 !important; cursor:not-allowed !important; pointer-events:none; }
+    .product-card.oos .btn-add-cart { opacity:.35; pointer-events:none; }
+    /* Search clear button */
+    .nav-search { position:relative; }
+    .nav-search-clear { position:absolute; right:3.6rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--muted); cursor:pointer; font-size:1rem; display:none; padding:0 .3rem; line-height:1; z-index:2; transition:color .15s; }
+    .nav-search-clear.show { display:block; }
+    .nav-search-clear:hover { color:var(--text); }
+    /* Password toggle */
+    .pw-wrap { position:relative; }
+    .pw-wrap .form-input { padding-right:2.2rem; }
+    .pw-toggle { position:absolute; right:.65rem; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--muted); font-size:.85rem; padding:0; line-height:1; transition:color .15s; }
+    .pw-toggle:hover { color:var(--text); }
+    /* Chat char counter */
+    .chat-char-count { font-size:.65rem; color:var(--muted); text-align:right; padding:0 .85rem .15rem; margin-top:-.25rem; }
+    .chat-char-count.warn { color:#e63946; }
   </style>
 </head>
 <body>
@@ -541,7 +561,8 @@
     </button>
     <a class="nav-logo" href="#">ABYSS<span class="hub">HUB</span></a>
     <div class="nav-search">
-      <input type="text" id="search-input" placeholder="Search cheats, keys, accounts…" autocomplete="off"/>
+      <input type="text" id="search-input" placeholder="Search cheats, keys, accounts…" autocomplete="off" oninput="liveSearch()" />
+      <button class="nav-search-clear" id="search-clear-btn" onclick="clearSearch()" type="button" tabindex="-1" aria-label="Clear search">&times;</button>
       <button onclick="doSearch()">Search</button>
     </div>
     <div class="nav-links">
@@ -780,7 +801,26 @@
 
     function doSearch() {
       const q = document.getElementById('search-input').value.trim().toLowerCase();
-      renderProducts(_all.filter(p => !q || p.name.toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q)));
+      const src = _currentFiltered ?? _all;
+      renderProducts(!q ? src : src.filter(p => p.name.toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q)));
+    }
+    function liveSearch(){
+      const q = document.getElementById('search-input').value;
+      const cb = document.getElementById('search-clear-btn');
+      if(cb) cb.classList.toggle('show', q.length > 0);
+      doSearch();
+    }
+    function clearSearch(){
+      const inp = document.getElementById('search-input');
+      inp.value = '';
+      const cb = document.getElementById('search-clear-btn'); if(cb) cb.classList.remove('show');
+      doSearch();
+      inp.focus();
+    }
+    function togglePw(id, btn){
+      const inp = document.getElementById(id);
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+      btn.textContent = inp.type === 'password' ? '👁️' : '🙈';
     }
     document.addEventListener('keydown', e => { if(e.key==='Enter'&&document.activeElement.id==='search-input') doSearch(); });
 
@@ -789,14 +829,17 @@
       document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
       e.target.classList.add('active');
       document.getElementById('products').scrollIntoView({behavior:'smooth'});
-      if(!cat){ _currentFiltered=null; renderProducts(_all); return; }
+      // Clear search when switching category
+      const si = document.getElementById('search-input'); if(si) si.value='';
+      const scb = document.getElementById('search-clear-btn'); if(scb) scb.classList.remove('show');
+      if(!cat){ _currentFiltered=null; sortProducts(document.getElementById('sort-select').value); return; }
       const filtered = _all.filter(p => {
         const n = p.name.toLowerCase()+' '+(p.description||'').toLowerCase();
         if(cat==='crypto') return (p.payment_methods||[]).includes('CRYPTO')&&!(p.payment_methods||[]).includes('CREDITCARD');
         return n.includes(cat);
       });
       _currentFiltered = filtered;
-      renderProducts(filtered);
+      sortProducts(document.getElementById('sort-select').value);
     }
 
     let _all = [];
@@ -861,7 +904,8 @@
           ? `<img src="${sanitize(p.thumbnail_url)}" alt="" loading="lazy">`
           : `<div class="card-thumb-ph">&#127918;</div>`;
 
-        return `<div class="product-card reveal" style="transition-delay:${(products.indexOf(p)%4)*0.07}s">
+        const oos = p.stock === 0;
+        return `<div class="product-card reveal${oos?' oos':''}" style="transition-delay:${(products.indexOf(p)%4)*0.07}s"${!oos?` onclick="openCheckout(${ri})"`:''}>`
           <div class="card-thumb">
             ${thumb}
             <span class="card-badge">INSTANT</span>
@@ -955,7 +999,7 @@
       else if(tab==='crypto'){ list=_all.filter(p=>(p.payment_methods||[]).includes('CRYPTO')&&!(p.payment_methods||[]).includes('CREDITCARD')); }
       else { list=_all; }
       _currentFiltered = tab==='all'?null:list;
-      renderProducts(list);
+      sortProducts(document.getElementById('sort-select').value);
     }
 
     function catScroll(dir){
@@ -988,7 +1032,7 @@
     function openCheckout(idx) {
       const p = _all[idx]; if(!p) return;
       _activeProduct = p;
-      document.getElementById('modal-email').value='';
+      document.getElementById('modal-email').value = localStorage.getItem('abysshub_last_email') || '';
       document.getElementById('modal-qty').value=p.min_order_amount??1;
       document.getElementById('modal-qty').min=p.min_order_amount??1;
       setModalError('');
@@ -997,7 +1041,8 @@
       const methods=p.payment_methods??['CRYPTO','CREDITCARD'];
       document.getElementById('tab-crypto').disabled=!methods.includes('CRYPTO');
       document.getElementById('tab-card').disabled=!methods.includes('CREDITCARD');
-      _activeMethod=methods[0]??'CRYPTO';
+      const _lastM = localStorage.getItem('abysshub_last_method');
+      _activeMethod = (_lastM && methods.includes(_lastM)) ? _lastM : (methods[0]??'CRYPTO');
       document.querySelectorAll('.method-tab').forEach(t=>t.classList.toggle('active',t.dataset.method===_activeMethod));
       const minQty=p.min_order_amount&&p.min_order_amount>1;
       document.getElementById('modal-min-label').textContent=minQty?`(min ${p.min_order_amount})`:'';
@@ -1014,11 +1059,12 @@
     }
     function setModalError(msg){ const el=document.getElementById('modal-error'); el.textContent=msg; el.classList.toggle('show',!!msg); }
 
-    document.querySelectorAll('.method-tab').forEach(tab=>{ tab.addEventListener('click',()=>{ if(tab.disabled)return; _activeMethod=tab.dataset.method; document.querySelectorAll('.method-tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); }); });
-    document.getElementById('modal-qty').addEventListener('input',updateTotal);
+    document.querySelectorAll('.method-tab').forEach(tab=>{ tab.addEventListener('click',()=>{ if(tab.disabled)return; _activeMethod=tab.dataset.method; localStorage.setItem('abysshub_last_method',_activeMethod); document.querySelectorAll('.method-tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); }); });
+    document.getElementById('modal-qty').addEventListener('input',()=>{ setModalError(''); updateTotal(); });
+    document.getElementById('modal-email').addEventListener('input',()=>setModalError(''));
     document.getElementById('checkout-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCheckout();});
     document.getElementById('modal-close-btn').addEventListener('click',closeCheckout);
-    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCheckout();});
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeCheckout(); closeCart(); closeCartModal(); } });
 
     document.getElementById('modal-submit').addEventListener('click', async()=>{
       if(!_activeProduct)return;
@@ -1034,7 +1080,7 @@
         if(res.status===429){setModalError('Too many requests — please wait a moment.');return;}
         if(!res.ok){setModalError((await res.text())||'Something went wrong.');return;}
         const {redirect_url}=await res.json();
-        if(redirect_url){window.location.href=redirect_url;}else{setModalError('No payment URL received.');}
+        if(redirect_url){ localStorage.setItem('abysshub_last_email',email); localStorage.setItem('abysshub_last_method',_activeMethod); window.location.href=redirect_url;}else{setModalError('No payment URL received.');}
       }catch{setModalError('Network error. Please check your connection.');}
       finally{btn.disabled=false;btn.classList.remove('loading');}
     });
@@ -1113,9 +1159,10 @@
           <label for="login-email">Email</label>
           <input class="form-input" type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
         </div>
-        <div class="form-group">
+        <div class="form-group pw-wrap">
           <label for="login-pw">Password</label>
           <input class="form-input" type="password" id="login-pw" placeholder="••••••••" autocomplete="current-password">
+          <button type="button" class="pw-toggle" onclick="togglePw('login-pw',this)" tabindex="-1" aria-label="Show/hide password">👁</button>
         </div>
         <button class="auth-submit" id="login-btn">Login</button>
         <div class="auth-footer-row">
@@ -1134,13 +1181,15 @@
           <label for="reg-email">Email</label>
           <input class="form-input" type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
         </div>
-        <div class="form-group">
+        <div class="form-group pw-wrap">
           <label for="reg-pw">Password</label>
           <input class="form-input" type="password" id="reg-pw" placeholder="Min 6 characters" autocomplete="new-password">
+          <button type="button" class="pw-toggle" onclick="togglePw('reg-pw',this)" tabindex="-1" aria-label="Show/hide password">👁</button>
         </div>
-        <div class="form-group">
+        <div class="form-group pw-wrap">
           <label for="reg-pw2">Confirm Password</label>
           <input class="form-input" type="password" id="reg-pw2" placeholder="••••••••" autocomplete="new-password">
+          <button type="button" class="pw-toggle" onclick="togglePw('reg-pw2',this)" tabindex="-1" aria-label="Show/hide password">👁</button>
         </div>
         <button class="auth-submit" id="reg-btn">Create Account</button>
       </div>
@@ -1188,9 +1237,10 @@
           <label for="reset-code">Reset Code</label>
           <input class="form-input" type="text" id="reset-code" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;letter-spacing:.15em;font-weight:700;text-align:center;">
         </div>
-        <div class="form-group">
+        <div class="form-group pw-wrap">
           <label for="reset-pw">New Password</label>
           <input class="form-input" type="password" id="reset-pw" placeholder="Min 6 characters" autocomplete="new-password">
+          <button type="button" class="pw-toggle" onclick="togglePw('reset-pw',this)" tabindex="-1" aria-label="Show/hide password">👁</button>
         </div>
         <button class="auth-submit" id="reset-btn">Reset Password</button>
         <div class="auth-footer-row">
@@ -1228,7 +1278,10 @@
           a:Math.random() };
       }
       function init(){ resize(); particles=Array.from({length:80},mkParticle); }
+      let _canvasPaused = false;
+      document.addEventListener('visibilitychange', ()=>{ _canvasPaused = document.hidden; });
       function draw(){
+        if(_canvasPaused){ requestAnimationFrame(draw); return; }
         ctx.clearRect(0,0,W,H);
         // draw lines between nearby particles
         for(let i=0;i<particles.length;i++){
@@ -1383,6 +1436,7 @@
     function setCcoError(msg){ const e=document.getElementById('cco-error'); e.textContent=msg; e.classList.toggle('show',!!msg); }
     document.getElementById('cart-modal-close').addEventListener('click', closeCartModal);
     document.getElementById('cart-modal').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeCartModal(); });
+    document.getElementById('cco-email').addEventListener('input', ()=>setCcoError(''));
 
     renderCart();
 
@@ -1391,6 +1445,9 @@
     const toastStack = document.getElementById('toast-stack');
 
     function showToast(icon, title, msg, duration=5000){
+      // Cap at 3 visible toasts
+      const existing = toastStack.querySelectorAll('.toast');
+      if(existing.length >= 3) existing[existing.length-1].remove();
       const t = document.createElement('div');
       t.className = 'toast';
       t.innerHTML = `<div class="toast-icon">${icon}</div><div class="toast-body"><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
@@ -1816,7 +1873,7 @@
 
       // ── VPN / BLOCK ──────────────────────────────────────────────────────
       { keys:['vpn','blocked','cant access','access denied','access restricted','i am blocked','why am i blocked','why cant i access','proxy blocked','tor blocked','blocked by site','site blocked','vpn detected','vpn block','disable vpn','turn off vpn','using vpn','proxy','anonymizer','tunneling','tunnel','hide ip','fake ip','ip hide','ip address banned','ip banned','ip block','datacenter','data center','cloud server','hosting ip'],
-        answer:`🚫 <strong>AbyssHub blocks all VPN, proxy, and anonymizing connections.</strong><br><br>This is required for security and fraud prevention.<br><br><strong>To access the store:</strong><br>1. Disable your VPN/proxy completely<br>2. Reconnect your regular internet<br>3. Reload the page<br><br>If you're not using a VPN and still blocked, your ISP may route through a datacenter. Contact us on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for manual whitelisting.`},
+        answer:`✅ <strong>VPNs &amp; proxies are currently <em>allowed</em> on AbyssHub.</strong><br><br>You can browse and purchase with your VPN enabled. If you experience any access issues, try disabling it temporarily and reloading.<br><br>For any other access problems, contact us on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.`},
 
       // ── AGE GATE ─────────────────────────────────────────────────────────
       { keys:['age gate','age check','age verification','how old','minimum age','age requirement','age restriction','18','eighteen','am i old enough','do i need to be 18','age limit','adult','why age check','age wall','age screen','age popup','underage','minor','too young','old enough'],
@@ -2065,6 +2122,18 @@
     }
     function closeChat(){ win.classList.remove('open'); }
 
+    function updateChatCount(){
+      const remaining = 200 - input.value.length;
+      const el = document.getElementById('chat-char-count');
+      if(!el) return;
+      if(remaining <= 40){
+        el.textContent = remaining + ' chars left';
+        el.classList.toggle('warn', remaining <= 15);
+      } else {
+        el.textContent = '';
+      }
+    }
+
     fab.addEventListener('click', ()=> win.classList.contains('open') ? closeChat() : openChat());
     closeBtn.addEventListener('click', closeChat);
     sendBtn.addEventListener('click', ()=> send());
@@ -2202,8 +2271,9 @@
       <button class="chat-suggestion" data-q="do you have a refund policy">Refunds</button>
       <button class="chat-suggestion" id="chat-staff-btn" style="border-color:var(--orange);color:var(--orange);">💬 Talk to Staff</button>
     </div>
+    <div class="chat-char-count" id="chat-char-count"></div>
     <div class="chat-input-row">
-      <input type="text" id="chat-input" placeholder="Ask anything…" autocomplete="off" maxlength="200"/>
+      <input type="text" id="chat-input" placeholder="Ask anything…" autocomplete="off" maxlength="200" oninput="updateChatCount()"/>
       <button id="chat-send">
         <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
       </button>
@@ -2375,6 +2445,7 @@
     }
 
     // Enter key submits
+    document.getElementById('login-email').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('login-pw').focus(); });
     document.getElementById('login-pw').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('login-btn').click(); });
     document.getElementById('reg-pw2').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('reg-btn').click(); });
     document.getElementById('verify-code').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('verify-btn').click(); });
