@@ -685,6 +685,73 @@
     .legal-modal li { margin-bottom:.25rem; }
     .legal-updated { font-size:.7rem; color:#555; margin-bottom:.75rem; }
 
+    /* ── LIVE PURCHASE NOTIFICATIONS (right side PH-style) ──────────────── */
+    #live-buys { position:fixed; bottom:1.25rem; right:1.25rem; z-index:1400; display:flex; flex-direction:column-reverse; gap:.5rem; pointer-events:none; }
+    .live-buy { background:rgba(10,10,10,.96); border:1px solid var(--border); border-left:3px solid var(--orange); border-radius:8px; padding:.55rem .75rem .55rem .65rem; max-width:300px; display:flex; align-items:flex-start; gap:.55rem; box-shadow:0 4px 20px rgba(0,0,0,.6); transform:translateX(110%); opacity:0; transition:transform .35s cubic-bezier(.22,1,.36,1), opacity .3s ease; pointer-events:all; }
+    .live-buy.show { transform:none; opacity:1; }
+    .live-buy-icon { width:32px; height:32px; border-radius:50%; background:var(--orange); display:flex; align-items:center; justify-content:center; font-size:.85rem; flex-shrink:0; }
+    .live-buy-body { flex:1; min-width:0; }
+    .live-buy-user { font-size:.78rem; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .live-buy-action { font-size:.72rem; color:var(--muted); margin:.1rem 0 .2rem; line-height:1.35; }
+    .live-buy-action strong { color:var(--text); font-weight:600; }
+    .live-buy-time { font-size:.65rem; color:#555; display:flex; align-items:center; gap:.25rem; }
+    @media(max-width:640px){ #live-buys { right:.65rem; bottom:.65rem; } .live-buy { max-width:220px; font-size:.7rem; padding:.4rem .55rem .4rem .5rem; } }
+
+    /* ── SPIN WHEEL ────────────────────────────────────────────────────────── */
+    #spin-trigger { position:fixed; right:0; top:50%; transform:translateY(-50%); z-index:1200; background:var(--orange); color:#000; writing-mode:vertical-rl; text-orientation:mixed; font-size:.72rem; font-weight:900; padding:.75rem .45rem; border-radius:6px 0 0 6px; cursor:pointer; letter-spacing:.08em; text-transform:uppercase; border:none; font-family:inherit; transition:background .15s, padding .15s; box-shadow:-3px 0 12px rgba(255,144,0,.3); }
+    #spin-trigger:hover { background:var(--orange2); padding-right:.6rem; }
+    .spin-modal { display:none; position:fixed; inset:0; z-index:99998; background:rgba(0,0,0,.92); align-items:center; justify-content:center; flex-direction:column; padding:1rem; }
+    .spin-modal.show { display:flex; }
+    .spin-modal-card { background:#0a0a0a; border:1px solid var(--border); border-radius:12px; padding:1.5rem 1.5rem 1.25rem; max-width:420px; width:100%; text-align:center; box-shadow:0 16px 60px rgba(0,0,0,.8); animation:slide-up .3s ease; position:relative; }
+    .spin-modal-close { position:absolute; top:.65rem; right:.75rem; background:none; border:none; color:#555; font-size:1.3rem; cursor:pointer; line-height:1; transition:color .15s; }
+    .spin-modal-close:hover { color:#fff; }
+    .spin-modal h2 { font-size:1.25rem; font-weight:900; margin-bottom:.2rem; }
+    .spin-modal-sub { font-size:.8rem; color:var(--muted); margin-bottom:1rem; }
+    .spin-modal-sub span { color:var(--orange); font-weight:700; }
+    .spin-wheel-wrap { position:relative; width:230px; height:230px; margin:0 auto .85rem; }
+    .spin-pointer { position:absolute; top:-8px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:9px solid transparent; border-right:9px solid transparent; border-top:18px solid var(--orange); z-index:5; filter:drop-shadow(0 2px 4px rgba(255,144,0,.5)); }
+    #spin-canvas { width:230px; height:230px; border-radius:50%; display:block; box-shadow:0 0 0 3px rgba(255,144,0,.3), 0 4px 24px rgba(0,0,0,.6); }
+    .spin-btn { width:100%; padding:.7rem; background:var(--orange); color:#000; border:none; border-radius:4px; font-size:.92rem; font-weight:900; cursor:pointer; font-family:inherit; transition:background .15s; margin-top:.5rem; }
+    .spin-btn:hover { background:var(--orange2); }
+    .spin-btn:disabled { opacity:.5; cursor:not-allowed; background:var(--orange); }
+    .spin-note { font-size:.68rem; color:#555; margin-top:.45rem; }
+    .spin-result { display:none; background:#111; border:1px solid var(--border); border-radius:8px; padding:1rem; margin-top:.75rem; }
+    .spin-result.show { display:block; }
+    .spin-result-pct { font-size:1.6rem; font-weight:900; color:var(--orange); }
+    .spin-result-code { font-size:.95rem; font-weight:700; letter-spacing:.15em; color:var(--text); margin:.35rem 0 .55rem; font-family:monospace; background:#0a0a0a; padding:.3rem .75rem; border-radius:4px; border:1px dashed var(--border); }
+    .spin-result-copy { background:transparent; border:1px solid var(--border); color:var(--muted); padding:.3rem .85rem; border-radius:3px; font-size:.73rem; cursor:pointer; font-family:inherit; transition:all .15s; }
+    .spin-result-copy:hover { border-color:var(--orange); color:var(--orange); }
+    .spin-result-note { font-size:.7rem; color:#555; margin-top:.4rem; }
+    @media(max-width:480px){ .spin-modal-card { padding:1rem; } .spin-wheel-wrap { width:200px; height:200px; } #spin-canvas { width:200px; height:200px; } }
+
+    /* ── VOUCH MODAL ───────────────────────────────────────────────────────── */
+    .vouch-modal { display:none; position:fixed; inset:0; z-index:99997; background:rgba(0,0,0,.85); align-items:center; justify-content:center; padding:1rem; }
+    .vouch-modal.show { display:flex; }
+    .vouch-modal-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; max-width:480px; width:100%; box-shadow:0 12px 48px rgba(0,0,0,.7); animation:slide-up .3s ease; }
+    .vouch-modal-card h3 { font-size:1rem; font-weight:900; margin-bottom:.25rem; }
+    .vouch-modal-card .sub { font-size:.78rem; color:var(--muted); margin-bottom:1rem; }
+    .star-row { display:flex; gap:.4rem; margin-bottom:.75rem; }
+    .star-btn { background:none; border:none; font-size:1.4rem; cursor:pointer; color:#555; transition:color .1s, transform .1s; padding:0; line-height:1; }
+    .star-btn.active, .star-btn:hover ~ .star-btn.active { color:#f5c518; }
+    .star-btn:hover { color:#f5c518; transform:scale(1.15); }
+    .vouch-err { font-size:.75rem; color:#ff4444; margin-top:.5rem; display:none; }
+    .vouch-err.show { display:block; }
+    .vouch-ok { font-size:.8rem; color:#0c0; margin-top:.5rem; display:none; text-align:center; font-weight:700; }
+    .vouch-ok.show { display:block; }
+    .vouch-btn { width:100%; padding:.65rem; background:var(--orange); color:#000; border:none; border-radius:4px; font-size:.88rem; font-weight:900; cursor:pointer; font-family:inherit; margin-top:.75rem; transition:background .15s; }
+    .vouch-btn:hover { background:var(--orange2); }
+
+    /* ── PROMO CODE FIELD ──────────────────────────────────────────────────── */
+    .promo-row { display:flex; gap:.5rem; margin-bottom:.75rem; }
+    .promo-input { flex:1; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:4px; padding:.5rem .75rem; font-size:.8rem; font-family:inherit; outline:none; letter-spacing:.1em; text-transform:uppercase; }
+    .promo-input::placeholder { text-transform:none; letter-spacing:0; }
+    .promo-input:focus { border-color:var(--orange); }
+    .promo-apply { background:var(--orange); color:#000; border:none; border-radius:4px; padding:.5rem .85rem; font-size:.78rem; font-weight:900; cursor:pointer; font-family:inherit; white-space:nowrap; transition:background .15s; }
+    .promo-apply:hover { background:var(--orange2); }
+    .promo-msg { font-size:.72rem; margin-bottom:.5rem; }
+    .promo-msg.ok { color:#0c0; }
+    .promo-msg.err { color:#f44; }
+
     /* ── SIDEBAR USER AREA (PH-style) ─────────────────────────────────────── */
     .sidebar-user-area { display:flex; align-items:center; justify-content:center; gap:1.25rem; padding:1rem 1.1rem; border-bottom:1px solid var(--border); background:#050505; }
     .sidebar-user-btn { display:flex; flex-direction:column; align-items:center; gap:.3rem; background:none; border:none; cursor:pointer; color:#ccc; font-size:.68rem; font-weight:600; font-family:inherit; transition:color .15s; padding:.3rem .6rem; }
@@ -831,6 +898,71 @@
       <div id="sidebar-trending-items"></div>
     </div>
     <button class="sidebar-discord" onclick="window.open('https://discord.gg/Y69UbMUEfu','_blank')">Join Discord</button>
+  </div>
+
+  <!-- LIVE PURCHASE NOTIFICATIONS (right side) -->
+  <div id="live-buys"></div>
+
+  <!-- SPIN TO WIN TRIGGER -->
+  <button id="spin-trigger" onclick="openSpin()">&#127920; Spin<br>to Win</button>
+
+  <!-- SPIN TO WIN MODAL -->
+  <div class="spin-modal" id="spin-modal">
+    <div class="spin-modal-card">
+      <button class="spin-modal-close" onclick="closeSpin()">&times;</button>
+      <h2>Spin to Win!</h2>
+      <p class="spin-modal-sub">Try your luck for up to <span>15% off</span></p>
+      <div class="spin-wheel-wrap">
+        <div class="spin-pointer"></div>
+        <canvas id="spin-canvas" width="230" height="230"></canvas>
+      </div>
+      <div class="spin-result" id="spin-result">
+        <div class="spin-result-pct" id="spin-result-pct">5% OFF</div>
+        <div class="spin-result-code" id="spin-result-code">ABYSS-XXXXXX</div>
+        <button class="spin-result-copy" onclick="copySpinCode()">Copy Code</button>
+        <div class="spin-result-note">Valid for 15 minutes &bull; Crypto payments only &bull; One use</div>
+      </div>
+      <button class="spin-btn" id="spin-btn" onclick="doSpin()">Spin the Wheel!</button>
+      <div class="spin-note" id="spin-note">One spin per visitor per day. Discount valid for 15 minutes.</div>
+    </div>
+  </div>
+
+  <!-- VOUCH MODAL -->
+  <div class="vouch-modal" id="vouch-modal">
+    <div class="vouch-modal-card">
+      <h3>&#11088; Leave a Vouch</h3>
+      <p class="sub">Verify your purchase and share your experience.</p>
+      <div class="form-group" style="margin-bottom:.6rem">
+        <label style="font-size:.75rem">Your Rating</label>
+        <div class="star-row" id="star-row">
+          <button class="star-btn active" data-v="1" onclick="setStars(1)">&#9733;</button>
+          <button class="star-btn active" data-v="2" onclick="setStars(2)">&#9733;</button>
+          <button class="star-btn active" data-v="3" onclick="setStars(3)">&#9733;</button>
+          <button class="star-btn active" data-v="4" onclick="setStars(4)">&#9733;</button>
+          <button class="star-btn active" data-v="5" onclick="setStars(5)">&#9733;</button>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:.6rem">
+        <label style="font-size:.75rem">Display Name <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+        <input class="form-input" type="text" id="vouch-username" placeholder="e.g. xshadows" maxlength="30">
+      </div>
+      <div class="form-group" style="margin-bottom:.6rem">
+        <label style="font-size:.75rem">Order ID</label>
+        <input class="form-input" type="text" id="vouch-orderid" placeholder="Your Order ID">
+      </div>
+      <div class="form-group" style="margin-bottom:.6rem">
+        <label style="font-size:.75rem">Email Used at Checkout</label>
+        <input class="form-input" type="email" id="vouch-email" placeholder="you@example.com">
+      </div>
+      <div class="form-group" style="margin-bottom:.6rem">
+        <label style="font-size:.75rem">Your Review <span style="color:var(--muted);font-weight:400">(min 10 chars)</span></label>
+        <textarea class="form-input" id="vouch-msg" rows="3" maxlength="500" placeholder="How was your experience?" style="resize:vertical;min-height:70px"></textarea>
+      </div>
+      <div class="vouch-err" id="vouch-err"></div>
+      <div class="vouch-ok" id="vouch-ok">&#10003; Vouch submitted! Thank you.</div>
+      <button class="vouch-btn" id="vouch-submit" onclick="submitVouch()">Submit Vouch</button>
+      <button style="width:100%;background:none;border:none;color:var(--muted);font-size:.75rem;cursor:pointer;margin-top:.5rem;font-family:inherit" onclick="closeVouch()">Cancel</button>
+    </div>
   </div>
 
   <!-- INTERSTITIAL AD -->
@@ -1037,56 +1169,45 @@
 
   <!-- REVIEWS -->
   <div class="reviews-section reveal" id="reviews" style="scroll-margin-top:100px;">
-    <div class="sec-header"><h2>&#11088; What Customers Say</h2></div>
-    <div class="reviews-grid">
+    <div class="sec-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem">
+      <h2>&#11088; Customer Vouches</h2>
+      <button style="background:var(--orange);color:#000;border:none;border-radius:4px;padding:.45rem 1rem;font-size:.78rem;font-weight:900;cursor:pointer;font-family:inherit" onclick="openVouch()">+ Leave a Vouch</button>
+    </div>
+    <div class="reviews-grid" id="reviews-grid">
+      <!-- populated by JS from /api/vouches, falls back to statics below -->
       <div class="review-card">
         <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
         <div class="review-text">"Bought 200 Steam FA accounts, every single one worked. Delivery was literally instant through Discord DM. Best bulk prices I've found anywhere."</div>
-        <div class="review-author">
-          <div class="review-avatar">D</div>
-          <div><div class="review-name">dxrk#0001</div><div class="review-verified">&#10003; Verified Buyer</div></div>
-        </div>
+        <div class="review-author"><div class="review-avatar">D</div><div><div class="review-name">dxrk#0001</div><div class="review-verified">&#10003; Verified Buyer</div></div></div>
       </div>
       <div class="review-card">
         <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
         <div class="review-text">"External cheat has been undetected for 3 months straight. No VAC ban, no issues. Lifetime key was 100% worth it."</div>
-        <div class="review-author">
-          <div class="review-avatar">Z</div>
-          <div><div class="review-name">zer0#4421</div><div class="review-verified">&#10003; Verified Buyer</div></div>
-        </div>
+        <div class="review-author"><div class="review-avatar">Z</div><div><div class="review-name">zer0#4421</div><div class="review-verified">&#10003; Verified Buyer</div></div></div>
       </div>
       <div class="review-card">
         <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
         <div class="review-text">"Xbox Game Pass code worked first try on redeem.microsoft.com. Paid with BTC, had the code in under a minute. Will buy again."</div>
-        <div class="review-author">
-          <div class="review-avatar">M</div>
-          <div><div class="review-name">mxke#7890</div><div class="review-verified">&#10003; Verified Buyer</div></div>
-        </div>
+        <div class="review-author"><div class="review-avatar">M</div><div><div class="review-name">mxke#7890</div><div class="review-verified">&#10003; Verified Buyer</div></div></div>
       </div>
       <div class="review-card">
         <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
         <div class="review-text">"Had an issue with one account, opened a ticket and got a replacement in 10 minutes. Support is actually insane for a shop this size."</div>
-        <div class="review-author">
-          <div class="review-avatar">J</div>
-          <div><div class="review-name">jxyce#2211</div><div class="review-verified">&#10003; Verified Buyer</div></div>
-        </div>
+        <div class="review-author"><div class="review-avatar">J</div><div><div class="review-name">jxyce#2211</div><div class="review-verified">&#10003; Verified Buyer</div></div></div>
       </div>
       <div class="review-card">
         <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
         <div class="review-text">"Gambling redeems actually hit. Got way more value than what I paid. This store is legit, been buying for weeks now."</div>
-        <div class="review-author">
-          <div class="review-avatar">R</div>
-          <div><div class="review-name">rxsty#5500</div><div class="review-verified">&#10003; Verified Buyer</div></div>
-        </div>
+        <div class="review-author"><div class="review-avatar">R</div><div><div class="review-name">rxsty#5500</div><div class="review-verified">&#10003; Verified Buyer</div></div></div>
       </div>
       <div class="review-card">
         <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
         <div class="review-text">"Monero payment was seamless. No KYC, no BS. Product in my DMs before I even closed the payment tab. 10/10 privacy."</div>
-        <div class="review-author">
-          <div class="review-avatar">K</div>
-          <div><div class="review-name">krypt0#1337</div><div class="review-verified">&#10003; Verified Buyer</div></div>
-        </div>
+        <div class="review-author"><div class="review-avatar">K</div><div><div class="review-name">krypt0#1337</div><div class="review-verified">&#10003; Verified Buyer</div></div></div>
       </div>
+    </div>
+    <div style="text-align:center;margin-top:1.25rem">
+      <button style="background:none;border:1px solid var(--border);color:var(--muted);padding:.45rem 1.25rem;border-radius:4px;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'" onclick="openVouch()">Share Your Experience &rarr;</button>
     </div>
   </div>
 
@@ -1309,6 +1430,14 @@
       <div class="form-group">
         <label for="modal-qty">Quantity <span id="modal-min-label" style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;font-size:.72rem;"></span></label>
         <input class="form-input" type="number" id="modal-qty" value="1" min="1" step="1">
+      </div>
+      <div class="form-group" id="promo-group">
+        <label style="font-size:.75rem;display:flex;align-items:center;gap:.35rem">&#127920; Promo Code <span style="color:var(--muted);font-weight:400;font-size:.68rem">(crypto only)</span></label>
+        <div class="promo-row">
+          <input class="promo-input" type="text" id="modal-promo" placeholder="ABYSS-XXXXXX" maxlength="16" autocomplete="off">
+          <button class="promo-apply" onclick="applyPromo()">Apply</button>
+        </div>
+        <div class="promo-msg" id="promo-msg"></div>
       </div>
       <div class="modal-total">
         <span class="modal-total-label">Order Total</span>
@@ -1672,12 +1801,22 @@
     function openCheckoutWithAd(idx){
       maybeShowInterstitial(()=>_origOpenCheckout(idx));
     }
-    function closeCheckout(){ document.getElementById('checkout-modal').classList.remove('open'); }
+    function closeCheckout(){
+      document.getElementById('checkout-modal').classList.remove('open');
+      // Reset promo state
+      if(typeof _promoCode!=='undefined'){_promoCode='';_promoDiscount=0;}
+      const pf=document.getElementById('modal-promo'); if(pf) pf.value='';
+      const pm=document.getElementById('promo-msg'); if(pm){pm.textContent='';pm.className='promo-msg';}
+    }
     function updateTotal() {
       if(!_activeProduct) return;
-      const qty=parseInt(document.getElementById('modal-qty').value,10)||1;
-      document.getElementById('modal-total').textContent=fmtPrice(_activeProduct.price,qty);
-      document.getElementById('modal-price-line').textContent=`${fmtPrice(_activeProduct.price)} each${_activeProduct.min_order_amount>1?` · min ${_activeProduct.min_order_amount}`:''}`;
+      const qty = parseInt(document.getElementById('modal-qty').value,10) || 1;
+      const base = _activeProduct.price;
+      const pct = (typeof _promoDiscount !== 'undefined' && _promoDiscount > 0) ? _promoDiscount : 0;
+      const final = pct > 0 ? base * (1 - pct / 100) : base;
+      const discLabel = pct > 0 ? ` <span style="color:#00e676;font-size:.75rem;margin-left:4px">-${pct}%</span>` : '';
+      document.getElementById('modal-total').innerHTML = fmtPrice(final, qty) + discLabel;
+      document.getElementById('modal-price-line').textContent = `${fmtPrice(final)} each${_activeProduct.min_order_amount > 1 ? ` · min ${_activeProduct.min_order_amount}` : ''}`;
     }
     function setModalError(msg){ const el=document.getElementById('modal-error'); el.textContent=msg; el.classList.toggle('show',!!msg); }
 
@@ -1698,7 +1837,8 @@
       setModalError('');
       const btn=document.getElementById('modal-submit'); btn.disabled=true; btn.classList.add('loading');
       try {
-        const res=await fetch('/api/create-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product:_activeProduct.name,quantity:qty,email,method:_activeMethod})});
+        const promoToSend=(typeof _promoCode!=='undefined'&&_promoCode&&_activeMethod==='CRYPTO')?_promoCode:'';
+        const res=await fetch('/api/create-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product:_activeProduct.name,quantity:qty,email,method:_activeMethod,promo_code:promoToSend})});
         if(res.status===429){setModalError('Too many requests — please wait a moment.');return;}
         if(!res.ok){setModalError((await res.text())||'Something went wrong.');return;}
         const {redirect_url}=await res.json();
@@ -2062,12 +2202,44 @@
 
     renderCart();
 
-    // ── LIVE ORDER NOTIFICATIONS ──────────────────────────────────────────────
+    // ── LIVE PURCHASE NOTIFICATIONS (PH-style, bottom-right) ───────────────
     let _lastEventId = 0;
-    const toastStack = document.getElementById('toast-stack');
+    const _liveBuys = document.getElementById('live-buys');
 
+    // Map product name to an action phrase
+    function _buyAction(product) {
+      const n = (product || '').toLowerCase();
+      if(n.includes('lifetime')) return `just secured <strong>lifetime access</strong>`;
+      if(n.includes('external') || n.includes('cheat')) return `just <strong>spoofed their system</strong>`;
+      if(n.includes('steam')) return `just claimed a <strong>Steam account</strong>`;
+      if(n.includes('xbox')) return `just grabbed <strong>Xbox keys</strong>`;
+      if(n.includes('week')) return `just copped a <strong>weekly key</strong>`;
+      if(n.includes('month')) return `just unlocked a <strong>monthly key</strong>`;
+      if(n.includes('trial')) return `just started a <strong>trial key</strong>`;
+      if(n.includes('day')) return `just grabbed a <strong>day key</strong>`;
+      if(n.includes('gambl') || n.includes('redeem') || n.includes('coin')) return `just redeemed <strong>gambling coins</strong>`;
+      return `just completed a <strong>purchase</strong>`;
+    }
+
+    function showLiveBuy(user, product) {
+      const existing = _liveBuys.querySelectorAll('.live-buy');
+      if(existing.length >= 3) existing[0].remove();
+      const el = document.createElement('div');
+      el.className = 'live-buy';
+      el.innerHTML = `<div class="live-buy-icon">&#9889;</div>
+        <div class="live-buy-body">
+          <div class="live-buy-user">User ${user}</div>
+          <div class="live-buy-action">${_buyAction(product)}</div>
+          <div class="live-buy-time">&#9889; just now</div>
+        </div>`;
+      _liveBuys.appendChild(el);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
+      setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(), 400); }, 6000);
+    }
+
+    // Keep existing toast function for system messages (cart, etc)
+    const toastStack = document.getElementById('toast-stack');
     function showToast(icon, title, msg, duration=5000){
-      // Cap at 3 visible toasts
       const existing = toastStack.querySelectorAll('.toast');
       if(existing.length >= 3) existing[existing.length-1].remove();
       const t = document.createElement('div');
@@ -2085,7 +2257,7 @@
         const events = await r.json();
         for(const ev of events){
           if(ev.id > _lastEventId) _lastEventId = ev.id;
-          showToast('&#128722;', 'New Order', `Someone just purchased ${ev.product}`);
+          showLiveBuy(ev.user || 'anon***', ev.product);
         }
       } catch{}
     }
@@ -3262,6 +3434,220 @@
     document.getElementById('verify-code').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('verify-btn').click(); });
     document.getElementById('reset-pw').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('reset-btn').click(); });
     document.getElementById('forgot-email').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('forgot-btn').click(); });
+
+    // ── PROMO CODE ──────────────────────────────────────────────────────────
+    let _promoCode = '', _promoDiscount = 0;
+
+    async function applyPromo(){
+      const code = document.getElementById('modal-promo').value.trim().toUpperCase();
+      const msgEl = document.getElementById('promo-msg');
+      if(!code){ msgEl.textContent='Enter a code first.'; msgEl.className='promo-msg err'; return; }
+      msgEl.textContent='Checking...'; msgEl.className='promo-msg';
+      try {
+        const r = await fetch('/api/promo/validate', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code})});
+        const d = await r.json();
+        if(d.valid){
+          _promoCode = code; _promoDiscount = d.discount;
+          msgEl.textContent = `✓ ${d.msg}`; msgEl.className='promo-msg ok';
+          updateTotal();
+        } else {
+          _promoCode=''; _promoDiscount=0;
+          msgEl.textContent = d.msg; msgEl.className='promo-msg err';
+          updateTotal();
+        }
+      } catch { msgEl.textContent='Network error.'; msgEl.className='promo-msg err'; }
+    }
+    document.getElementById('modal-promo').addEventListener('keydown', e=>{ if(e.key==='Enter') applyPromo(); });
+    // Hide promo group for card payments
+    document.querySelectorAll('.method-tab').forEach(t=>t.addEventListener('click',()=>{
+      const pg = document.getElementById('promo-group');
+      if(t.dataset.method==='CREDITCARD'){ pg.style.opacity='.45'; pg.style.pointerEvents='none'; }
+      else { pg.style.opacity=''; pg.style.pointerEvents=''; }
+    }));
+
+    // ── SPIN WHEEL ──────────────────────────────────────────────────────────
+    const _spinLabels  = ['5%','10%','5%','15%','5%','10%','5%','5%'];
+    const _spinColors  = ['#00b8d4','#006773','#00c851','#004d36','#00b8d4','#006773','#00c851','#004d36'];
+    const _spinBorders = ['#00d4ff','#0097a7','#00e676','#006d4e','#00d4ff','#0097a7','#00e676','#006d4e'];
+    let _spinDeg = 0;
+    let _spinCode = '';
+
+    function _drawWheel(){
+      const canvas = document.getElementById('spin-canvas');
+      if(!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const n = _spinLabels.length;
+      const arc = (2 * Math.PI) / n;
+      const cx = canvas.width / 2, cy = canvas.height / 2;
+      const r = Math.min(cx, cy) - 6;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for(let i = 0; i < n; i++){
+        const s = -Math.PI/2 + i * arc, e = s + arc;
+        // Segment fill
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx, cy, r, s, e); ctx.closePath();
+        ctx.fillStyle = _spinColors[i]; ctx.fill();
+        // Segment stroke
+        ctx.strokeStyle = 'rgba(0,0,0,0.25)'; ctx.lineWidth = 1.5; ctx.stroke();
+        // Label
+        ctx.save();
+        ctx.translate(cx, cy); ctx.rotate(s + arc/2);
+        ctx.textAlign = 'right'; ctx.fillStyle = '#fff';
+        ctx.font = 'bold 13px Arial, sans-serif';
+        ctx.fillText(_spinLabels[i], r - 10, 5);
+        ctx.restore();
+      }
+      // Outer ring
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2*Math.PI);
+      ctx.strokeStyle = 'rgba(255,144,0,0.4)'; ctx.lineWidth = 3; ctx.stroke();
+      // Center circle
+      ctx.beginPath(); ctx.arc(cx, cy, 34, 0, 2*Math.PI);
+      ctx.fillStyle = '#050505'; ctx.fill();
+      ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = 'bold 12px Arial, sans-serif'; ctx.fillStyle = '#ccc';
+      ctx.fillText('SPIN', cx, cy);
+    }
+
+    function openSpin(){ document.getElementById('spin-modal').classList.add('show'); _drawWheel(); }
+    function closeSpin(){ document.getElementById('spin-modal').classList.remove('show'); }
+    document.getElementById('spin-modal').addEventListener('click', e=>{ if(e.target.id==='spin-modal') closeSpin(); });
+
+    async function doSpin(){
+      const btn = document.getElementById('spin-btn');
+      const note = document.getElementById('spin-note');
+      btn.disabled = true; btn.textContent = 'Spinning…';
+      try {
+        const r = await fetch('/api/spin', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
+        const d = await r.json();
+        if(!d.ok){
+          note.textContent = d.msg || 'Error spinning. Try again later.';
+          btn.disabled = false; btn.textContent = 'Spin the Wheel!';
+          return;
+        }
+        // Animate wheel to winning segment
+        const segIdx = d.segment;
+        const targetFinal = (337.5 - segIdx * 45 + 3600) % 360;
+        let delta = targetFinal - (_spinDeg % 360);
+        if(delta <= 0) delta += 360;
+        _spinDeg += 5 * 360 + delta;
+
+        const canvas = document.getElementById('spin-canvas');
+        canvas.style.transition = 'transform 4.5s cubic-bezier(0.17, 0.67, 0.25, 0.97)';
+        canvas.style.transform = `rotate(${_spinDeg}deg)`;
+
+        _spinCode = d.code;
+        // After animation ends show result
+        setTimeout(()=>{
+          const res = document.getElementById('spin-result');
+          document.getElementById('spin-result-pct').textContent = d.discount + '% OFF!';
+          document.getElementById('spin-result-code').textContent = d.code;
+          res.classList.add('show');
+          // Pre-fill checkout promo field
+          document.getElementById('modal-promo').value = d.code;
+          note.textContent = 'Code expires in 15 minutes. Apply it at checkout!';
+          btn.textContent = 'Come back tomorrow!';
+        }, 4700);
+      } catch {
+        note.textContent = 'Network error. Try again.';
+        btn.disabled = false; btn.textContent = 'Spin the Wheel!';
+      }
+    }
+
+    function copySpinCode(){
+      if(!_spinCode) return;
+      navigator.clipboard.writeText(_spinCode).then(()=>{
+        const b = document.querySelector('.spin-result-copy');
+        const orig = b.textContent; b.textContent = 'Copied!'; b.style.color='var(--orange)';
+        setTimeout(()=>{ b.textContent=orig; b.style.color=''; }, 1500);
+      });
+    }
+
+    // ── VOUCHES ─────────────────────────────────────────────────────────────
+    let _vouchRating = 5;
+
+    async function loadVouches(){
+      try {
+        const r = await fetch('/api/vouches');
+        if(!r.ok) return;
+        const vouches = await r.json();
+        if(!vouches.length) return; // keep static fallback
+        const grid = document.getElementById('reviews-grid');
+        const stars = n => '&#9733;'.repeat(n) + (n<5?'&#9734;'.repeat(5-n):'');
+        grid.innerHTML = vouches.slice(0,12).map(v=>{
+          const initial = (v.username||'?')[0].toUpperCase();
+          const timeAgo = _timeAgo(v.created_at);
+          return `<div class="review-card">
+            <div class="review-stars">${stars(v.rating)}</div>
+            <div class="review-text">"${_esc(v.message)}"</div>
+            <div class="review-author">
+              <div class="review-avatar">${initial}</div>
+              <div>
+                <div class="review-name">${_esc(v.username)}</div>
+                <div class="review-verified">&#10003; Verified Buyer &bull; <span style="color:#555">${timeAgo}</span>${v.product?` &bull; <span style="color:var(--muted)">${_esc(v.product)}</span>`:''}</div>
+              </div>
+            </div>
+          </div>`;
+        }).join('');
+      } catch {}
+    }
+
+    function _timeAgo(ts){
+      if(!ts) return '';
+      const diff = Math.floor(Date.now()/1000) - ts;
+      if(diff < 60) return 'just now';
+      if(diff < 3600) return Math.floor(diff/60)+'m ago';
+      if(diff < 86400) return Math.floor(diff/3600)+'h ago';
+      return Math.floor(diff/86400)+'d ago';
+    }
+    function _esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    loadVouches();
+
+    function setStars(n){
+      _vouchRating = n;
+      document.querySelectorAll('.star-btn').forEach(b=>{
+        b.classList.toggle('active', parseInt(b.dataset.v) <= n);
+      });
+    }
+    function openVouch(){
+      document.getElementById('vouch-modal').classList.add('show');
+      document.getElementById('vouch-err').classList.remove('show');
+      document.getElementById('vouch-ok').classList.remove('show');
+      document.getElementById('vouch-submit').disabled = false;
+      document.getElementById('vouch-submit').textContent = 'Submit Vouch';
+    }
+    function closeVouch(){ document.getElementById('vouch-modal').classList.remove('show'); }
+    document.getElementById('vouch-modal').addEventListener('click', e=>{ if(e.target.id==='vouch-modal') closeVouch(); });
+
+    async function submitVouch(){
+      const order_id  = document.getElementById('vouch-orderid').value.trim();
+      const email     = document.getElementById('vouch-email').value.trim();
+      const message   = document.getElementById('vouch-msg').value.trim();
+      const username  = document.getElementById('vouch-username').value.trim();
+      const errEl     = document.getElementById('vouch-err');
+      const okEl      = document.getElementById('vouch-ok');
+      const btn       = document.getElementById('vouch-submit');
+      errEl.classList.remove('show'); okEl.classList.remove('show');
+      if(!order_id||!email||!message){ errEl.textContent='Order ID, email and message are required.'; errEl.classList.add('show'); return; }
+      btn.disabled = true; btn.textContent = 'Submitting…';
+      try {
+        const r = await fetch('/api/vouch', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({order_id, email, rating:_vouchRating, message, username})});
+        const d = await r.json();
+        if(d.ok){
+          okEl.classList.add('show');
+          btn.textContent = 'Submitted!';
+          setTimeout(()=>{ closeVouch(); loadVouches(); }, 2000);
+        } else {
+          errEl.textContent = d.msg || 'Error submitting vouch.';
+          errEl.classList.add('show');
+          btn.disabled=false; btn.textContent='Submit Vouch';
+        }
+      } catch {
+        errEl.textContent='Network error. Please try again.';
+        errEl.classList.add('show');
+        btn.disabled=false; btn.textContent='Submit Vouch';
+      }
+    }
   })();
   </script>
 

@@ -3,6 +3,8 @@ import hashlib
 import hmac
 import json
 import os
+import secrets as _secrets
+import sqlite3 as _sql
 import time
 import uuid
 from pathlib import Path
@@ -13,9 +15,47 @@ from loguru import logger
 NOWPAYMENTS_IPN_SECRET = os.environ.get('NOWPAYMENTS_IPN_SECRET', '')
 
 # ── Live order events (in-memory ring buffer for toast notifications) ─────────
-_events: list[dict] = []          # [{"id": int, "product": str}, …]
+_events: list[dict] = []          # [{"id": int, "product": str, "user": str}, …]
 _event_counter: int = 0
 _EVENTS_MAX = 100                  # keep last 100 events
+
+# ── Store DB (promo codes, vouches, spin limits) ───────────────────────────────
+_STORE_DB = Path(__file__).parent / 'store.db'
+_SPIN_SEGMENTS = [5, 10, 5, 15, 5, 10, 5, 5]  # 8 wheel segments (discount %)
+
+def _init_store_db():
+    conn = _sql.connect(str(_STORE_DB))
+    try:
+        conn.executescript("""
+        CREATE TABLE IF NOT EXISTS promo_codes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            code TEXT UNIQUE NOT NULL,
+            discount INTEGER NOT NULL,
+            segment INTEGER NOT NULL,
+            created_at INTEGER NOT NULL,
+            expires_at INTEGER NOT NULL,
+            used INTEGER DEFAULT 0,
+            ip TEXT
+        );
+        CREATE TABLE IF NOT EXISTS spin_limits (
+            ip TEXT PRIMARY KEY,
+            last_spin INTEGER NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS vouches (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_id TEXT NOT NULL UNIQUE,
+            username TEXT NOT NULL,
+            rating INTEGER NOT NULL,
+            message TEXT NOT NULL,
+            product TEXT,
+            created_at INTEGER NOT NULL
+        );
+        """)
+        conn.commit()
+    finally:
+        conn.close()
+
+_init_store_db()
 
 # ── VPN / Proxy detection cache ───────────────────────────────────────────────
 _vpn_cache: dict[str, tuple[bool, float]] = {}   # ip → (is_blocked, expiry)
@@ -271,6 +311,7 @@ async def start_api_server(secret: str, port: int = 8080):
         quantity     = int(body.get('quantity', 1))
         email        = body.get('email', '').strip()
         method       = body.get('method', 'CRYPTO').upper()
+        promo_code   = (body.get('promo_code') or '').strip().upper()
 
         if not product_name or not email:
             return web.Response(status=422, text="product and email are required")
@@ -292,13 +333,37 @@ async def start_api_server(secret: str, port: int = 8080):
         if quantity < min_qty:
             return web.json_response({'error': f'Minimum order quantity is {min_qty}'}, status=422)
 
+        # Validate promo code for CRYPTO payments
+        promo_discount = 0
+        if promo_code and method == 'CRYPTO':
+            try:
+                now_ts = int(time.time())
+                conn_p = _sql.connect(str(_STORE_DB))
+                row = conn_p.execute(
+                    'SELECT discount, expires_at, used FROM promo_codes WHERE code=?', (promo_code,)
+                ).fetchone()
+                conn_p.close()
+                if row and row[2] == 0 and row[1] > now_ts:
+                    promo_discount = row[0]
+                elif row and row[2] == 1:
+                    return web.json_response({'error': 'Promo code already used.'}, status=422)
+                elif row:
+                    return web.json_response({'error': 'Promo code expired.'}, status=422)
+                else:
+                    return web.json_response({'error': 'Invalid promo code.'}, status=422)
+            except Exception as e:
+                logger.error(f'Promo code lookup error: {e}')
+
         try:
             import asyncio
             loop = asyncio.get_running_loop()
             if method == 'CRYPTO':
                 from utils.crypto_api import createOrder
+                unit_price = product['price']
+                if promo_discount > 0:
+                    unit_price = round(unit_price * (1 - promo_discount / 100), 2)
                 order = await loop.run_in_executor(
-                    None, lambda: createOrder(product['price'], quantity, email, product['name'])
+                    None, lambda: createOrder(unit_price, quantity, email, product['name'])
                 )
                 if not order:
                     return web.Response(status=502, text="Failed to create crypto invoice")
@@ -306,7 +371,16 @@ async def start_api_server(secret: str, port: int = 8080):
                 if not checkout_link:
                     logger.error(f"BTCPay response missing checkoutLink: {order}")
                     return web.Response(status=502, text="Failed to get payment link")
-                return web.json_response({'redirect_url': checkout_link})
+                # Mark promo code as used
+                if promo_discount > 0 and promo_code:
+                    try:
+                        conn_p = _sql.connect(str(_STORE_DB))
+                        conn_p.execute('UPDATE promo_codes SET used=1 WHERE code=?', (promo_code,))
+                        conn_p.commit()
+                        conn_p.close()
+                    except Exception:
+                        pass
+                return web.json_response({'redirect_url': checkout_link, 'discount_applied': promo_discount})
 
             elif method == 'CREDITCARD':
                 from utils.cardpayment_utils import createPayment
@@ -400,7 +474,17 @@ async def start_api_server(secret: str, port: int = 8080):
             global _event_counter
             _event_counter += 1
             product_name = data.get('order_description') or data.get('product_id') or 'a product'
-            _events.append({'id': _event_counter, 'product': str(product_name)})
+            # Anonymize buyer email for live notification display
+            masked = 'user***'
+            try:
+                from utils.db_functions import getOrderById
+                stored = getOrderById(invoice_id) or getOrderById(str(data.get('payment_id', '')))
+                if stored and stored[9]:  # buyeremail index 9
+                    prefix = stored[9].split('@')[0]
+                    masked = (prefix[:3] if len(prefix) >= 3 else prefix[:1]) + '***'
+            except Exception:
+                pass
+            _events.append({'id': _event_counter, 'product': str(product_name), 'user': masked})
             if len(_events) > _EVENTS_MAX:
                 _events.pop(0)
 
@@ -545,7 +629,167 @@ async def start_api_server(secret: str, port: int = 8080):
 
     app.router.add_post('/api/order/lookup', order_lookup)
 
-    # ── Auth endpoints ──────────────────────────────────────────────────────
+    # ── Spin to Win ─────────────────────────────────────────────────────────
+
+    _spin_ip_rate: dict[str, list[float]] = {}
+
+    async def spin_wheel(request):
+        """One spin per IP per 24 hours. Returns promo code + discount + segment index."""
+        ip = _get_ip(request)
+        now_ts = int(time.time())
+        # Check 24h spin limit
+        try:
+            conn_s = _sql.connect(str(_STORE_DB))
+            row = conn_s.execute('SELECT last_spin FROM spin_limits WHERE ip=?', (ip,)).fetchone()
+            if row and now_ts - row[0] < 86400:
+                conn_s.close()
+                time_left = 86400 - (now_ts - row[0])
+                hrs = time_left // 3600
+                mins = (time_left % 3600) // 60
+                return web.json_response({'ok': False, 'msg': f'You already spun today. Come back in {hrs}h {mins}m.'}, status=429)
+            conn_s.close()
+        except Exception as e:
+            logger.error(f'Spin rate check error: {e}')
+
+        # Pick random segment
+        seg_idx = _secrets.randbelow(len(_SPIN_SEGMENTS))
+        discount = _SPIN_SEGMENTS[seg_idx]
+
+        # Generate unique promo code
+        code = 'ABYSS-' + _secrets.token_hex(3).upper()
+        expires_at = now_ts + 900  # 15 min
+
+        try:
+            conn_s = _sql.connect(str(_STORE_DB))
+            conn_s.execute(
+                'INSERT INTO promo_codes (code, discount, segment, created_at, expires_at, used, ip) VALUES (?,?,?,?,?,0,?)',
+                (code, discount, seg_idx, now_ts, expires_at, ip)
+            )
+            conn_s.execute(
+                'INSERT OR REPLACE INTO spin_limits (ip, last_spin) VALUES (?,?)',
+                (ip, now_ts)
+            )
+            conn_s.commit()
+            conn_s.close()
+        except Exception as e:
+            logger.error(f'Spin DB error: {e}')
+            return web.json_response({'ok': False, 'msg': 'Server error, try again.'}, status=500)
+
+        return web.json_response({
+            'ok': True,
+            'code': code,
+            'discount': discount,
+            'segment': seg_idx,
+            'expires_in': 900,
+        })
+
+    async def promo_validate(request):
+        """Validate a promo code without using it — returns discount% if valid."""
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+        code = (body.get('code') or '').strip().upper()
+        if not code:
+            return web.json_response({'valid': False, 'msg': 'No code provided.'})
+        try:
+            now_ts = int(time.time())
+            conn_p = _sql.connect(str(_STORE_DB))
+            row = conn_p.execute('SELECT discount, expires_at, used FROM promo_codes WHERE code=?', (code,)).fetchone()
+            conn_p.close()
+            if not row:
+                return web.json_response({'valid': False, 'msg': 'Invalid code.'})
+            if row[2] == 1:
+                return web.json_response({'valid': False, 'msg': 'Code already used.'})
+            if row[1] < now_ts:
+                return web.json_response({'valid': False, 'msg': 'Code expired.'})
+            return web.json_response({'valid': True, 'discount': row[0], 'msg': f'{row[0]}% off applied!'})
+        except Exception as e:
+            logger.error(f'Promo validate error: {e}')
+            return web.json_response({'valid': False, 'msg': 'Server error.'})
+
+    # ── Vouches ─────────────────────────────────────────────────────────────
+
+    _vouch_rate: dict[str, list[float]] = {}
+
+    async def get_vouches(request):
+        """Return latest approved vouches."""
+        try:
+            conn_v = _sql.connect(str(_STORE_DB))
+            rows = conn_v.execute(
+                'SELECT username, rating, message, product, created_at FROM vouches ORDER BY created_at DESC LIMIT 20'
+            ).fetchall()
+            conn_v.close()
+            result = [{'username': r[0], 'rating': r[1], 'message': r[2], 'product': r[3], 'created_at': r[4]} for r in rows]
+            return web.json_response(result)
+        except Exception as e:
+            logger.error(f'Get vouches error: {e}')
+            return web.json_response([])
+
+    async def submit_vouch(request):
+        """Submit a vouch — must provide a valid settled order_id + matching email."""
+        ip = _get_ip(request)
+        if _sliding_window(_vouch_rate, ip, 60, 3):
+            return web.json_response({'ok': False, 'msg': 'Too many requests.'}, status=429)
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+
+        order_id = (body.get('order_id') or '').strip()
+        email    = (body.get('email') or '').strip().lower()
+        rating   = int(body.get('rating') or 5)
+        message  = (body.get('message') or '').strip()[:500]
+        username = (body.get('username') or '').strip()[:30]
+
+        if not order_id or not email or not message:
+            return web.json_response({'ok': False, 'msg': 'order_id, email and message are required.'})
+        if not (1 <= rating <= 5):
+            rating = 5
+        if len(message) < 10:
+            return web.json_response({'ok': False, 'msg': 'Message too short (min 10 chars).'})
+
+        # Verify order + email
+        try:
+            from utils.db_functions import getOrderById
+            order = getOrderById(order_id)
+            if not order:
+                return web.json_response({'ok': False, 'msg': 'Order not found. Check your Order ID.'})
+            stored_email = (order[9] or '').strip().lower()
+            if stored_email != email:
+                return web.json_response({'ok': False, 'msg': 'Email does not match this order.'})
+            if order[5] != 'Settled':
+                return web.json_response({'ok': False, 'msg': 'Order must be completed (Settled) to leave a vouch.'})
+            product_name = order[7] or ''
+        except Exception as e:
+            logger.error(f'Vouch order verify error: {e}')
+            return web.json_response({'ok': False, 'msg': 'Server error verifying order.'})
+
+        # Build display username: if not provided, use masked email
+        if not username:
+            prefix = email.split('@')[0]
+            username = (prefix[:3] if len(prefix) >= 3 else prefix) + '***'
+
+        # Insert vouch (UNIQUE on order_id prevents duplicates)
+        try:
+            conn_v = _sql.connect(str(_STORE_DB))
+            conn_v.execute(
+                'INSERT INTO vouches (order_id, username, rating, message, product, created_at) VALUES (?,?,?,?,?,?)',
+                (order_id, username, rating, message, product_name, int(time.time()))
+            )
+            conn_v.commit()
+            conn_v.close()
+            return web.json_response({'ok': True, 'msg': 'Vouch submitted! Thank you.'})
+        except _sql.IntegrityError:
+            return web.json_response({'ok': False, 'msg': 'A vouch already exists for this order.'})
+        except Exception as e:
+            logger.error(f'Vouch insert error: {e}')
+            return web.json_response({'ok': False, 'msg': 'Server error.'})
+
+    app.router.add_post('/api/spin',            spin_wheel)
+    app.router.add_post('/api/promo/validate',  promo_validate)
+    app.router.add_get('/api/vouches',          get_vouches)
+    app.router.add_post('/api/vouch',           submit_vouch)
 
     async def auth_register(request):
         ip = _get_ip(request)
