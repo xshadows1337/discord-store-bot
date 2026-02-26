@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>xShadows Shop</title>
+  <title>ABYSS HUB</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -36,16 +36,50 @@
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 2rem;
       height: 64px;
-      background: rgba(13,13,18,.85);
+      background: rgba(13,13,18,.92);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
     }
+    /* PornHub-style logo */
     .nav-logo {
-      display: flex; align-items: center; gap: .6rem;
-      font-size: 1.2rem; font-weight: 700; letter-spacing: -.02em;
-      text-decoration: none; color: var(--text);
+      display: flex; align-items: center; gap: 0;
+      font-size: 1.35rem; font-weight: 900;
+      text-decoration: none; color: #fff;
+      letter-spacing: -.01em;
+      font-family: 'Arial Black', 'Segoe UI', sans-serif;
     }
-    .nav-logo span { color: var(--accent2); }
+    .nav-logo .logo-hub {
+      background: #ff9000;
+      color: #000;
+      border-radius: 5px;
+      padding: 1px 7px 2px;
+      margin-left: 4px;
+      font-size: 1.35rem;
+      font-weight: 900;
+      line-height: 1.3;
+    }
+    /* Live users pill */
+    .nav-right {
+      display: flex; align-items: center; gap: .8rem;
+    }
+    .nav-live-users {
+      display: flex; align-items: center; gap: .45rem;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 99px;
+      padding: 4px 12px 4px 8px;
+      font-size: .8rem; font-weight: 600; color: var(--text);
+    }
+    .nav-live-dot {
+      width: 8px; height: 8px;
+      background: #3ddc84; border-radius: 50%;
+      box-shadow: 0 0 6px #3ddc84;
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: .6; transform: scale(.85); }
+    }
     .nav-badge {
       background: var(--green); color: #000;
       font-size: .65rem; font-weight: 700;
@@ -373,19 +407,14 @@
 
   <!-- NAV -->
   <nav>
-    <a class="nav-logo" href="#">
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="url(#lg)" stroke-width="2.2" stroke-linecap="round">
-        <defs>
-          <linearGradient id="lg" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#7c5cfc"/>
-            <stop offset="100%" stop-color="#c084fc"/>
-          </linearGradient>
-        </defs>
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-      </svg>
-      x<span>Shadows</span> Shop
-    </a>
-    <span class="nav-badge">LIVE</span>
+    <a class="nav-logo" href="#">ABYSS<span class="logo-hub">HUB</span></a>
+    <div class="nav-right">
+      <div class="nav-live-users">
+        <span class="nav-live-dot"></span>
+        <span id="live-user-count">—</span>&nbsp;online
+      </div>
+      <span class="nav-badge">LIVE</span>
+    </div>
   </nav>
 
   <!-- HERO -->
@@ -738,6 +767,34 @@
         btn.disabled = false;
         btn.classList.remove('loading');
       }
+    });
+  </script>
+
+  <script>
+    /* ── LIVE USERS ── */
+    const liveEl = document.getElementById('live-user-count');
+    let _sid = null;
+
+    async function pingVisitor() {
+      try {
+        const r = await fetch('/api/visitors/ping', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({sid: _sid})
+        });
+        const d = await r.json();
+        _sid = d.sid;
+        liveEl.textContent = d.count;
+      } catch {}
+    }
+
+    // Ping immediately, then every 20s
+    pingVisitor();
+    setInterval(pingVisitor, 20000);
+
+    // Tell server we left
+    window.addEventListener('beforeunload', () => {
+      if (_sid) navigator.sendBeacon('/api/visitors/leave', JSON.stringify({sid: _sid}));
     });
   </script>
 </body>

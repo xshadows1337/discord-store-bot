@@ -2,11 +2,27 @@ import hashlib
 import hmac
 import json
 import os
+import time
+import uuid
 from pathlib import Path
 from aiohttp import web
 from loguru import logger
 
 NOWPAYMENTS_IPN_SECRET = os.environ.get('NOWPAYMENTS_IPN_SECRET', '')
+
+# ── Live visitors tracking (in-memory) ───────────────────────────────────────
+_visitors: dict[str, float] = {}   # sid → last_ping_time
+_VISITOR_TTL = 45  # seconds before a session is considered gone
+
+def _prune_visitors():
+    cutoff = time.time() - _VISITOR_TTL
+    dead = [sid for sid, t in _visitors.items() if t < cutoff]
+    for sid in dead:
+        del _visitors[sid]
+
+def _live_count() -> int:
+    _prune_visitors()
+    return max(len(_visitors), 1)   # always show at least 1 (current user)
 
 # Resolve paths relative to this file so they work regardless of CWD
 _HERE = Path(__file__).parent
@@ -118,6 +134,26 @@ async def start_api_server(secret: str, port: int = 8080):
             logger.error(f"Checkout error: {exc}")
             return web.Response(status=500, text="Internal error")
 
+    # ── Visitors ─────────────────────────────────────────────────────────────
+
+    async def visitors_ping(request):
+        try:
+            body = await request.json()
+        except Exception:
+            body = {}
+        sid = body.get('sid') or str(uuid.uuid4())
+        _visitors[sid] = time.time()
+        return web.json_response({'sid': sid, 'count': _live_count()})
+
+    async def visitors_leave(request):
+        try:
+            body = await request.json()
+            sid = body.get('sid', '')
+            _visitors.pop(sid, None)
+        except Exception:
+            pass
+        return web.Response(status=204)
+
     # ── NOWPayments IPN ──────────────────────────────────────────────────────────
 
     async def nowpayments_ipn(request):
@@ -216,6 +252,10 @@ async def start_api_server(secret: str, port: int = 8080):
     # Static asset serving (CSS, JS, images if added later)
     if _STATIC_DIR.exists():
         app.router.add_static('/static/', path=str(_STATIC_DIR), name='static')
+
+    # Visitors (live user counter)
+    app.router.add_post('/api/visitors/ping',  visitors_ping)
+    app.router.add_post('/api/visitors/leave', visitors_leave)
 
     # NOWPayments IPN
     app.router.add_post('/api/nowpayments/ipn', nowpayments_ipn)
