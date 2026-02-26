@@ -10,20 +10,59 @@ from loguru import logger
 
 NOWPAYMENTS_IPN_SECRET = os.environ.get('NOWPAYMENTS_IPN_SECRET', '')
 
-# ── Rate limiting (in-memory, per IP) ────────────────────────────────────────
-_rate: dict[str, list[float]] = {}   # ip → list of request timestamps
-_RATE_WINDOW  = 60    # seconds
-_RATE_MAX     = 10    # max requests per IP per window
+# ── Security / DDoS mitigations ───────────────────────────────────────────────
+# Per-IP sliding-window rate limits
+_rate:      dict[str, list[float]] = {}   # ip → request timestamps (all routes)
+_rate_co:   dict[str, list[float]] = {}   # ip → request timestamps (checkout only)
+_error_hits: dict[str, int]        = {}   # ip → 4xx/5xx count
+_banned:    dict[str, float]       = {}   # ip → ban expiry timestamp
 
-def _is_rate_limited(ip: str) -> bool:
-    now = time.time()
-    cutoff = now - _RATE_WINDOW
-    timestamps = [t for t in _rate.get(ip, []) if t > cutoff]
-    _rate[ip] = timestamps
-    if len(timestamps) >= _RATE_MAX:
+# Thresholds
+_GLOBAL_WINDOW   = 60;  _GLOBAL_MAX    = 120   # 120 req/min across all routes
+_CO_WINDOW       = 60;  _CO_MAX        = 10    # 10 checkout req/min
+_ERR_MAX         = 20    # 4xx errors before auto-ban
+_BAN_DURATION    = 600   # 10-minute ban
+
+# Paths that scanners/bots probe — instant 404 + count toward error ban
+_SCANNER_PATHS = {
+    '/.env', '/wp-admin', '/wp-login.php', '/phpmyadmin', '/admin',
+    '/config.php', '/.git/config', '/xmlrpc.php', '/shell.php',
+    '/backup.sql', '/db.sql', '/actuator', '/console', '/manager',
+}
+
+def _get_ip(request) -> str:
+    return request.headers.get('X-Forwarded-For', request.remote or '0.0.0.0').split(',')[0].strip()
+
+def _is_banned(ip: str) -> bool:
+    expiry = _banned.get(ip)
+    if expiry and time.time() < expiry:
         return True
-    _rate[ip].append(now)
+    if expiry:
+        del _banned[ip]
     return False
+
+def _ban(ip: str, reason: str):
+    _banned[ip] = time.time() + _BAN_DURATION
+    logger.warning(f"[SECURITY] Banned {ip} for {_BAN_DURATION}s — {reason}")
+
+def _sliding_window(store: dict, ip: str, window: int, limit: int) -> bool:
+    """Returns True (= blocked) if IP exceeds limit within window seconds."""
+    now    = time.time()
+    cutoff = now - window
+    store[ip] = [t for t in store.get(ip, []) if t > cutoff]
+    if len(store[ip]) >= limit:
+        return True
+    store[ip].append(now)
+    return False
+
+def _record_error(ip: str):
+    _error_hits[ip] = _error_hits.get(ip, 0) + 1
+    if _error_hits[ip] >= _ERR_MAX:
+        _ban(ip, f"{_ERR_MAX} error responses")
+
+# Legacy helper kept for backwards compat with existing code
+def _is_rate_limited(ip: str) -> bool:
+    return _sliding_window(_rate_co, ip, _CO_WINDOW, _CO_MAX)
 
 # ── Live visitors tracking (in-memory) ───────────────────────────────────────
 _visitors: dict[str, float] = {}   # sid → last_ping_time
@@ -50,7 +89,45 @@ async def start_api_server(secret: str, port: int = 8080):
     Allows pushing a new products.json without a redeploy.
     Also serves the xshadows.shop website at /.
     """
-    app = web.Application()
+    @web.middleware
+    async def security_middleware(request, handler):
+        ip   = _get_ip(request)
+        path = request.path
+
+        # 1. Banned IPs → immediate drop
+        if _is_banned(ip):
+            return web.Response(status=429, text="Banned.")
+
+        # 2. Scanner/probe paths → 404 + error counter
+        if path in _SCANNER_PATHS or path.startswith('/.') or path.endswith('.php'):
+            _record_error(ip)
+            return web.Response(status=404, text="Not found.")
+
+        # 3. Global rate limit (all routes combined)
+        if _sliding_window(_rate, ip, _GLOBAL_WINDOW, _GLOBAL_MAX):
+            _ban(ip, "global rate limit exceeded")
+            return web.Response(status=429, text="Too many requests.")
+
+        response = await handler(request)
+
+        # 4. Track error rates; auto-ban aggressive scanners
+        if response.status >= 400:
+            _record_error(ip)
+
+        # 5. Security headers on every response
+        response.headers.setdefault('X-Content-Type-Options',    'nosniff')
+        response.headers.setdefault('X-Frame-Options',           'DENY')
+        response.headers.setdefault('X-XSS-Protection',          '1; mode=block')
+        response.headers.setdefault('Referrer-Policy',           'strict-origin-when-cross-origin')
+        response.headers.setdefault('Content-Security-Policy',
+            "default-src 'self' https:; script-src 'self' 'unsafe-inline'; "
+            "style-src 'self' 'unsafe-inline'; img-src * data:;")
+        return response
+
+    app = web.Application(
+        client_max_size=64 * 1024,       # 64 KB max request body — blocks large payload attacks
+        middlewares=[security_middleware],
+    )
 
     # ── Website ──────────────────────────────────────────────────────────────
 
@@ -299,8 +376,13 @@ async def start_api_server(secret: str, port: int = 8080):
     app.router.add_get('/health',        health)
     app.router.add_put('/api/products',  update_products)
 
-    runner = web.AppRunner(app)
+    runner = web.AppRunner(
+        app,
+        handle_signals=False,
+        keepalive_timeout=30,   # close idle keep-alive connections after 30s (slow loris)
+        shutdown_timeout=10,
+    )
     await runner.setup()
-    site = web.TCPSite(runner, '0.0.0.0', port)
+    site = web.TCPSite(runner, '0.0.0.0', port, reuse_port=True, backlog=256)
     await site.start()
     logger.info(f"API server listening on :{port} — website live at /")
