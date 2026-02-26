@@ -454,6 +454,7 @@
       const btn=document.getElementById('modal-submit'); btn.disabled=true; btn.classList.add('loading');
       try {
         const res=await fetch('/api/create-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product:_activeProduct.name,quantity:qty,email,method:_activeMethod})});
+        if(res.status===429){setModalError('Too many requests — please wait a moment.');return;}
         if(!res.ok){setModalError((await res.text())||'Something went wrong.');return;}
         const {redirect_url}=await res.json();
         if(redirect_url){window.location.href=redirect_url;}else{setModalError('No payment URL received.');}

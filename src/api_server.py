@@ -10,6 +10,21 @@ from loguru import logger
 
 NOWPAYMENTS_IPN_SECRET = os.environ.get('NOWPAYMENTS_IPN_SECRET', '')
 
+# ── Rate limiting (in-memory, per IP) ────────────────────────────────────────
+_rate: dict[str, list[float]] = {}   # ip → list of request timestamps
+_RATE_WINDOW  = 60    # seconds
+_RATE_MAX     = 10    # max requests per IP per window
+
+def _is_rate_limited(ip: str) -> bool:
+    now = time.time()
+    cutoff = now - _RATE_WINDOW
+    timestamps = [t for t in _rate.get(ip, []) if t > cutoff]
+    _rate[ip] = timestamps
+    if len(timestamps) >= _RATE_MAX:
+        return True
+    _rate[ip].append(now)
+    return False
+
 # ── Live visitors tracking (in-memory) ───────────────────────────────────────
 _visitors: dict[str, float] = {}   # sid → last_ping_time
 _VISITOR_TTL = 45  # seconds before a session is considered gone
@@ -87,7 +102,11 @@ async def start_api_server(secret: str, port: int = 8080):
             return web.Response(status=500, text="Internal error")
 
     async def create_checkout(request):
-        """Public endpoint for the website checkout — creates a Stripe or BTCPay session."""
+        """Public endpoint for the website checkout — creates a Stripe or NOWPayments session."""
+        ip = request.headers.get('X-Forwarded-For', request.remote or '').split(',')[0].strip()
+        if _is_rate_limited(ip):
+            return web.Response(status=429, text="Too many requests — please wait a moment.")
+
         try:
             body = await request.json()
         except Exception:
