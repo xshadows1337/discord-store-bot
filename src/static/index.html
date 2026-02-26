@@ -307,18 +307,26 @@
     .reveal.visible { opacity:1; transform:none; }
 
     /* AGE GATE */
-    .agegate { position:fixed; inset:0; z-index:9999; background:#000; display:flex; align-items:center; justify-content:center; padding:1rem; }
-    .agegate-box { border:1px solid #444; border-radius:6px; padding:2.5rem 2rem; max-width:560px; width:100%; text-align:center; background:#111; }
+    .agegate { position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.97); display:none; align-items:center; justify-content:center; padding:1rem; }
+    .agegate.show { display:flex; animation:agegate-in .35s cubic-bezier(.22,1,.36,1) both; }
+    @keyframes agegate-in { from{opacity:0;transform:scale(.96);}to{opacity:1;transform:none;} }
+    .agegate-box { border:1px solid #333; border-top:3px solid var(--orange); border-radius:6px; padding:2.5rem 2rem; max-width:520px; width:100%; text-align:center; background:#111; box-shadow:0 16px 60px rgba(0,0,0,.7); }
     .agegate-logo { font-size:1.8rem; font-weight:900; color:#fff; font-family:'Arial Black',Arial,sans-serif; margin-bottom:1.5rem; }
     .agegate-logo .hub { background:var(--orange); color:#000; border-radius:4px; padding:1px 10px 2px; margin-left:3px; }
-    .agegate-box h2 { font-size:1.5rem; font-weight:900; margin-bottom:1.25rem; }
+    .agegate-box h2 { font-size:1.4rem; font-weight:900; margin-bottom:1.25rem; }
     .agegate-box p { color:#aaa; font-size:.84rem; line-height:1.7; margin-bottom:.6rem; }
     .agegate-box a { color:var(--orange); text-decoration:none; }
-    .agegate-btns { display:flex; gap:.75rem; justify-content:center; margin:1.75rem 0 1.25rem; flex-wrap:wrap; }
-    .agegate-enter { background:var(--orange); color:#000; border:2px solid var(--orange); border-radius:4px; padding:.7rem 1.8rem; font-size:.9rem; font-weight:900; cursor:pointer; font-family:inherit; transition:background .15s; }
-    .agegate-enter:hover { background:var(--orange2); border-color:var(--orange2); }
-    .agegate-exit { background:transparent; color:#ccc; border:2px solid #555; border-radius:4px; padding:.7rem 1.8rem; font-size:.9rem; font-weight:700; cursor:pointer; font-family:inherit; transition:border-color .15s; }
-    .agegate-exit:hover { border-color:#888; }
+    .agegate-box a:hover { text-decoration:underline; }
+    .agegate-check-row { display:flex; align-items:flex-start; gap:.65rem; background:#1a1a1a; border:1px solid #333; border-radius:4px; padding:.75rem 1rem; margin:1.25rem 0; text-align:left; cursor:pointer; transition:border-color .15s; }
+    .agegate-check-row:hover { border-color:var(--orange); }
+    #agegate-cb { width:16px; height:16px; accent-color:var(--orange); cursor:pointer; flex-shrink:0; margin-top:1px; }
+    .agegate-check-row label { font-size:.83rem; color:#ccc; cursor:pointer; line-height:1.5; }
+    .agegate-btns { display:flex; gap:.75rem; justify-content:center; margin:0 0 1.25rem; flex-wrap:wrap; }
+    .agegate-enter { background:var(--orange); color:#000; border:2px solid var(--orange); border-radius:4px; padding:.7rem 1.8rem; font-size:.9rem; font-weight:900; cursor:pointer; font-family:inherit; transition:background .15s,opacity .15s; }
+    .agegate-enter:hover:not(:disabled) { background:var(--orange2); border-color:var(--orange2); }
+    .agegate-enter:disabled { opacity:.35; cursor:not-allowed; }
+    .agegate-exit { background:transparent; color:#ccc; border:2px solid #555; border-radius:4px; padding:.7rem 1.8rem; font-size:.9rem; font-weight:700; cursor:pointer; font-family:inherit; transition:border-color .15s,color .15s; }
+    .agegate-exit:hover { border-color:#888; color:#fff; }
     .agegate-footer { font-size:.72rem; color:#444; margin-top:1rem; }
 
     /* SIDEBAR */
@@ -464,14 +472,18 @@
 <body>
 
   <!-- AGE GATE -->
-  <div class="agegate" id="agegate">
+  <div class="agegate" id="agegate" role="dialog" aria-modal="true" aria-label="Age verification">
     <div class="agegate-box">
       <div class="agegate-logo">ABYSS<span class="hub">HUB</span></div>
-      <h2>This site sells restricted digital goods</h2>
-      <p>By entering, you confirm you are 18 years of age or older and agree to our <a href="#">Terms of Service</a>.</p>
-      <p style="color:#666;font-size:.78rem;">AbyssHub sells digital game keys, software, and external tools for educational purposes only.</p>
+      <h2>Age Verification Required</h2>
+      <p>This site sells restricted digital goods. You must be <strong>18 years of age or older</strong> to enter and agree to our <a href="#" onclick="return false">Terms of Service</a>.</p>
+      <p style="color:#555;font-size:.78rem;">AbyssHub sells digital game keys, software, and external tools for educational purposes only.</p>
+      <div class="agegate-check-row" onclick="document.getElementById('agegate-cb').click()">
+        <input type="checkbox" id="agegate-cb">
+        <label for="agegate-cb">I confirm that I am <strong>18 years of age or older</strong> and I accept the Terms of Service</label>
+      </div>
       <div class="agegate-btns">
-        <button class="agegate-enter" id="agegate-enter">I am 18 or older &mdash; Enter</button>
+        <button class="agegate-enter" id="agegate-enter" disabled aria-disabled="true">Enter AbyssHub &rarr;</button>
         <button class="agegate-exit" onclick="window.location.href='https://google.com'">I am under 18 &mdash; Exit</button>
       </div>
       <p class="agegate-footer">&copy; 2026 AbyssHub &mdash; All products for educational purposes only.</p>
@@ -1476,17 +1488,38 @@
     (function(){
       const gate = document.getElementById('agegate');
       if(localStorage.getItem('abysshub_age_ok') === '1'){
-        gate.style.display = 'none';
-      } else {
-        document.body.style.overflow = 'hidden';
-        document.getElementById('agegate-enter').addEventListener('click', ()=>{
-          localStorage.setItem('abysshub_age_ok','1');
-          gate.style.opacity = '0';
-          gate.style.transition = 'opacity .4s';
-          document.body.style.overflow = '';
-          setTimeout(()=>gate.style.display='none', 420);
-        });
+        // Already confirmed — keep hidden, no flash
+        return;
       }
+      // First visit: show gate
+      gate.classList.add('show');
+      document.body.style.overflow = 'hidden';
+      const cb = document.getElementById('agegate-cb');
+      const enterBtn = document.getElementById('agegate-enter');
+      // Enable/disable Enter button based on checkbox
+      cb.addEventListener('change', ()=>{
+        enterBtn.disabled = !cb.checked;
+        enterBtn.setAttribute('aria-disabled', String(!cb.checked));
+      });
+      function doEnter(){
+        if(!cb.checked) return;
+        localStorage.setItem('abysshub_age_ok','1');
+        gate.style.opacity = '0';
+        gate.style.transition = 'opacity .35s';
+        document.body.style.overflow = '';
+        setTimeout(()=>{ gate.classList.remove('show'); gate.style.opacity=''; }, 370);
+      }
+      enterBtn.addEventListener('click', doEnter);
+      // Enter key confirms only when checkbox is checked
+      document.addEventListener('keydown', function ageKey(e){
+        if(e.key === 'Enter' && cb.checked){
+          e.preventDefault();
+          doEnter();
+          document.removeEventListener('keydown', ageKey);
+        }
+      });
+      // Auto-focus the checkbox
+      setTimeout(()=> cb.focus(), 120);
     })();
 
     // ── SIDEBAR ───────────────────────────────────────────────────────────────
