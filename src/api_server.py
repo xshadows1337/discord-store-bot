@@ -5,6 +5,7 @@ import os
 import time
 import uuid
 from pathlib import Path
+import aiohttp
 from aiohttp import web
 from loguru import logger
 
@@ -14,6 +15,76 @@ NOWPAYMENTS_IPN_SECRET = os.environ.get('NOWPAYMENTS_IPN_SECRET', '')
 _events: list[dict] = []          # [{"id": int, "product": str}, …]
 _event_counter: int = 0
 _EVENTS_MAX = 100                  # keep last 100 events
+
+# ── VPN / Proxy detection cache ───────────────────────────────────────────────
+_vpn_cache: dict[str, tuple[bool, float]] = {}   # ip → (is_blocked, expiry)
+_VPN_CACHE_TTL = 3600   # cache result for 1 hour
+_PRIVATE_PREFIXES = ('10.', '172.', '192.168.', '127.', '::1', 'localhost')
+
+async def _is_vpn(ip: str) -> bool:
+    """Return True if the IP is a known VPN, proxy, or datacenter host."""
+    if any(ip.startswith(p) for p in _PRIVATE_PREFIXES):
+        return False
+    now = time.time()
+    cached = _vpn_cache.get(ip)
+    if cached and now < cached[1]:
+        return cached[0]
+    try:
+        url = f'http://ip-api.com/json/{ip}?fields=status,proxy,hosting'
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, timeout=aiohttp.ClientTimeout(total=3)) as resp:
+                data = await resp.json(content_type=None)
+        blocked = bool(data.get('proxy') or data.get('hosting'))
+    except Exception:
+        blocked = False   # fail open — don't block on API error
+    _vpn_cache[ip] = (blocked, now + _VPN_CACHE_TTL)
+    if blocked:
+        logger.warning(f"[VPN-BLOCK] Blocked VPN/proxy IP: {ip}")
+    return blocked
+
+_VPN_BLOCK_PAGE = """\
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AbyssHUB — Access Restricted</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#000;color:#fff;font-family:'Arial',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem;}
+  .logo{font-size:2rem;font-weight:900;letter-spacing:-1px;margin:2.5rem 0 2rem;}
+  .logo .hub{background:#ff9000;color:#000;border-radius:4px;padding:2px 10px 3px;margin-left:3px;}
+  .notice-box{max-width:620px;width:100%;text-align:left;}
+  h1{font-size:1.4rem;font-weight:900;margin-bottom:1.5rem;text-align:center;letter-spacing:.02em;}
+  .video-block{width:100%;max-width:380px;margin:0 auto 2rem;border:2px solid #333;border-radius:4px;overflow:hidden;background:#0a0a0a;display:flex;align-items:center;justify-content:center;height:180px;}
+  .shield-icon{font-size:4rem;opacity:.25;}
+  .btn-row{display:flex;flex-direction:column;gap:.75rem;align-items:center;margin-bottom:2rem;}
+  .btn-notice{background:#ff9000;color:#000;border:2px solid #ff9000;border-radius:4px;padding:.7rem 2.5rem;font-size:.95rem;font-weight:900;cursor:default;letter-spacing:.03em;width:260px;text-align:center;}
+  .btn-law{background:transparent;color:#fff;border:2px solid #ff9000;border-radius:4px;padding:.7rem 2.5rem;font-size:.95rem;font-weight:700;cursor:default;width:260px;text-align:center;}
+  p{color:#ccc;font-size:.88rem;line-height:1.75;margin-bottom:1rem;}
+  a{color:#ff9000;text-decoration:none;}
+  .footer{margin-top:3rem;color:#333;font-size:.72rem;text-align:center;}
+</style>
+</head>
+<body>
+  <div class="logo">ABYSS<span class="hub">HUB</span></div>
+  <div class="notice-box">
+    <h1>ACCESS RESTRICTED — VPN DETECTED</h1>
+    <div class="video-block"><div class="shield-icon">&#128683;</div></div>
+    <div class="btn-row">
+      <div class="btn-notice">Notice to Users</div>
+      <div class="btn-law">Why Am I Blocked?</div>
+    </div>
+    <p>Dear user,</p>
+    <p>We have detected that you are accessing AbyssHUB through a <strong>VPN, proxy, or anonymizing network</strong>. To protect the integrity of our platform and comply with fraud prevention requirements, we do not permit access from VPN or proxy connections.</p>
+    <p>This restriction exists to prevent fraudulent purchases, chargebacks, and abuse of our automated delivery system. We take the security of our products and customers seriously.</p>
+    <p>To access AbyssHUB, please <strong>disable your VPN or proxy</strong> and reload the page. If you believe this is an error, please <a href="https://discord.gg/Y69UbMUEfu" target="_blank">contact us on Discord</a>.</p>
+    <p>We apologize for the inconvenience and appreciate your understanding.</p>
+  </div>
+  <div class="footer">&copy; 2026 AbyssHUB &mdash; All rights reserved.</div>
+</body>
+</html>
+"""
 
 # ── Security / DDoS mitigations ───────────────────────────────────────────────
 # Per-IP sliding-window rate limits
@@ -137,7 +208,16 @@ async def start_api_server(secret: str, port: int = 8080):
     # ── Website ──────────────────────────────────────────────────────────────
 
     async def index(request):
-        """Serve the store landing page (no-cache so updates are always live)."""
+        """Serve the store landing page — VPN/proxy IPs get the block page."""
+        ip = _get_ip(request)
+        if await _is_vpn(ip):
+            return web.Response(
+                text=_VPN_BLOCK_PAGE,
+                content_type='text/html',
+                charset='utf-8',
+                status=403,
+                headers={'Cache-Control': 'no-store'},
+            )
         index_file = _STATIC_DIR / 'index.html'
         if not index_file.exists():
             return web.Response(status=404, text="index.html not found")
@@ -344,7 +424,13 @@ async def start_api_server(secret: str, port: int = 8080):
             since = 0
         new_events = [e for e in _events if e['id'] > since]
         return web.json_response(new_events)
+    # ── VPN check endpoint (client-side secondary verification) ──────────────
 
+    async def vpn_check(request):
+        """Return whether the requesting IP is a VPN/proxy. Used by client-side JS."""
+        ip = _get_ip(request)
+        blocked = await _is_vpn(ip)
+        return web.json_response({'blocked': blocked})
     # ── Bot API ───────────────────────────────────────────────────────────────
 
     async def health(request):
@@ -400,6 +486,9 @@ async def start_api_server(secret: str, port: int = 8080):
 
     # Events feed
     app.router.add_get('/api/events/feed', events_feed)
+
+    # VPN check
+    app.router.add_get('/api/vpn-check', vpn_check)
 
     # Bot API routes
     app.router.add_get('/health',        health)
