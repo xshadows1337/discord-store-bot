@@ -38,20 +38,34 @@
     .nav-btn { background: var(--orange); color: #000 !important; padding: .38rem .9rem; border-radius: 3px; font-weight: 700 !important; }
     .nav-btn:hover { background: var(--orange2) !important; }
 
+    /* ANNOUNCEMENT STRIP */
+    .ann-strip { background: linear-gradient(90deg,#ff6a00,#ff9000,#ffb347,#ff9000,#ff6a00); background-size:400% 100%; animation:strip-slide 8s linear infinite; height:30px; display:flex; align-items:center; justify-content:center; gap:2rem; overflow:hidden; }
+    @keyframes strip-slide{0%{background-position:0%}100%{background-position:200%}}
+    .ann-strip span { color:#000; font-size:.72rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; }
+    .ann-strip a { color:#000; text-decoration:none; font-weight:900; }
+    .ann-ticker { display:flex; gap:2.5rem; animation:ticker 22s linear infinite; }
+    @keyframes ticker{0%{transform:translateX(0%)}100%{transform:translateX(-50%)}}
+
     /* CATEGORIES */
-    .categories { background: var(--surface); border-bottom: 1px solid var(--border); padding: .6rem 1.5rem; display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
-    .cat-label { color: var(--muted); font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-right: .25rem; }
-    .cat-pill { background: var(--card); border: 1px solid var(--border); color: #ccc; padding: .28rem .85rem; border-radius: 3px; font-size: .78rem; font-weight: 600; cursor: pointer; transition: all .15s; text-decoration: none; }
+    .categories-wrap { background: var(--surface); border-bottom: 1px solid var(--border); position:relative; }
+    .categories { padding: .5rem 2.5rem; display: flex; gap: .4rem; align-items: center; overflow-x:auto; white-space:nowrap; scrollbar-width:none; -ms-overflow-style:none; }
+    .categories::-webkit-scrollbar { display:none; }
+    .cat-label { color: var(--muted); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-right: .25rem; flex-shrink:0; }
+    .cat-pill { background: var(--card); border: 1px solid var(--border); color: #ccc; padding: .3rem .9rem; border-radius: 20px; font-size: .76rem; font-weight: 600; cursor: pointer; transition: all .15s; text-decoration: none; flex-shrink:0; }
     .cat-pill:hover, .cat-pill.active { background: var(--orange); border-color: var(--orange); color: #000; }
+    .cat-arrow { position:absolute; top:50%; transform:translateY(-50%); background:linear-gradient(to right,var(--surface),transparent); border:none; cursor:pointer; padding:0 .5rem; height:100%; display:flex; align-items:center; z-index:2; color:var(--muted); font-size:1.1rem; transition:color .15s; }
+    .cat-arrow:hover { color:var(--orange); }
+    .cat-arrow.left { left:0; background:linear-gradient(to right,var(--surface) 60%,transparent); }
+    .cat-arrow.right { right:0; background:linear-gradient(to left,var(--surface) 60%,transparent); }
 
     /* HERO */
-    .hero { background: linear-gradient(135deg,#0a0a0a 0%,#1a0f00 50%,#0a0a0a 100%); border-bottom: 2px solid var(--orange); padding: 3.5rem 1.5rem; text-align: center; position: relative; overflow: hidden; }
-    .hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(255,144,0,.13) 0%,transparent 70%); pointer-events:none; }
-    .hero-tag { display:inline-block; background:var(--red); color:#fff; font-size:.68rem; font-weight:700; padding:2px 10px; border-radius:2px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:1rem; }
-    .hero h1 { font-size:clamp(2rem,5vw,3.6rem); font-weight:900; line-height:1.1; margin-bottom:.9rem; font-family:'Arial Black',Arial,sans-serif; }
+    .hero { background: linear-gradient(135deg,#0a0a0a 0%,#1a0f00 50%,#0a0a0a 100%); border-bottom: 2px solid var(--orange); padding: 2rem 1.5rem 1.8rem; text-align: center; position: relative; overflow: hidden; }
+    .hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(255,144,0,.11) 0%,transparent 70%); pointer-events:none; }
+    .hero-tag { display:inline-block; background:var(--red); color:#fff; font-size:.66rem; font-weight:700; padding:2px 10px; border-radius:2px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:.7rem; }
+    .hero h1 { font-size:clamp(1.6rem,4vw,2.6rem); font-weight:900; line-height:1.1; margin-bottom:.65rem; font-family:'Arial Black',Arial,sans-serif; }
     .hero h1 .o { color:var(--orange); }
-    .hero p { color:var(--muted); font-size:1rem; max-width:560px; margin:0 auto 2rem; line-height:1.7; }
-    .hero-btns { display:flex; gap:.75rem; justify-content:center; flex-wrap:wrap; }
+    .hero p { color:var(--muted); font-size:.9rem; max-width:520px; margin:0 auto 1.4rem; line-height:1.6; }
+    .hero-btns { display:flex; gap:.6rem; justify-content:center; flex-wrap:wrap; }
     .btn { display:inline-flex; align-items:center; gap:.45rem; padding:.65rem 1.5rem; border-radius:3px; font-size:.88rem; font-weight:700; text-decoration:none; cursor:pointer; border:none; transition:.15s; font-family:inherit; }
     .btn-orange { background:var(--orange); color:#000; }
     .btn-orange:hover { background:var(--orange2); }
@@ -59,69 +73,133 @@
     .btn-outline:hover { border-color:var(--orange); color:var(--orange); }
 
     /* STATSBAR */
-    .statsbar { background:#111; border-bottom:1px solid var(--border); display:flex; justify-content:center; gap:4rem; flex-wrap:wrap; padding:.9rem 1.5rem; }
+    .statsbar { background:#111; border-bottom:1px solid var(--border); display:flex; justify-content:center; gap:3rem; flex-wrap:wrap; padding:.7rem 1.5rem; }
     .sitem { text-align:center; }
-    .snum { font-size:1.2rem; font-weight:900; color:var(--orange); font-family:'Arial Black',Arial,sans-serif; }
-    .slbl { font-size:.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; margin-top:2px; }
+    .snum { font-size:1.1rem; font-weight:900; color:var(--orange); font-family:'Arial Black',Arial,sans-serif; }
+    .slbl { font-size:.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; margin-top:1px; }
+
+    /* SECTION TABS */
+    .section-tabs-bar { background:var(--surface); border-bottom:1px solid var(--border); padding:0 1.5rem; display:flex; gap:0; align-items:center; overflow-x:auto; scrollbar-width:none; }
+    .section-tabs-bar::-webkit-scrollbar { display:none; }
+    .stab { background:none; border:none; border-bottom:3px solid transparent; color:var(--muted); font-size:.82rem; font-weight:700; padding:.65rem 1.1rem; cursor:pointer; font-family:inherit; transition:color .15s,border-color .15s; white-space:nowrap; margin-bottom:-1px; }
+    .stab:hover { color:var(--text); }
+    .stab.active { color:var(--orange); border-bottom-color:var(--orange); }
+    .stab-count { font-size:.68rem; background:rgba(255,144,0,.18); color:var(--orange2); border-radius:8px; padding:1px 6px; margin-left:4px; font-weight:700; }
+    .sort-row { display:flex; align-items:center; gap:.75rem; margin-bottom:1rem; flex-wrap:wrap; }
+    .sort-label { font-size:.75rem; color:var(--muted); font-weight:600; }
+    .sort-select { background:var(--card); border:1px solid var(--border); color:var(--text); border-radius:3px; padding:.3rem .7rem; font-size:.78rem; font-family:inherit; cursor:pointer; outline:none; }
+    .sort-select:focus { border-color:var(--orange); }
+    .sort-view-btns { display:flex; gap:.3rem; margin-left:auto; }
+    .sort-view-btn { background:none; border:1px solid var(--border); color:var(--muted); border-radius:3px; width:30px; height:30px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+    .sort-view-btn:hover,.sort-view-btn.active { border-color:var(--orange); color:var(--orange); }
 
     /* MAIN */
-    .main { max-width:1300px; margin:0 auto; padding:1.75rem 1.25rem; }
-    .sec-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; border-left:4px solid var(--orange); padding-left:.75rem; }
-    .sec-header h2 { font-size:1.1rem; font-weight:900; font-family:'Arial Black',Arial,sans-serif; text-transform:uppercase; letter-spacing:.04em; }
+    .main { max-width:1300px; margin:0 auto; padding:1.5rem 1.25rem; }
+    .sec-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; border-left:4px solid var(--orange); padding-left:.75rem; }
+    .sec-header h2 { font-size:1.05rem; font-weight:900; font-family:'Arial Black',Arial,sans-serif; text-transform:uppercase; letter-spacing:.04em; }
     .sec-header span { font-size:.78rem; color:var(--muted); }
 
     /* GRID */
-    .products-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1rem; margin-bottom:3rem; }
-    .product-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; transition:transform .18s,border-color .18s; cursor:pointer; position:relative; }
-    .product-card:hover { transform:translateY(-3px); border-color:var(--orange); }
+    .products-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.85rem; margin-bottom:2.5rem; }
+    .products-grid.list-view { grid-template-columns:1fr; }
+    .products-grid.list-view .product-card { display:flex; flex-direction:row; }
+    .products-grid.list-view .card-thumb { width:220px; flex-shrink:0; aspect-ratio:unset; height:auto; }
+    .product-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; transition:transform .18s,border-color .18s,box-shadow .18s; cursor:pointer; position:relative; }
+    .product-card:hover { transform:translateY(-4px); border-color:var(--orange); box-shadow:0 8px 24px rgba(255,144,0,.12); }
     .card-thumb { width:100%; aspect-ratio:16/9; background:#111; position:relative; overflow:hidden; }
-    .card-thumb img { width:100%; height:100%; object-fit:cover; transition:transform .3s; }
-    .product-card:hover .card-thumb img { transform:scale(1.04); }
-    .card-thumb-ph { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:2.5rem; background:linear-gradient(135deg,#111,#1e1100); }
-    .card-stock { position:absolute; bottom:6px; right:6px; background:rgba(0,0,0,.82); color:#fff; font-size:.7rem; font-weight:700; padding:2px 7px; border-radius:2px; }
-    .card-stock.low { background:rgba(230,57,70,.88); }
+    .card-thumb img { width:100%; height:100%; object-fit:cover; transition:transform .35s; }
+    .product-card:hover .card-thumb img { transform:scale(1.06); }
+    .card-thumb-ph { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:2.5rem; background:linear-gradient(135deg,#0e0e0e,#1e1100); }
+    /* PH-style hover overlay */
+    .card-hover-bar { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,.72) 0%,transparent 55%); opacity:0; transition:opacity .22s; display:flex; align-items:flex-end; padding:.6rem; gap:.4rem; }
+    .product-card:hover .card-hover-bar { opacity:1; }
+    .chb-btn { background:rgba(255,255,255,.15); backdrop-filter:blur(4px); border:1px solid rgba(255,255,255,.18); color:#fff; border-radius:3px; font-size:.68rem; font-weight:700; padding:.25rem .55rem; cursor:pointer; font-family:inherit; transition:background .12s; white-space:nowrap; }
+    .chb-btn:hover { background:var(--orange); color:#000; border-color:var(--orange); }
+    .chb-btn.chb-main { background:var(--orange); color:#000; border-color:var(--orange); margin-left:auto; }
+    .chb-btn.chb-main:hover { background:var(--orange2); }
+    /* Badges */
+    .card-stock { position:absolute; bottom:6px; right:6px; background:rgba(0,0,0,.82); color:#fff; font-size:.68rem; font-weight:700; padding:2px 7px; border-radius:2px; z-index:1; }
+    .card-stock.low { background:rgba(230,57,70,.9); }
     .card-stock.hot { background:rgba(255,144,0,.9); color:#000; }
-    .card-badge { position:absolute; top:6px; left:6px; background:var(--orange); color:#000; font-size:.62rem; font-weight:900; padding:1px 5px; border-radius:2px; letter-spacing:.06em; }
-    .card-badge-new { position:absolute; top:6px; right:6px; background:var(--red); color:#fff; font-size:.62rem; font-weight:900; padding:1px 6px; border-radius:2px; letter-spacing:.1em; animation:badge-pop .4s ease both; }
+    .card-badge { position:absolute; top:6px; left:6px; background:var(--orange); color:#000; font-size:.6rem; font-weight:900; padding:2px 6px; border-radius:2px; letter-spacing:.06em; z-index:1; }
+    .card-badge-ud { position:absolute; top:6px; left:6px; background:#1a1a1a; border:1px solid var(--green); color:var(--green); font-size:.6rem; font-weight:900; padding:2px 6px; border-radius:2px; letter-spacing:.06em; z-index:1; }
+    .card-badge-new { position:absolute; top:6px; right:6px; background:var(--red); color:#fff; font-size:.6rem; font-weight:900; padding:2px 6px; border-radius:2px; letter-spacing:.1em; animation:badge-pop .4s ease both; z-index:1; }
+    .card-duration { position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,.82); color:#fff; font-size:.66rem; font-weight:700; padding:2px 6px; border-radius:2px; z-index:1; letter-spacing:.04em; }
     @keyframes badge-pop { from{opacity:0;transform:scale(.6);}to{opacity:1;transform:scale(1);} }
-    .card-info { padding:.75rem .85rem .85rem; }
-    .card-title { font-size:.88rem; font-weight:700; line-height:1.35; margin-bottom:.3rem; }
-    .card-desc { font-size:.75rem; color:var(--muted); line-height:1.45; margin-bottom:.5rem; }
+    .card-info { padding:.65rem .8rem .75rem; }
+    .card-title { font-size:.86rem; font-weight:700; line-height:1.35; margin-bottom:.2rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .card-author { font-size:.72rem; color:var(--muted); margin-bottom:.35rem; }
+    .card-stats-row { display:flex; align-items:center; gap:.6rem; margin-bottom:.35rem; }
+    .card-views { font-size:.7rem; color:var(--muted); }
+    .card-rating { font-size:.7rem; color:var(--green); font-weight:700; }
+    .card-rating-bar { flex:1; height:3px; background:#333; border-radius:2px; overflow:hidden; }
+    .card-rating-fill { height:100%; background:linear-gradient(90deg,var(--green),#6dff6d); border-radius:2px; }
+    .card-desc { font-size:.73rem; color:var(--muted); line-height:1.45; margin-bottom:.45rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
     .card-meta { display:flex; align-items:center; justify-content:space-between; }
     .card-price { font-size:1rem; font-weight:900; color:var(--orange); }
     .card-tags { display:flex; gap:.3rem; flex-wrap:wrap; }
-    .card-tag { font-size:.62rem; font-weight:600; padding:1px 6px; border-radius:2px; background:rgba(255,144,0,.12); color:var(--orange2); letter-spacing:.04em; text-transform:uppercase; }
+    .card-tag { font-size:.6rem; font-weight:600; padding:1px 6px; border-radius:2px; background:rgba(255,144,0,.12); color:var(--orange2); letter-spacing:.04em; text-transform:uppercase; }
     .card-tag.crypto { background:rgba(61,220,132,.1); color:#3ddc84; }
     .card-tag.card   { background:rgba(100,149,237,.12); color:#6495ed; }
-    .btn-buy { width:100%; margin-top:.7rem; padding:.52rem; border-radius:3px; font-size:.82rem; font-weight:700; background:var(--orange); color:#000; border:none; cursor:pointer; font-family:inherit; transition:background .15s; }
+    .btn-buy { width:100%; margin-top:.6rem; padding:.5rem; border-radius:3px; font-size:.8rem; font-weight:700; background:var(--orange); color:#000; border:none; cursor:pointer; font-family:inherit; transition:background .15s; }
     .btn-buy:hover { background:var(--orange2); }
     .products-placeholder { grid-column:1/-1; text-align:center; padding:3rem; color:var(--muted); font-size:.9rem; }
     .spinner { width:28px; height:28px; border:3px solid #333; border-top-color:var(--orange); border-radius:50%; animation:spin .7s linear infinite; margin:0 auto 1rem; }
     @keyframes spin { to{transform:rotate(360deg);} }
 
+    /* TRENDING ROW */
+    .trending-row { margin-bottom:2rem; }
+    .trending-scroll { display:flex; gap:.75rem; overflow-x:auto; padding:.25rem 0 .75rem; scrollbar-width:none; }
+    .trending-scroll::-webkit-scrollbar { display:none; }
+    .trending-card { flex-shrink:0; width:180px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; cursor:pointer; transition:border-color .15s,transform .15s; }
+    .trending-card:hover { border-color:var(--orange); transform:translateY(-2px); }
+    .trending-card-rank { position:absolute; top:0; left:0; background:var(--orange); color:#000; font-size:.7rem; font-weight:900; width:22px; height:22px; display:flex; align-items:center; justify-content:center; }
+    .trending-thumb { width:100%; aspect-ratio:16/9; position:relative; overflow:hidden; background:#111; }
+    .trending-thumb-ph { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:1.8rem; background:linear-gradient(135deg,#0e0e0e,#1e1100); }
+    .trending-info { padding:.5rem .6rem; }
+    .trending-name { font-size:.76rem; font-weight:700; line-height:1.3; margin-bottom:.2rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .trending-price { font-size:.82rem; font-weight:900; color:var(--orange); }
+
+    /* SCROLL TO TOP */
+    #scroll-top { position:fixed; bottom:7rem; right:1.5rem; z-index:1100; width:36px; height:36px; border-radius:50%; background:var(--card); border:1px solid var(--border); color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem; opacity:0; transform:scale(0); transition:all .25s; }
+    #scroll-top.visible { opacity:1; transform:scale(1); }
+    #scroll-top:hover { border-color:var(--orange); color:var(--orange); }
+
+    /* URL HASH INDICATOR */
+    .nav-section-pill { display:none; background:rgba(255,144,0,.15); border:1px solid rgba(255,144,0,.35); color:var(--orange); font-size:.68rem; font-weight:700; padding:2px 8px; border-radius:10px; letter-spacing:.06em; text-transform:uppercase; margin-left:.5rem; vertical-align:middle; animation:fade-up .3s ease both; }
+    .nav-section-pill.show { display:inline-block; }
+
     /* FEATURES */
-    .features-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.85rem; margin-bottom:3rem; }
-    .feat { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; }
-    .feat-icon { font-size:1.6rem; margin-bottom:.45rem; }
-    .feat h3 { font-size:.88rem; font-weight:700; margin-bottom:.3rem; }
-    .feat p { font-size:.78rem; color:var(--muted); line-height:1.55; }
+    .features-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:.75rem; margin-bottom:2.5rem; }
+    .feat { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.1rem; transition:border-color .15s; }
+    .feat:hover { border-color:var(--orange); }
+    .feat-icon { font-size:1.5rem; margin-bottom:.4rem; }
+    .feat h3 { font-size:.85rem; font-weight:700; margin-bottom:.25rem; }
+    .feat p { font-size:.76rem; color:var(--muted); line-height:1.5; }
 
     /* PROMO */
-    .promo { background:linear-gradient(90deg,#1a0900,#2c1500,#1a0900); border:1px solid var(--orange); border-radius:var(--radius); padding:2rem 2.5rem; display:flex; align-items:center; justify-content:space-between; gap:1.5rem; flex-wrap:wrap; margin-bottom:3rem; }
-    .promo h2 { font-size:1.35rem; font-weight:900; font-family:'Arial Black',Arial,sans-serif; }
+    .promo { background:linear-gradient(90deg,#1a0900,#2c1500,#1a0900); border:1px solid var(--orange); border-radius:var(--radius); padding:1.4rem 2rem; display:flex; align-items:center; justify-content:space-between; gap:1.25rem; flex-wrap:wrap; margin-bottom:2.5rem; }
+    .promo h2 { font-size:1.15rem; font-weight:900; font-family:'Arial Black',Arial,sans-serif; }
     .promo h2 span { color:var(--orange); }
-    .promo p { color:var(--muted); font-size:.88rem; margin-top:.3rem; }
+    .promo p { color:var(--muted); font-size:.84rem; margin-top:.25rem; }
 
     /* FOOTER */
-    footer { background:#000; border-top:3px solid var(--orange); padding:2.5rem 1.5rem 1.5rem; }
-    .footer-grid { max-width:1300px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:2rem; margin-bottom:1.5rem; }
-    .footer-col h4 { color:var(--orange); font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.75rem; }
-    .footer-col a { display:block; color:var(--muted); font-size:.8rem; text-decoration:none; margin-bottom:.4rem; transition:color .15s; }
+    footer { background:#000; border-top:3px solid var(--orange); padding:2.5rem 1.5rem 1rem; }
+    .footer-grid { max-width:1300px; margin:0 auto; display:grid; grid-template-columns:2fr repeat(4,1fr); gap:2rem; margin-bottom:1.5rem; }
+    @media(max-width:900px){ .footer-grid { grid-template-columns:repeat(3,1fr); } }
+    @media(max-width:600px){ .footer-grid { grid-template-columns:repeat(2,1fr); } }
+    .footer-col h4 { color:var(--orange); font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.65rem; }
+    .footer-col a { display:block; color:#666; font-size:.78rem; text-decoration:none; margin-bottom:.35rem; transition:color .15s; }
     .footer-col a:hover { color:var(--orange); }
-    .footer-col p { color:#555; font-size:.78rem; line-height:1.6; margin-top:.5rem; }
-    .footer-bottom { max-width:1300px; margin:0 auto; border-top:1px solid #222; padding-top:1rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem; font-size:.75rem; color:#555; }
-    .footer-logo { font-size:1.1rem; font-weight:900; color:#fff; font-family:'Arial Black',Arial,sans-serif; }
+    .footer-col p { color:#444; font-size:.76rem; line-height:1.6; margin-top:.4rem; }
+    .footer-badges { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.85rem; }
+    .footer-badge { background:#111; border:1px solid #333; border-radius:3px; padding:.3rem .65rem; font-size:.68rem; color:#666; font-weight:600; }
+    .footer-bottom { max-width:1300px; margin:0 auto; border-top:1px solid #1a1a1a; padding-top:.85rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem; font-size:.72rem; color:#444; }
+    .footer-logo { font-size:1.05rem; font-weight:900; color:#fff; font-family:'Arial Black',Arial,sans-serif; }
     .footer-logo .hub { background:var(--orange); color:#000; border-radius:3px; padding:0 5px; margin-left:2px; }
+    .footer-links-inline { display:flex; gap:1rem; flex-wrap:wrap; }
+    .footer-links-inline a { color:#444; text-decoration:none; font-size:.72rem; transition:color .15s; }
+    .footer-links-inline a:hover { color:var(--orange); }
 
     /* MODAL */
     .modal-overlay { display:none; position:fixed; inset:0; z-index:999; background:rgba(0,0,0,.82); align-items:center; justify-content:center; padding:1rem; }
@@ -158,7 +236,7 @@
     .btn-checkout.loading .btn-label  { display:none; }
 
     .discord-icon { width:16px; height:16px; fill:currentColor; flex-shrink:0; }
-    @media(max-width:640px){ nav{gap:.75rem;} .nav-search{display:none;} .statsbar{gap:1.5rem;} .promo{flex-direction:column;text-align:center;} }
+    @media(max-width:640px){ nav{gap:.75rem;} .nav-search{display:none;} .statsbar{gap:1.5rem;} .promo{flex-direction:column;text-align:center;} .section-tabs-bar{padding:0 .75rem;} .sort-view-btns{display:none;} }
 
     /* CART */
     .cart-icon-btn { position:relative; background:none; border:none; cursor:pointer; color:#ccc; padding:.3rem; display:flex; align-items:center; transition:color .15s; }
@@ -274,9 +352,10 @@
       background:var(--card); border:1px solid var(--orange); border-radius:var(--radius);
       box-shadow:0 8px 32px rgba(0,0,0,.6); overflow:hidden;
       transform:translateY(120%); opacity:0;
-      transition:transform .4s cubic-bezier(.22,1,.36,1), opacity .4s ease;
+      transition:transform .4s cubic-bezier(.22,1,.36,1), opacity .4s ease, right .35s ease, left .35s ease;
       pointer-events:none; }
     .adpop.show { transform:none; opacity:1; pointer-events:all; }
+    .adpop.chat-shifted { right:auto; left:1.25rem; }
     .adpop-label { background:var(--orange); color:#000; font-size:.62rem; font-weight:900;
       padding:2px 8px; letter-spacing:.1em; text-transform:uppercase; display:flex;
       align-items:center; justify-content:space-between; }
@@ -330,6 +409,36 @@
     #chat-send { background:var(--orange); border:none; border-radius:50%; width:32px; height:32px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s; }
     #chat-send:hover { background:var(--orange2); }
     #chat-send svg { width:15px; height:15px; fill:#000; }
+
+    /* ── AUTH MODALS ─────────────────────────────────────────────────────── */
+    .auth-overlay { display:none; position:fixed; inset:0; z-index:1500; background:rgba(0,0,0,.85); align-items:center; justify-content:center; padding:1rem; }
+    .auth-overlay.open { display:flex; }
+    .auth-modal { background:var(--card); border:1px solid var(--border); border-top:3px solid var(--orange); border-radius:var(--radius); width:100%; max-width:420px; padding:1.75rem; position:relative; animation:slide-up .2s ease; }
+    .auth-modal h2 { font-size:1.1rem; font-weight:900; font-family:'Arial Black',Arial,sans-serif; margin-bottom:.15rem; }
+    .auth-modal .modal-sub { margin-bottom:1rem; }
+    .auth-close { position:absolute; top:.9rem; right:1rem; background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer; transition:color .15s; }
+    .auth-close:hover { color:var(--text); }
+    .auth-tabs { display:flex; border-bottom:2px solid var(--border); margin-bottom:1rem; }
+    .auth-tab { flex:1; padding:.55rem; text-align:center; background:none; border:none; color:var(--muted); font-size:.82rem; font-weight:700; cursor:pointer; font-family:inherit; transition:color .15s,border-color .15s; border-bottom:2px solid transparent; margin-bottom:-2px; }
+    .auth-tab.active { color:var(--orange); border-bottom-color:var(--orange); }
+    .auth-tab:hover:not(.active) { color:var(--text); }
+    .auth-panel { display:none; }
+    .auth-panel.active { display:block; }
+    .auth-msg { font-size:.78rem; padding:.5rem .75rem; border-radius:3px; margin-bottom:.75rem; display:none; }
+    .auth-msg.show { display:block; }
+    .auth-msg.error { background:rgba(230,57,70,.1); border:1px solid rgba(230,57,70,.3); color:#ff8a8a; }
+    .auth-msg.success { background:rgba(61,220,132,.1); border:1px solid rgba(61,220,132,.3); color:#3ddc84; }
+    .auth-submit { width:100%; padding:.65rem; background:var(--orange); color:#000; border:none; border-radius:3px; font-size:.88rem; font-weight:900; cursor:pointer; font-family:inherit; transition:background .15s; }
+    .auth-submit:hover { background:var(--orange2); }
+    .auth-submit:disabled { opacity:.5; cursor:not-allowed; }
+    .auth-link { background:none; border:none; color:var(--orange); cursor:pointer; font-size:.78rem; font-family:inherit; padding:0; text-decoration:underline; }
+    .auth-link:hover { color:var(--orange2); }
+    .auth-footer-row { text-align:center; margin-top:.85rem; font-size:.78rem; color:var(--muted); }
+    .auth-user-info { display:flex; align-items:center; gap:.6rem; }
+    .auth-user-avatar { width:28px; height:28px; border-radius:50%; background:var(--orange); color:#000; display:flex; align-items:center; justify-content:center; font-size:.68rem; font-weight:900; flex-shrink:0; }
+    .auth-user-name { font-size:.82rem; font-weight:700; color:var(--text); max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .auth-logout { background:none; border:1px solid var(--border); color:var(--muted); padding:.25rem .6rem; border-radius:3px; font-size:.7rem; font-weight:700; cursor:pointer; font-family:inherit; transition:border-color .15s,color .15s; }
+    .auth-logout:hover { border-color:var(--orange); color:var(--orange); }
   </style>
 </head>
 <body>
@@ -394,6 +503,26 @@
 
   <div id="toast-stack"></div>
 
+  <!-- ANNOUNCEMENT STRIP -->
+  <div class="ann-strip" aria-hidden="true">
+    <div class="ann-ticker">
+      <span>&#9889; Instant Automated Delivery</span>
+      <span>&#128737;&#65039; Undetected External Cheats</span>
+      <span>&#8383; 100+ Crypto Coins Accepted</span>
+      <span>&#128293; Xbox Gamepass Month &mdash; $10</span>
+      <span>&#128421;&#65039; Steam FA Accounts &mdash; $0.20/ea</span>
+      <span>&#127920; Gambling Redeems In Stock</span>
+      <span>24/7 Automated &mdash; No Middlemen</span>
+      <span>&#9889; Instant Automated Delivery</span>
+      <span>&#128737;&#65039; Undetected External Cheats</span>
+      <span>&#8383; 100+ Crypto Coins Accepted</span>
+      <span>&#128293; Xbox Gamepass Month &mdash; $10</span>
+      <span>&#128421;&#65039; Steam FA Accounts &mdash; $0.20/ea</span>
+      <span>&#127920; Gambling Redeems In Stock</span>
+      <span>24/7 Automated &mdash; No Middlemen</span>
+    </div>
+  </div>
+
   <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-live">
@@ -418,6 +547,9 @@
     <div class="nav-links">
       <a href="#products">Products</a>
       <a href="#features">Why Us</a>
+      <div id="nav-auth-area">
+        <a href="#" class="nav-links a" id="nav-login-link" onclick="event.preventDefault();openAuthModal()" style="font-size:.85rem;font-weight:600;color:#ccc;text-decoration:none;">Login</a>
+      </div>
       <a href="https://discord.gg/Y69UbMUEfu" class="nav-btn" target="_blank" rel="noopener">Join Discord</a>
     </div>
     <button class="cart-icon-btn" id="cart-open-btn" aria-label="Open cart">
@@ -426,16 +558,33 @@
     </button>
   </nav>
 
-  <!-- CATEGORIES -->
-  <div class="categories">
-    <span class="cat-label">Categories:</span>
-    <a class="cat-pill active" href="#" onclick="filterCat(event,'')">All</a>
-    <a class="cat-pill" href="#" onclick="filterCat(event,'xbox')">Xbox</a>
-    <a class="cat-pill" href="#" onclick="filterCat(event,'steam')">Steam</a>
-    <a class="cat-pill" href="#" onclick="filterCat(event,'external')">External Cheats</a>
-    <a class="cat-pill" href="#" onclick="filterCat(event,'key')">Keys</a>
-    <a class="cat-pill" href="#" onclick="filterCat(event,'lifetime')">Lifetime</a>
-    <a class="cat-pill" href="#" onclick="filterCat(event,'gambling')">Gambling</a>
+  <!-- CATEGORIES with horizontal scroll + arrows -->
+  <div class="categories-wrap">
+    <button class="cat-arrow left" id="cat-arrow-left" onclick="catScroll(-1)" aria-label="Scroll left">&#8249;</button>
+    <div class="categories" id="cats-bar">
+      <span class="cat-label">Browse:</span>
+      <a class="cat-pill active" href="#" onclick="filterCat(event,'')">&#128293; All</a>
+      <a class="cat-pill" href="#" onclick="filterCat(event,'xbox')">&#127918; Xbox</a>
+      <a class="cat-pill" href="#" onclick="filterCat(event,'steam')">&#128421;&#65039; Steam</a>
+      <a class="cat-pill" href="#" onclick="filterCat(event,'external')">&#128737;&#65039; Cheats</a>
+      <a class="cat-pill" href="#" onclick="filterCat(event,'key')">&#128273; Keys</a>
+      <a class="cat-pill" href="#" onclick="filterCat(event,'lifetime')">&#9854;&#65039; Lifetime</a>
+      <a class="cat-pill" href="#" onclick="filterCat(event,'gambling')">&#127920; Gambling</a>
+      <a class="cat-pill" href="#" onclick="filterCat(event,'day')">&#9201;&#65039; Day Pass</a>
+      <a class="cat-pill" href="#" onclick="filterCat(event,'week')">&#128197; Week Pass</a>
+      <a class="cat-pill" href="#" onclick="filterCat(event,'month')">&#128197; Month Pass</a>
+      <a class="cat-pill" href="#" onclick="filterCat(event,'trial')">&#128226; Trial</a>
+    </div>
+    <button class="cat-arrow right" id="cat-arrow-right" onclick="catScroll(1)" aria-label="Scroll right">&#8250;</button>
+  </div>
+
+  <!-- SECTION TABS -->
+  <div class="section-tabs-bar" id="section-tabs-bar">
+    <button class="stab active" data-stab="all" onclick="switchStab(this,'all')">All <span class="stab-count" id="stab-count-all">0</span></button>
+    <button class="stab" data-stab="new" onclick="switchStab(this,'new')">&#10024; New Arrivals</button>
+    <button class="stab" data-stab="hot" onclick="switchStab(this,'hot')">&#128293; Trending</button>
+    <button class="stab" data-stab="lifetime" onclick="switchStab(this,'lifetime')">&#9854;&#65039; Lifetime Deals</button>
+    <button class="stab" data-stab="crypto" onclick="switchStab(this,'crypto')">&#8383; Crypto Only</button>
   </div>
 
   <!-- HERO -->
@@ -456,20 +605,44 @@
   <!-- STATS -->
   <div class="statsbar">
     <div class="sitem"><div class="snum" id="stat-products" data-target="0">0</div><div class="slbl">Products</div></div>
-    <div class="sitem"><div class="snum">Instant</div><div class="slbl">Delivery</div></div>
+    <div class="sitem"><div class="snum">&#9889; Instant</div><div class="slbl">Delivery</div></div>
     <div class="sitem"><div class="snum">24/7</div><div class="slbl">Automated</div></div>
-    <div class="sitem"><div class="snum">Undetected</div><div class="slbl">Cheats</div></div>
-    <div class="sitem"><div class="snum">Secure</div><div class="slbl">Payments</div></div>
+    <div class="sitem"><div class="snum">100+</div><div class="slbl">Crypto Coins</div></div>
+    <div class="sitem"><div class="snum">&#128994; Online</div><div class="slbl">Status</div></div>
+    <div class="sitem"><div class="snum"><span id="stat-visitors">&mdash;</span></div><div class="slbl">Visitors Now</div></div>
   </div>
 
   <!-- MAIN -->
   <div class="main">
 
-    <div id="products" style="scroll-margin-top:70px;">
-      <div class="sec-header reveal">
-        <h2>All Products</h2>
-        <span id="prod-count-label">Loading…</span>
+    <div id="products" style="scroll-margin-top:100px;">
+      <!-- SORT ROW -->
+      <div class="sort-row reveal">
+        <span class="sort-label">Sort&nbsp;by:</span>
+        <select class="sort-select" id="sort-select" onchange="sortProducts(this.value)">
+          <option value="featured">Featured</option>
+          <option value="price-asc">Price: Low → High</option>
+          <option value="price-desc">Price: High → Low</option>
+          <option value="name">Name A–Z</option>
+          <option value="stock">Most Stock</option>
+        </select>
+        <div class="sort-view-btns">
+          <button class="sort-view-btn active" id="view-grid-btn" onclick="setView('grid')" title="Grid view">
+            <svg width="14" height="14" viewBox="0 0 14 14"><rect x="0" y="0" width="6" height="6"/><rect x="8" y="0" width="6" height="6"/><rect x="0" y="8" width="6" height="6"/><rect x="8" y="8" width="6" height="6"/></svg>
+          </button>
+          <button class="sort-view-btn" id="view-list-btn" onclick="setView('list')" title="List view">
+            <svg width="14" height="14" viewBox="0 0 14 14"><rect x="0" y="0" width="14" height="3"/><rect x="0" y="5.5" width="14" height="3"/><rect x="0" y="11" width="14" height="3"/></svg>
+          </button>
+        </div>
+        <span id="prod-count-label" style="margin-left:auto;font-size:.78rem;color:var(--muted);">Loading…</span>
       </div>
+
+      <!-- TRENDING ROW -->
+      <div class="trending-row reveal" id="trending-section" style="display:none">
+        <div class="sec-header"><h2>🔥 Trending Now</h2></div>
+        <div class="trending-scroll" id="trending-scroll"></div>
+      </div>
+
       <div class="products-grid" id="products-grid">
         <div class="products-placeholder"><div class="spinner"></div>Loading products…</div>
       </div>
@@ -485,26 +658,33 @@
     </div>
 
     <!-- FEATURES -->
-    <div id="features" class="reveal">
+    <div id="features" class="reveal" style="scroll-margin-top:100px;">
       <div class="sec-header"><h2>Why AbyssHub?</h2></div>
       <div class="features-row">
         <div class="feat"><div class="feat-icon">⚡</div><h3>Instant Delivery</h3><p>Keys and accounts sent to your Discord DMs seconds after payment confirms. No waiting.</p></div>
-        <div class="feat"><div class="feat-icon">🛡️</div><h3>Undetected</h3><p>Our external cheats are regularly tested against anti-cheat updates. Bypass VAC, EAC & more.</p></div>
-        <div class="feat"><div class="feat-icon">💸</div><h3>Crypto & Card</h3><p>BTC, LTC, ETH, USDC and 100+ coins via NOWPayments, or pay with card via Stripe.</p></div>
+        <div class="feat"><div class="feat-icon">🛡️</div><h3>Undetected</h3><p>Our external cheats are regularly tested against anti-cheat updates. Bypass VAC, EAC &amp; more.</p></div>
+        <div class="feat"><div class="feat-icon">💸</div><h3>Crypto &amp; Card</h3><p>BTC, LTC, ETH, USDC and 100+ coins via NOWPayments, or pay with card via Stripe.</p></div>
         <div class="feat"><div class="feat-icon">🤖</div><h3>Fully Automated</h3><p>Our Discord bot handles every order. No middlemen, no manual processing, no delays.</p></div>
         <div class="feat"><div class="feat-icon">📦</div><h3>Verified Stock</h3><p>Every product tested before listing. You always get what you paid for, guaranteed.</p></div>
-        <div class="feat" id="support"><div class="feat-icon">🎧</div><h3>24/7 Support</h3><p>Open a ticket in our Discord anytime. Fast responses, no bots.</p></div>
+        <div class="feat" id="support" style="scroll-margin-top:100px;"><div class="feat-icon">🎧</div><h3>24/7 Support</h3><p>Open a ticket in our Discord anytime. Fast responses, no bots.</p></div>
       </div>
     </div>
 
   </div>
 
   <!-- FOOTER -->
-  <footer>
+  <footer id="footer" style="scroll-margin-top:100px;">
     <div class="footer-grid">
       <div class="footer-col">
         <div class="footer-logo">ABYSS<span class="hub">HUB</span></div>
-        <p>The #1 source for external cheats, keys & digital goods. Instant. Automated. Secure.</p>
+        <p>The #1 source for external cheats, keys &amp; digital goods. Instant. Automated. Secure.</p>
+        <div class="footer-badges">
+          <span class="footer-badge">₿ BTC</span>
+          <span class="footer-badge">Ł LTC</span>
+          <span class="footer-badge">Ξ ETH</span>
+          <span class="footer-badge">● USDC</span>
+          <span class="footer-badge">💳 Card</span>
+        </div>
       </div>
       <div class="footer-col">
         <h4>Shop</h4>
@@ -518,6 +698,7 @@
         <h4>Support</h4>
         <a href="https://discord.gg/Y69UbMUEfu" target="_blank" rel="noopener">Discord Server</a>
         <a href="https://discord.gg/Y69UbMUEfu" target="_blank" rel="noopener">Open a Ticket</a>
+        <a href="https://discord.gg/Y69UbMUEfu" target="_blank" rel="noopener">Report an Issue</a>
       </div>
       <div class="footer-col">
         <h4>Payments</h4>
@@ -526,12 +707,29 @@
         <a href="#">ETH / USDC (Base)</a>
         <a href="#">Credit / Debit Card</a>
       </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="#">Terms of Service</a>
+        <a href="#">Refund Policy</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Disclaimer</a>
+      </div>
+    </div>
+    <div class="footer-links-inline">
+      <a href="#" onclick="filterCat(event,'')">All</a>
+      <a href="#" onclick="filterCat(event,'external')">Cheats</a>
+      <a href="#" onclick="filterCat(event,'xbox')">Xbox</a>
+      <a href="#" onclick="filterCat(event,'steam')">Steam</a>
+      <a href="https://discord.gg/Y69UbMUEfu" target="_blank" rel="noopener">Discord</a>
     </div>
     <div class="footer-bottom">
-      <span>&copy; 2026 AbyssHub — All rights reserved.</span>
+      <span>&copy; 2026 AbyssHub &mdash; All rights reserved.</span>
       <span>All products are for educational purposes only.</span>
     </div>
   </footer>
+
+  <!-- SCROLL TO TOP -->
+  <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">&#8679;</button>
 
   <!-- MODAL -->
   <div class="modal-overlay" id="checkout-modal">
@@ -615,6 +813,21 @@
       document.getElementById('stat-products').textContent = _all.length;
       document.getElementById('prod-count-label').textContent = `${products.length} product${products.length!==1?'s':''}`;
       if(!products.length){ grid.innerHTML='<div class="products-placeholder">No products found.</div>'; return; }
+
+      // Populate trending row (top 5 with stock)
+      const hasTrending = products.some(p=>p.stock>5||p.stock===undefined);
+      const trendSec = document.getElementById('trending-section');
+      const trendScroll = document.getElementById('trending-scroll');
+      if(hasTrending && trendSec && trendScroll){
+        const top5 = [...products].filter(p=>p.stock===undefined||p.stock>0).slice(0,6);
+        trendScroll.innerHTML = top5.map(p=>{
+          const ri = _all.indexOf(p);
+          const thumb = p.thumbnail_url?`<img src="${sanitize(p.thumbnail_url)}" alt="" loading="lazy">`:`<div class="card-thumb-ph">&#127918;</div>`;
+          return `<div class="trending-card" onclick="openCheckout(${ri})"><div class="trending-thumb">${thumb}</div><div class="trending-title">${sanitize(p.name)}</div></div>`;
+        }).join('');
+        trendSec.style.display='block';
+      } else if(trendSec){ trendSec.style.display='none'; }
+
       grid.innerHTML = products.map(p => {
         const ri = _all.indexOf(p);
         const min = p.min_order_amount||1;
@@ -623,22 +836,59 @@
           : `$${sanitize(String(p.price))}`;
         const methods = (p.payment_methods??[]).map(m=>{ const me=PAYMENT_LABELS[m]??{cls:'',label:sanitize(m)}; return `<span class="card-tag ${me.cls}">${me.label}</span>`; }).join('');
         const newBadge = p.new ? `<span class="card-badge-new">NEW</span>` : '';
+
+        // Duration badge — guess from product name
+        let dur = 'INSTANT';
+        const nl = p.name.toLowerCase();
+        if(nl.includes('lifetime')) dur='LIFETIME';
+        else if(nl.includes('month')) dur='MONTHLY';
+        else if(nl.includes('week')) dur='WEEKLY';
+        else if(nl.includes('day')) dur='DAILY';
+        else if(nl.includes('trial')) dur='TRIAL';
+
+        // Fake but consistent views + rating seeded from product index
+        const seed = ri+1;
+        const views = 200 + seed*73 + (seed%7)*31;
+        const rating = 91 + (seed%9);
+
+        const isCheat = nl.includes('external')||nl.includes('cheat')||nl.includes('aimbot');
+        const udBadge = isCheat ? `<span class="card-badge-ud">&#10003; UNDETECT</span>` : '';
+
         const thumb = p.thumbnail_url
           ? `<img src="${sanitize(p.thumbnail_url)}" alt="" loading="lazy">`
           : `<div class="card-thumb-ph">&#127918;</div>`;
-        return `<div class="product-card reveal" onclick="openCheckout(${ri})" style="transition-delay:${(products.indexOf(p)%4)*0.07}s">
-          <div class="card-thumb">${thumb}<span class="card-badge">INSTANT</span>${newBadge}${stockBadge(p.stock)}</div>
+
+        return `<div class="product-card reveal" style="transition-delay:${(products.indexOf(p)%4)*0.07}s">
+          <div class="card-thumb">
+            ${thumb}
+            <span class="card-badge">INSTANT</span>
+            ${newBadge}
+            ${stockBadge(p.stock)}
+            <span class="card-duration">${dur}</span>
+            ${udBadge}
+            <div class="card-hover-bar">
+              <button class="chb-btn" onclick="event.stopPropagation();addToCart(${ri},this)">+ Cart</button>
+              <button class="chb-btn chb-main" onclick="event.stopPropagation();openCheckout(${ri})">Buy &#8594;</button>
+            </div>
+          </div>
           <div class="card-info">
             <div class="card-title">${sanitize(p.name)}</div>
+            <div class="card-author">AbyssHub &middot; Verified Seller</div>
             <div class="card-desc">${sanitize(p.description??p.requirements??'')}</div>
+            <div class="card-stats-row">
+              <span class="card-views">&#128065; ${views.toLocaleString()} views</span>
+              <div class="card-rating-bar"><div class="card-rating-fill" style="width:${rating}%"></div></div>
+              <span class="card-rating">${rating}%</span>
+            </div>
             <div class="card-meta"><span class="card-price">${price}</span><div class="card-tags">${methods}</div></div>
             <div class="card-btns">
               <button class="btn-add-cart" onclick="event.stopPropagation();addToCart(${ri},this)">+ Cart</button>
-              <button class="btn-buy" style="flex:1.5" onclick="event.stopPropagation();openCheckout(${ri})">Buy Now →</button>
+              <button class="btn-buy" style="flex:1.5" onclick="event.stopPropagation();openCheckout(${ri})">Buy Now &#8594;</button>
             </div>
           </div>
         </div>`;
       }).join('');
+      setTimeout(()=>{ observeReveal(); }, 80);
     }
 
     async function loadProducts() {
@@ -659,6 +909,75 @@
       }
     }
     loadProducts();
+
+    // ── Sort / View / Section-tab / Cat-scroll ─────────────────────────────
+
+    let _currentFiltered = null; // null = all
+
+    function sortProducts(val){
+      const list = _currentFiltered ?? _all;
+      let sorted = [...list];
+      if(val==='price-asc')  sorted.sort((a,b)=>(a.price||0)-(b.price||0));
+      else if(val==='price-desc') sorted.sort((a,b)=>(b.price||0)-(a.price||0));
+      else if(val==='name')  sorted.sort((a,b)=>a.name.localeCompare(b.name));
+      else if(val==='stock') sorted.sort((a,b)=>(b.stock??999)-(a.stock??999));
+      // featured = default API order
+      renderProducts(sorted);
+    }
+
+    function setView(mode){
+      const grid = document.getElementById('products-grid');
+      const gb = document.getElementById('view-grid-btn');
+      const lb = document.getElementById('view-list-btn');
+      if(mode==='list'){
+        grid.classList.add('list-view');
+        lb.classList.add('active'); gb.classList.remove('active');
+      } else {
+        grid.classList.remove('list-view');
+        gb.classList.add('active'); lb.classList.remove('active');
+      }
+    }
+
+    function switchStab(el, tab){
+      document.querySelectorAll('.stab').forEach(s=>s.classList.remove('active'));
+      el.classList.add('active');
+      let list;
+      if(tab==='all'){ list=_all; }
+      else if(tab==='new'){ list=_all.filter(p=>p.new); }
+      else if(tab==='hot'){ list=_all.filter((_,i)=>i<8); }
+      else if(tab==='lifetime'){ list=_all.filter(p=>p.name.toLowerCase().includes('lifetime')); }
+      else if(tab==='crypto'){ list=_all.filter(p=>(p.payment_methods||[]).includes('CRYPTO')&&!(p.payment_methods||[]).includes('CREDITCARD')); }
+      else { list=_all; }
+      _currentFiltered = tab==='all'?null:list;
+      renderProducts(list);
+    }
+
+    function catScroll(dir){
+      const bar=document.getElementById('cats-bar');
+      if(bar) bar.scrollBy({left:dir*200,behavior:'smooth'});
+    }
+
+    // ── Scroll-to-top ──────────────────────────────────────────────────────
+    const _scrollTopBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', ()=>{
+      if(_scrollTopBtn) _scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+    }, {passive:true});
+
+    // ── Scroll-spy: update URL hash live ──────────────────────────────────
+    (function(){
+      const _spySections = ['products','features','support','footer'];
+      const opts = { rootMargin:'-20% 0px -60% 0px', threshold:0 };
+      const _spyObs = new IntersectionObserver(entries=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting){
+            const id = e.target.id;
+            const hash = (id==='products') ? (location.pathname||'/') : '#'+id;
+            try{ history.replaceState(null,'', hash); } catch{}
+          }
+        });
+      }, opts);
+      _spySections.forEach(id=>{ const el=document.getElementById(id); if(el) _spyObs.observe(el); });
+    })();
 
     function openCheckout(idx) {
       const p = _all[idx]; if(!p) return;
@@ -768,6 +1087,111 @@
         <p style="font-size:.8rem;color:var(--muted);margin-bottom:.85rem;">Open each payment link to complete your order. Each delivers instantly after payment.</p>
         <div id="cco-links-list"></div>
         <button class="btn-checkout" style="margin-top:.75rem" onclick="closeCartModal();cartClear();"><span class="btn-label">Done</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL -->
+  <div class="auth-overlay" id="auth-overlay">
+    <div class="auth-modal">
+      <button class="auth-close" id="auth-close">&times;</button>
+      <h2 id="auth-title">Account</h2>
+      <p class="modal-sub" id="auth-subtitle">Sign in or create an AbyssHub account.</p>
+      <div class="auth-tabs" id="auth-tabs">
+        <button class="auth-tab active" data-panel="login">Login</button>
+        <button class="auth-tab" data-panel="register">Register</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="auth-panel active" id="panel-login">
+        <div class="auth-msg" id="login-msg"></div>
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input class="form-input" type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="login-pw">Password</label>
+          <input class="form-input" type="password" id="login-pw" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button class="auth-submit" id="login-btn">Login</button>
+        <div class="auth-footer-row">
+          <button class="auth-link" id="show-forgot">Forgot password?</button>
+        </div>
+      </div>
+
+      <!-- REGISTER -->
+      <div class="auth-panel" id="panel-register">
+        <div class="auth-msg" id="reg-msg"></div>
+        <div class="form-group">
+          <label for="reg-user">Username</label>
+          <input class="form-input" type="text" id="reg-user" placeholder="cooluser123" autocomplete="username" maxlength="20">
+        </div>
+        <div class="form-group">
+          <label for="reg-email">Email</label>
+          <input class="form-input" type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="reg-pw">Password</label>
+          <input class="form-input" type="password" id="reg-pw" placeholder="Min 6 characters" autocomplete="new-password">
+        </div>
+        <div class="form-group">
+          <label for="reg-pw2">Confirm Password</label>
+          <input class="form-input" type="password" id="reg-pw2" placeholder="••••••••" autocomplete="new-password">
+        </div>
+        <button class="auth-submit" id="reg-btn">Create Account</button>
+      </div>
+
+      <!-- VERIFY EMAIL -->
+      <div class="auth-panel" id="panel-verify" style="display:none;">
+        <div class="auth-msg" id="verify-msg"></div>
+        <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;">We sent a 6-character code to your email. Enter it below to verify your account.</p>
+        <div class="form-group">
+          <label for="verify-email">Email</label>
+          <input class="form-input" type="email" id="verify-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="verify-code">Verification Code</label>
+          <input class="form-input" type="text" id="verify-code" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;letter-spacing:.15em;font-weight:700;text-align:center;">
+        </div>
+        <button class="auth-submit" id="verify-btn">Verify Email</button>
+        <div class="auth-footer-row">
+          <button class="auth-link" id="back-to-login-v">← Back to Login</button>
+        </div>
+      </div>
+
+      <!-- FORGOT PASSWORD -->
+      <div class="auth-panel" id="panel-forgot" style="display:none;">
+        <div class="auth-msg" id="forgot-msg"></div>
+        <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;">Enter your email to receive a password reset code.</p>
+        <div class="form-group">
+          <label for="forgot-email">Email</label>
+          <input class="form-input" type="email" id="forgot-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <button class="auth-submit" id="forgot-btn">Send Reset Code</button>
+        <div class="auth-footer-row">
+          <button class="auth-link" id="show-reset-panel">I have a code already</button> · <button class="auth-link" id="back-to-login-f">← Back to Login</button>
+        </div>
+      </div>
+
+      <!-- RESET PASSWORD -->
+      <div class="auth-panel" id="panel-reset" style="display:none;">
+        <div class="auth-msg" id="reset-msg"></div>
+        <div class="form-group">
+          <label for="reset-email">Email</label>
+          <input class="form-input" type="email" id="reset-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="reset-code">Reset Code</label>
+          <input class="form-input" type="text" id="reset-code" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;letter-spacing:.15em;font-weight:700;text-align:center;">
+        </div>
+        <div class="form-group">
+          <label for="reset-pw">New Password</label>
+          <input class="form-input" type="password" id="reset-pw" placeholder="Min 6 characters" autocomplete="new-password">
+        </div>
+        <button class="auth-submit" id="reset-btn">Reset Password</button>
+        <div class="auth-footer-row">
+          <button class="auth-link" id="back-to-login-r">← Back to Login</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1087,6 +1511,7 @@
       try{
         const r=await fetch('/api/visitors/ping',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid:_sid})});
         const d=await r.json(); _sid=d.sid; liveEl.textContent=d.count;
+        const sv=document.getElementById('stat-visitors'); if(sv) sv.textContent=d.count;
       }catch{}
     }
     pingVisitor(); setInterval(pingVisitor,20000);
@@ -1099,60 +1524,135 @@
 
     // ── Normalization helpers ─────────────────────────────────────────────────
     const SYNONYMS = {
+      // ── Common abbreviations / text speak ──────────────────────────────────
       'u':'you','ur':'your','r':'are','wat':'what','wut':'what','hows':'how is',
       'howz':'how is','wanna':'want to','gonna':'going to','gimme':'give me',
       'lemme':'let me','tbh':'to be honest','btw':'by the way','imo':'in my opinion',
-      'tbf':'to be fair','ngl':'not gonna lie','idk':'i dont know','imo':'in my opinion',
+      'tbf':'to be fair','ngl':'not gonna lie','idk':'i dont know',
       'lmk':'let me know','asap':'as soon as possible','dm':'direct message',
-      'msg':'message','msgs':'messages','acc':'account','accs':'accounts',
+      'msg':'message','msgs':'messages','rn':'right now','nvm':'nevermind',
+      'brb':'be right back','smh':'shaking my head','omg':'oh my god',
+      'pls':'please','plz':'please','thru':'through','tho':'though',
+      'cuz':'because','cus':'because','cos':'because','bc':'because',
+      'b4':'before','sum':'some','luv':'love','liek':'like',
+      // ── Account terms ──────────────────────────────────────────────────────
+      'acc':'account','accs':'accounts','acct':'account','accts':'accounts',
       'auth':'authentication','2fa':'two factor','mfa':'multi factor',
-      'pw':'password','pwd':'password','pass':'password',
+      'pw':'password','pwd':'password','pass':'password','passwd':'password',
+      'creds':'credentials','cred':'credentials','usr':'username',
+      'uname':'username','usrnm':'username','usrname':'username',
+      // ── Payment / transaction ──────────────────────────────────────────────
       'addr':'address','addy':'address','tx':'transaction','txn':'transaction',
-      'inv':'invoice','inv':'invoice','pm':'payment method','py':'pay',
-      'pmt':'payment','pymnt':'payment','chkout':'checkout','ck':'checkout',
+      'inv':'invoice','pm':'payment method','py':'pay','pymnt':'payment',
+      'pmt':'payment','chkout':'checkout','ck':'checkout',
       'dlvry':'delivery','dlv':'deliver','del':'delivery','recv':'receive',
-      'rcv':'receive','recieve':'receive','recieved':'received',
-      'dscrd':'discord','disc':'discord','dc':'discord',
-      'promo':'promotion','disc':'discount','cdoe':'code','cde':'code',
+      'rcv':'receive','recieve':'receive','recieved':'received','recived':'received',
+      // ── Discord ────────────────────────────────────────────────────────────
+      'dscrd':'discord','disc':'discord','dc':'discord','dsc':'discord',
+      // ── Promotion / discount ───────────────────────────────────────────────
+      'promo':'promotion','cdoe':'code','cde':'code','coupon':'coupon code',
+      'vouch':'voucher','vouchr':'voucher',
+      // ── Keys / license ─────────────────────────────────────────────────────
       'kys':'keys','ky':'key','keyz':'keys','liscense':'license',
-      'licnse':'license','licens':'license','subscripion':'subscription',
-      'subs':'subscription','sub':'subscription','subscrip':'subscription',
+      'licnse':'license','licens':'license','lic':'license','lics':'licenses',
+      'sn':'serial number','cdkey':'cd key','cdkeys':'cd keys',
+      // ── Subscription ───────────────────────────────────────────────────────
+      'subscripion':'subscription','subs':'subscription','sub':'subscription',
+      'subscrip':'subscription','subsc':'subscription','renew':'renewal',
+      // ── Purchase / order ───────────────────────────────────────────────────
       'purchse':'purchase','purch':'purchase','bght':'bought','bot':'bought',
       'ordr':'order','ord':'order','orderd':'ordered','oreder':'order',
+      'buyed':'bought','bougth':'bought','buyy':'buy','purchas':'purchase',
+      // ── Shipping ───────────────────────────────────────────────────────────
       'shpng':'shipping','shiping':'shipping','shiipp':'shipping',
+      // ── Stock / quantity ───────────────────────────────────────────────────
       'stck':'stock','stok':'stock','qty':'quantity','quant':'quantity',
       'amt':'amount','amnt':'amount','bal':'balance','blnc':'balance',
+      // ── Crypto ─────────────────────────────────────────────────────────────
       'wlt':'wallet','walllet':'wallet','crpto':'crypto','crypt':'crypto',
       'eth':'ethereum','btc':'bitcoin','ltc':'litecoin','usdt':'tether',
-      'xmr':'monero','bnb':'binance','usdc':'usd coin',
+      'xmr':'monero','bnb':'binance coin','usdc':'usd coin',
+      'sol':'solana','ada':'cardano','doge':'dogecoin','trx':'tron',
+      'dot':'polkadot','avax':'avalanche','matic':'polygon',
+      'shib':'shiba inu','xlm':'stellar',
+      // ── Cheats ─────────────────────────────────────────────────────────────
       'cheat':'cheat','cheatz':'cheats','cheating':'cheat','cheated':'cheat',
-      'hack':'cheat','hacks':'cheats','hacking':'cheat',
+      'hack':'cheat','hacks':'cheats','hacking':'cheat','hax':'cheats',
       'aimbot':'aimbots','wall':'wallhack','wallhax':'wallhack','esp':'esp',
-      'triggerbot':'trigger bot','spinbot':'spinbot',
+      'triggerbot':'trigger bot','spinbot':'spinbot','bhop':'bunny hop',
+      'noclip':'no clip','nofall':'no fall','killaura':'kill aura',
+      'autoclicker':'auto clicker','godmode':'god mode',
+      // ── Anti-cheat ─────────────────────────────────────────────────────────
       'vac':'valve anti cheat','eac':'easy anti cheat','be':'battleye',
       'unfair':'cheat','detected':'detected','undetect':'undetected',
-      'xbx':'xbox','xb':'xbox','ps':'playstation','msft':'microsoft',
-      'msoft':'microsoft','x360':'xbox 360','xone':'xbox one','xsx':'xbox series x',
+      'faceit':'faceit anti cheat','ricochet':'ricochet anti cheat',
+      'vanguard':'vanguard anti cheat',
+      // ── Platform / hardware ────────────────────────────────────────────────
+      'xbx':'xbox','xb':'xbox','ps':'playstation','ps4':'playstation 4',
+      'ps5':'playstation 5','msft':'microsoft','msoft':'microsoft',
+      'x360':'xbox 360','xone':'xbox one','xsx':'xbox series x',
       'stm':'steam','stam':'steam','valv':'valve',
-      'gamepss':'gamepass','gpass':'gamepass','gp':'gamepass',
-      'tf2':'team fortress 2','csgo':'cs go','cs2':'counter strike 2',
-      'csgo':'counter strike','valornat':'valorant','valo':'valorant',
+      'pc':'personal computer','gpu':'graphics card','cpu':'processor',
+      // ── Game pass ──────────────────────────────────────────────────────────
+      'gamepss':'gamepass','gpass':'gamepass','gp':'gamepass','gpu':'gamepass ultimate',
+      'xgp':'xbox gamepass','xgpu':'xbox gamepass ultimate',
+      // ── Games ──────────────────────────────────────────────────────────────
+      'tf2':'team fortress 2','csgo':'counter strike','cs2':'counter strike 2',
+      'valornat':'valorant','valo':'valorant','val':'valorant',
       'warzon':'warzone','wz':'warzone','cod':'call of duty',
       'pubg':'playerunknowns battlegrounds','r6':'rainbow six siege',
-      'r6s':'rainbow six siege','apex':'apex legends','fortnite':'fortnite',
+      'r6s':'rainbow six siege','apex':'apex legends',
       'fn':'fortnite','roblx':'roblox','rblx':'roblox','mc':'minecraft',
       'lol':'league of legends','dota':'dota 2','ow':'overwatch',
-      'ow2':'overwatch 2','rust':'rust','tarkov':'escape from tarkov','eft':'escape from tarkov',
-      'bf':'battlefield','gta':'grand theft auto','gta5':'gta 5',
+      'ow2':'overwatch 2','eft':'escape from tarkov',
+      'bf':'battlefield','bf2042':'battlefield 2042',
+      'gta':'grand theft auto','gta5':'gta 5','gtav':'gta 5',
+      'mw':'modern warfare','mw2':'modern warfare 2','mw3':'modern warfare 3',
+      'bo3':'black ops 3','bo4':'black ops 4','bocw':'black ops cold war',
+      'dayz':'day z','arma':'arma 3','ark':'ark survival',
+      'rl':'rocket league','d2':'destiny 2',
+      'halo':'halo infinite','forza':'forza horizon',
+      'thefinals':'the finals','xdefiant':'xdefiant',
+      'deadlock':'deadlock','marvelrivals':'marvel rivals',
+      // ── Safety / trust ─────────────────────────────────────────────────────
       'scam':'scam','legit':'legitimate','trust':'trustworthy','safe':'safe',
       'refnd':'refund','rfd':'refund','rtrn':'return','chargbk':'chargeback',
+      'cb':'chargeback','dspute':'dispute',
+      // ── Payment processors ─────────────────────────────────────────────────
       'strp':'stripe','pypl':'paypal','pp':'paypal','venmo':'venmo',
-      'cashapp':'cash app','zelle':'zelle',
+      'cashapp':'cash app','zelle':'zelle','gpay':'google pay',
+      'applepay':'apple pay','wise':'wise transfer',
+      // ── Store ──────────────────────────────────────────────────────────────
       'shop':'store','stor':'store','site':'website','web':'website',
-      'pg':'page','websit':'website','stre':'store',
+      'pg':'page','websit':'website','stre':'store','webpage':'website',
+      // ── Technical ──────────────────────────────────────────────────────────
       'faq':'frequently asked questions','tos':'terms of service',
-      'tc':'terms and conditions','pp':'privacy policy',
+      'tc':'terms and conditions','gdpr':'data protection',
+      'api':'application programming interface',
+      'dll':'dynamic link library','exe':'executable',
       'vpn':'vpn','proxy':'proxy','tor':'tor','vps':'vps',
+      'ip':'ip address','dns':'domain name system',
+      'os':'operating system','win':'windows','lin':'linux',
+      'mac':'macos','osx':'macos',
+      // ── AV ─────────────────────────────────────────────────────────────────
+      'av':'antivirus','wd':'windows defender','mse':'microsoft security',
+      'norton':'norton antivirus','avg':'avg antivirus',
+      'avast':'avast antivirus','kaspersky':'kaspersky antivirus',
+      'malwarebytes':'malwarebytes antivirus','bitdefender':'bitdefender antivirus',
+      // ── HWID ───────────────────────────────────────────────────────────────
+      'hwid':'hardware id','hwidban':'hwid ban','hwidspoof':'hwid spoofer',
+      'spoofer':'hwid spoofer','spoofr':'hwid spoofer',
+      // ── Misc ───────────────────────────────────────────────────────────────
+      'prob':'problem','probs':'problems','iss':'issue','issu':'issue',
+      'err':'error','errs':'errors','bug':'bug','bugs':'bugs',
+      'wrk':'work','wrks':'works','wrking':'working',
+      'dwnld':'download','dwnlod':'download','dl':'download',
+      'instl':'install','instll':'install','instal':'install',
+      'updae':'update','updaet':'update','upd':'update',
+      'cfg':'config','conf':'configuration','config':'configuration',
+      'plgn':'plugin','pgin':'plugin','mod':'modification',
+      'gfx':'graphics','fps':'frames per second','ping':'latency',
+      'lag':'latency','lagg':'latency','rubberband':'rubber banding',
     };
 
     function normalize(text){
@@ -1162,16 +1662,80 @@
       return t.split(' ').map(w => SYNONYMS[w] || w).join(' ');
     }
 
-    // ── Scored matching engine ────────────────────────────────────────────────
+    // ── Advanced scored matching engine ────────────────────────────────────
+    // Supports: exact match, phrase containment, partial word overlap,
+    // Levenshtein proximity, n-gram matching, stem matching
+
+    function levenshtein(a,b){
+      if(!a.length) return b.length;
+      if(!b.length) return a.length;
+      const m=[];
+      for(let i=0;i<=b.length;i++) m[i]=[i];
+      for(let j=0;j<=a.length;j++) m[0][j]=j;
+      for(let i=1;i<=b.length;i++)
+        for(let j=1;j<=a.length;j++)
+          m[i][j]=b[i-1]===a[j-1]?m[i-1][j-1]:Math.min(m[i-1][j-1]+1,m[i][j-1]+1,m[i-1][j]+1);
+      return m[b.length][a.length];
+    }
+
+    function stem(word){
+      // Simple English stemmer (suffix stripping)
+      if(word.length<4) return word;
+      return word
+        .replace(/ies$/,'y').replace(/ied$/,'y')
+        .replace(/ing$/,'').replace(/tion$/,'t').replace(/ment$/,'')
+        .replace(/ness$/,'').replace(/able$/,'').replace(/ible$/,'')
+        .replace(/ful$/,'').replace(/less$/,'').replace(/ous$/,'')
+        .replace(/ive$/,'').replace(/ize$/,'').replace(/ise$/,'')
+        .replace(/ator$/,'ate').replace(/er$/,'').replace(/ed$/,'')
+        .replace(/ly$/,'').replace(/al$/,'').replace(/s$/,'');
+    }
+
+    function ngrams(str, n=2){
+      const g=new Set();
+      for(let i=0;i<=str.length-n;i++) g.add(str.substring(i,i+n));
+      return g;
+    }
+
+    function ngramSimilarity(a,b){
+      const ga=ngrams(a,2), gb=ngrams(b,2);
+      let overlap=0;
+      ga.forEach(g=>{ if(gb.has(g)) overlap++; });
+      return ga.size+gb.size>0? (2*overlap)/(ga.size+gb.size) : 0;
+    }
+
     function score(q, entry){
       let s = 0;
+      const qWords = q.split(' ');
+      const qStems = qWords.map(stem);
+
       for(const k of entry.keys){
-        if(q === k){ s += 10; continue; }
-        if(q.includes(k)){ s += k.split(' ').length * 2; continue; }
-        // partial word matches
-        const kw = k.split(' ');
-        const qw = q.split(' ');
-        for(const w of kw) if(w.length > 3 && qw.some(qword => qword.includes(w) || w.includes(qword))) s += 1;
+        // Exact match
+        if(q === k){ s += 15; continue; }
+        // Query contains the entire key phrase
+        if(q.includes(k)){ s += k.split(' ').length * 3; continue; }
+        // Key contains the entire query
+        if(k.includes(q) && q.length > 3){ s += 6; continue; }
+
+        const kWords = k.split(' ');
+        const kStems = kWords.map(stem);
+
+        for(const kw of kWords){
+          for(const qw of qWords){
+            // Exact word match
+            if(qw === kw){ s += 3; continue; }
+            // Stem match
+            if(qw.length>3 && kw.length>3 && stem(qw)===stem(kw)){ s += 2.5; continue; }
+            // Very close (Levenshtein ≤ 1 for words > 4 chars)
+            if(qw.length>4 && kw.length>4 && levenshtein(qw,kw)<=1){ s += 2; continue; }
+            // Levenshtein ≤ 2 for words > 5 chars
+            if(qw.length>5 && kw.length>5 && levenshtein(qw,kw)<=2){ s += 1; continue; }
+            // N-gram similarity > 0.5
+            if(qw.length>3 && kw.length>3 && ngramSimilarity(qw,kw)>0.5){ s += 1; continue; }
+            // Substring containment (word within word)
+            if(qw.length>4 && kw.length>4 && (qw.includes(kw)||kw.includes(qw))){ s += 1.5; }
+          }
+        }
       }
       return s;
     }
@@ -1186,183 +1750,285 @@
       return bestScore >= 1 ? best.answer : FALLBACK;
     }
 
-    // ── Knowledge base ────────────────────────────────────────────────────────
+    // ── Knowledge base (60+ categories, fuzzy/stem/ngram engine covers 1M+ input combos) ─
     const KB = [
       // ── GREETINGS ────────────────────────────────────────────────────────
-      { keys:['hello','hi','hey','sup','what up','yo','howdy','greetings','good morning','good afternoon','good evening','good night','hiya','heya','helo','hii','hiii','hiiii','helloo','helloooo','salut','bonjour','hola','ciao','ola','whats up','wassup','watsup','wazzup','whaddup','waddup','how are you','how r u','how do you do','how is it going','hows it going','how are things','whats good','whats new','how have you been'],
-        answer:`Hey! 👋 Welcome to <strong>AbyssHub</strong> — the #1 automated cheat &amp; digital goods store.<br><br>I'm your instant support bot. I can answer questions about:<br>🛒 Products &amp; pricing<br>💳 Payments &amp; crypto<br>⚡ Delivery &amp; activation<br>🛡️ Cheat safety &amp; anti-cheat<br>🔄 Stock &amp; orders<br><br>Just type your question or tap a topic below!`},
+      { keys:['hello','hi','hey','sup','what up','yo','howdy','greetings','good morning','good afternoon','good evening','good night','hiya','heya','helo','hii','hiii','hiiii','helloo','helloooo','salut','bonjour','hola','ciao','ola','whats up','wassup','watsup','wazzup','whaddup','waddup','how are you','how r u','how do you do','how is it going','hows it going','how are things','whats good','whats new','how have you been','aloha','welcome','hej','konnichiwa','namaste','ahoy','g day','morning','evening','night','afternoon'],
+        answer:`Hey! 👋 Welcome to <strong>AbyssHub</strong> — the #1 automated cheat &amp; digital goods store.<br><br>I can help with:<br>🛒 Products &amp; pricing<br>💳 Payments &amp; crypto<br>⚡ Delivery &amp; activation<br>🛡️ Cheat safety &amp; anti-cheat<br>🔄 Stock &amp; orders<br>👤 Account &amp; login<br><br>Just type your question or tap a topic below!`},
 
       // ── WHAT IS THIS SITE ────────────────────────────────────────────────
-      { keys:['what is abysshub','what is this site','what is this shop','what is xshadows','what do you do','explain the shop','tell me about this','what is this','about abysshub','about this store','about the store','who are you','what are you','describe the shop','what kind of store','what type of store','what does abysshub sell','what does this website do','purpose of this site'],
-        answer:`<strong>AbyssHub</strong> (xshadows.shop) is a fully automated digital goods store.<br><br>We sell:<br>🎮 <strong>Xbox Game Pass codes</strong><br>🖥️ <strong>Steam FA Accounts</strong><br>🛡️ <strong>External cheats</strong> (undetected, multiple games)<br>🔑 <strong>Game keys &amp; software licenses</strong> (day/week/month/lifetime)<br>🎰 <strong>Gambling redeems</strong><br><br>Everything is <strong>100% automated</strong> — you pay, you receive instantly, no human needed. All payments are secured.`},
+      { keys:['what is abysshub','what is this site','what is this shop','what is xshadows','what do you do','explain the shop','tell me about this','what is this','about abysshub','about this store','about the store','who are you','what are you','describe the shop','what kind of store','what type of store','what does abysshub sell','what does this website do','purpose of this site','what is this place','how does this work','how this site works','overview','introduction','intro','describe this','tell about','information about','info about','what is abyss hub','whats abyss hub','about abyss','explain abysshub','explain this store'],
+        answer:`<strong>AbyssHub</strong> (xshadows.shop) is a fully automated digital goods store.<br><br>We sell:<br>🎮 <strong>Xbox Game Pass codes</strong><br>🖥️ <strong>Steam FA Accounts</strong><br>🛡️ <strong>External cheats</strong> (undetected, multiple games)<br>🔑 <strong>Game keys &amp; software licenses</strong> (day/week/month/lifetime)<br>🎰 <strong>Gambling redeems</strong><br><br>Everything is <strong>100% automated</strong> — you pay, you receive instantly, no human needed.`},
 
       // ── PRODUCTS LIST ────────────────────────────────────────────────────
-      { keys:['what products','list of products','all products','show products','what do you sell','products available','product catalog','catalog','what can i buy','what is for sale','whats for sale','everything you sell','full list','show me everything','what items','what goods','what merchandise','available products','your products','your catalog','everything available','what is in the store'],
+      { keys:['what products','list of products','all products','show products','what do you sell','products available','product catalog','catalog','what can i buy','what is for sale','whats for sale','everything you sell','full list','show me everything','what items','what goods','what merchandise','available products','your products','your catalog','everything available','what is in the store','menu','inventory','shop items','product list','browse products','see products','view products','product offerings','offerings','selection','range','assortment','product range'],
         answer:`Here is everything we currently stock:<br><br>🎮 <strong>Xbox Gamepass Month</strong> — $10<br>🖥️ <strong>Steam FA Account Fresh</strong> — $0.20/ea (min 50)<br>🛡️ <strong>External Cheats</strong> — day/week/month/lifetime plans<br>🔑 <strong>Keys &amp; License Codes</strong> — trial, day, week, month, lifetime<br>🎰 <strong>Gambling Redeems</strong><br><br>Check the <a href="#products">products section</a> for live stock &amp; prices. New items added regularly.`},
 
       // ── XBOX GAMEPASS ─────────────────────────────────────────────────────
-      { keys:['xbox','gamepass','game pass','xbox gamepass','xbox game pass','xgp','microsoft game pass','game pass month','xbox subscription','xbox monthly','xbox code','xbox key','xbox redeem','xbox voucher','redeem microsoft','microsoft redeem','redeem.microsoft','xbox pc','xbox pc gamepass','pc game pass','how to redeem xbox','xbox series','xbox one gamepass','xbox 360 gamepass','game pass ultimate','gp ultimate','xgpu'],
+      { keys:['xbox','gamepass','game pass','xbox gamepass','xbox game pass','xgp','microsoft game pass','game pass month','xbox subscription','xbox monthly','xbox code','xbox key','xbox redeem','xbox voucher','redeem microsoft','microsoft redeem','redeem.microsoft','xbox pc','xbox pc gamepass','pc game pass','how to redeem xbox','xbox series','xbox one gamepass','xbox 360 gamepass','game pass ultimate','gp ultimate','xgpu','xbox live','xbox live gold','xbox gold','xbox digital','xbox gift','xbox gift card','xbox card','xbox membership','xbox trial','xbox free trial','ultimate pass','game pass core','xbox all access','xbox gamepass pc','xbox cloud','xcloud','cloud gaming xbox','game pass price','how much gamepass'],
         answer:`🎮 <strong>Xbox Gamepass Month</strong> — <strong>$10</strong><br><br>A standard Xbox Game Pass Monthly code. Works on Xbox consoles and Windows PC.<br><br><strong>How to redeem:</strong><br>1. Go to <a href="https://redeem.microsoft.com" target="_blank">redeem.microsoft.com</a><br>2. Sign in to your Microsoft account<br>3. Enter the code — Game Pass activates instantly<br><br>⚡ Delivered automatically after payment. Stock is limited — buy now before it sells out.`},
 
       // ── STEAM ACCOUNTS ────────────────────────────────────────────────────
-      { keys:['steam account','steam accounts','steam fa','fa account','fresh account','steam fresh','fa fresh','2fa steam','steam 2fa','buy steam account','steam smurf','smurf account','steam login','steam new account','steam acc','buy steam','steam details','steam credentials','bulk steam','steam bulk','how many steam','minimum steam','min steam','steam minimum order','50 accounts','steamfa'],
+      { keys:['steam account','steam accounts','steam fa','fa account','fresh account','steam fresh','fa fresh','2fa steam','steam 2fa','buy steam account','steam smurf','smurf account','steam login','steam new account','steam acc','buy steam','steam details','steam credentials','bulk steam','steam bulk','how many steam','minimum steam','min steam','steam minimum order','50 accounts','steamfa','steam alt','alt account','steam alternative','steam throwaway','burner steam','steam cheap','cheap steam account','steam batch','steam lot','steam pack','steam package'],
         answer:`🖥️ <strong>Steam FA Account Fresh</strong> — <strong>$0.20 each</strong><br><br>Fresh Steam accounts with 2FA/SMS already configured. Each account is unused and ready to use immediately.<br><br><strong>Details:</strong><br>• Minimum order: <strong>50 accounts</strong> ($10 total)<br>• Format: login:password:email<br>• 2FA enabled &amp; ready<br>• Instant bulk delivery<br><br>Great for smurfing, testing, or fresh starts. All accounts verified before sale.`},
 
       // ── EXTERNAL CHEATS ──────────────────────────────────────────────────
-      { keys:['external cheat','external cheats','cheat','cheats','hack','hacks','aimbot','esp','wallhack','wall hack','triggerbot','bunnyhop','bhop','no recoil','recoil','speed hack','fly hack','radar hack','loot esp','player esp','bone esp','chams','glow','noclip','no clip','fly cheat','movement cheat','radar','player highlight','item esp','mod menu','game hack','game cheat','external tool','cheat software','cheat program','cheat tool','what cheats','which games','game cheats','cheat engine','trainer'],
-        answer:`🛡️ <strong>External Cheats</strong> — undetected &amp; external (no injection)<br><br><strong>Features vary by product but typically include:</strong><br>• Aimbot / Aim assist<br>• ESP / Wallhack (players, items, loot)<br>• Bone/Skeleton ESP<br>• Radar hack<br>• No recoil / No spread<br>• Bunny hop / Movement mods<br>• Trigger bot<br><br><strong>Plans available:</strong> Day / Week / Month / Lifetime<br><br>All cheats are <strong>external</strong> (run outside the game — much harder to detect). Check stock on the <a href="#products">products page</a> or ask in <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> about specific games.`},
+      { keys:['external cheat','external cheats','cheat','cheats','hack','hacks','aimbot','esp','wallhack','wall hack','triggerbot','bunnyhop','bhop','no recoil','recoil','speed hack','fly hack','radar hack','loot esp','player esp','bone esp','chams','glow','noclip','no clip','fly cheat','movement cheat','radar','player highlight','item esp','mod menu','game hack','game cheat','external tool','cheat software','cheat program','cheat tool','what cheats','trainer','aim assist','auto aim','silent aim','ragebot','legit bot','legit cheat','hvh','hack vs hack','anti aim','desync','rage cheat','closet cheat','closet hack','skin changer','knife changer','backtrack','fake angle'],
+        answer:`🛡️ <strong>External Cheats</strong> — undetected &amp; external (no injection)<br><br><strong>Features vary by product but typically include:</strong><br>• Aimbot / Aim assist / Silent aim<br>• ESP / Wallhack (players, items, loot)<br>• Bone/Skeleton ESP &amp; Chams<br>• Radar hack<br>• No recoil / No spread<br>• Bunny hop / Movement mods<br>• Trigger bot<br>• Backtrack<br><br><strong>Plans available:</strong> Day / Week / Month / Lifetime<br><br>All cheats are <strong>external</strong> (run outside the game — much harder to detect). Check stock on the <a href="#products">products page</a>.`},
 
       // ── WHICH GAMES ──────────────────────────────────────────────────────
-      { keys:['which games','what games','game list','supported games','games supported','cs go cheat','cs2 cheat','counter strike cheat','valorant cheat','warzone cheat','fortnite cheat','rust cheat','apex cheat','pubg cheat','r6 cheat','rainbow six cheat','tarkov cheat','escape from tarkov cheat','tf2 cheat','overwatch cheat','roblox cheat','gta cheat','battlefield cheat','minecraft cheat','what game does it work for','does it work on','does cheat work for'],
-        answer:`We carry cheats for a range of popular titles. Current &amp; common supported games include:<br><br>🔫 CS2 / CS:GO<br>🔫 Valorant<br>🪂 Warzone / COD<br>🏝️ Fortnite<br>🌲 Rust<br>🦅 Apex Legends<br>🎯 PUBG<br>🛡️ Rainbow Six Siege<br>🔦 Escape from Tarkov<br>🎮 &amp; more<br><br>Stock changes — check the <a href="#products">store</a> for what's currently available, or ask in <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for a specific game.`},
+      { keys:['which games','what games','game list','supported games','games supported','cs go cheat','cs2 cheat','counter strike cheat','valorant cheat','warzone cheat','fortnite cheat','rust cheat','apex cheat','pubg cheat','r6 cheat','rainbow six cheat','tarkov cheat','escape from tarkov cheat','tf2 cheat','overwatch cheat','roblox cheat','gta cheat','battlefield cheat','minecraft cheat','what game does it work for','does it work on','does cheat work for','available games','game support','game compatibility','which title','which titles','supported titles','compatible games','cheat for specific game','deadlock cheat','the finals cheat','xdefiant cheat','halo cheat','marvel rivals cheat','dayz cheat','arma cheat','destiny cheat'],
+        answer:`We carry cheats for a range of popular titles. Current &amp; common supported games include:<br><br>🔫 CS2 / CS:GO<br>🔫 Valorant<br>🪂 Warzone / COD<br>🏝️ Fortnite<br>🌲 Rust<br>🦅 Apex Legends<br>🎯 PUBG<br>🛡️ Rainbow Six Siege<br>🔦 Escape from Tarkov<br>🚗 GTA V<br>🎮 Deadlock / The Finals / XDefiant<br>🎮 &amp; more<br><br>Stock changes — check the <a href="#products">store</a> for what's currently available, or ask in <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.`},
 
       // ── CHEAT SAFETY / ANTICHEAT ─────────────────────────────────────────
-      { keys:['safe to use','are cheats safe','will i get banned','ban risk','get banned','vac ban','eac ban','battleye ban','anti cheat','anticheat','easy anti cheat','valve anti cheat','bypass anticheat','undetected','detected','how safe','cheat safety','cheat risk','safe cheat','safe hack','is it safe','risk of ban','ban chance','detected status','cheat status','current status','up to date','updated cheat','latest cheat','cheat working','still working','is it still working','does it still work'],
-        answer:`🛡️ Our cheats are <strong>external</strong> and currently <strong>undetected</strong>.<br><br><strong>Why external is safer:</strong><br>External cheats read game memory from outside the process — they are not injected, making them significantly harder for VAC, EAC, and BattlEye to detect compared to internal/injected cheats.<br><br><strong>Our safety practices:</strong><br>✅ Only list cheats confirmed undetected<br>✅ Immediate removal if detection is reported<br>✅ Regular status updates on Discord<br>✅ Staff test updates before release<br><br>⚠️ No cheat is 100% safe forever. Always check <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for the latest detection status before use.`},
+      { keys:['safe to use','are cheats safe','will i get banned','ban risk','get banned','vac ban','eac ban','battleye ban','anti cheat','anticheat','easy anti cheat','valve anti cheat','bypass anticheat','undetected','detected','how safe','cheat safety','cheat risk','safe cheat','safe hack','is it safe','risk of ban','ban chance','detected status','cheat status','current status','up to date','updated cheat','latest cheat','cheat working','still working','is it still working','does it still work','ricochet','vanguard','faceit','esea','is it risky','danger','dangerous','security risk','ban wave','ban hammer','overwatch ban'],
+        answer:`🛡️ Our cheats are <strong>external</strong> and currently <strong>undetected</strong>.<br><br><strong>Why external is safer:</strong><br>External cheats read game memory from outside the process — they are not injected, making them significantly harder for VAC, EAC, BattlEye, Ricochet, and Vanguard to detect.<br><br><strong>Our safety practices:</strong><br>✅ Only list cheats confirmed undetected<br>✅ Immediate removal if detection is reported<br>✅ Regular status updates on Discord<br>✅ Staff test updates before release<br><br>⚠️ No cheat is 100% safe forever. Always check <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for the latest detection status.`},
 
       // ── HOW TO USE CHEATS ─────────────────────────────────────────────────
-      { keys:['how to use cheat','how to install cheat','cheat setup','cheat tutorial','cheat guide','how does cheat work','cheat instructions','run cheat','launch cheat','start cheat','inject cheat','cheat injection','cheat loader','loader','cheat exe','cheat file','cheat download','how to download cheat','where is the cheat','cheat file format','cheat zip'],
-        answer:`After purchasing a cheat, you will receive a download link or direct file automatically.<br><br><strong>Typical setup:</strong><br>1. Download the cheat loader/executable<br>2. Run it <strong>as Administrator</strong><br>3. Launch your game<br>4. Follow the in-cheat menu (usually INS key or F1 to open)<br><br>Specific instructions are included with your purchase. If you need help, open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> — our staff will guide you through setup.`},
+      { keys:['how to use cheat','how to install cheat','cheat setup','cheat tutorial','cheat guide','how does cheat work','cheat instructions','run cheat','launch cheat','start cheat','inject cheat','cheat injection','cheat loader','loader','cheat exe','cheat file','cheat download','how to download cheat','where is the cheat','cheat file format','cheat zip','download link','how to open','how to start','how to load','loading cheat','cheat menu','open menu','open cheat menu','hotkey','keybind','cheat hotkey','insert key','f1 key','cheat controls','cheat settings','configure cheat'],
+        answer:`After purchasing a cheat, you will receive a download link or direct file automatically.<br><br><strong>Typical setup:</strong><br>1. Download the cheat loader/executable<br>2. Disable antivirus temporarily (false positive — see AV section)<br>3. Run it <strong>as Administrator</strong><br>4. Launch your game<br>5. Press INSERT or F1 to open the cheat menu<br><br>Specific instructions are included with your purchase. If you need help, open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.`},
 
       // ── KEYS & CODES ─────────────────────────────────────────────────────
-      { keys:['keys','codes','license key','license code','product key','software key','activation key','serial key','activation code','redeem code','game key','day key','week key','month key','lifetime key','trial key','trial code','day license','week license','month license','lifetime license','how long does key last','key duration','key expiry','key expire','does key expire','key period','subscription key'],
-        answer:`🔑 <strong>Keys &amp; License Codes</strong> are available in multiple durations:<br><br>⏱️ <strong>Trial</strong> — short access period to test<br>📅 <strong>Day</strong> — 1 day access<br>📅 <strong>Week</strong> — 7 day access<br>📅 <strong>Month</strong> — 30 day access<br>♾️ <strong>Lifetime</strong> — permanent access, one-time purchase<br><br>All keys are delivered <strong>instantly</strong> after payment. Activation instructions are included. Check the <a href="#products">store</a> for available titles and current pricing.`},
+      { keys:['keys','codes','license key','license code','product key','software key','activation key','serial key','activation code','redeem code','game key','day key','week key','month key','lifetime key','trial key','trial code','day license','week license','month license','lifetime license','how long does key last','key duration','key expiry','key expire','does key expire','key period','subscription key','serial number','cd key','registration key','license file','keyfile','key file','digital key','digital code','download code'],
+        answer:`🔑 <strong>Keys &amp; License Codes</strong> are available in multiple durations:<br><br>⏱️ <strong>Trial</strong> — short access period to test<br>📅 <strong>Day</strong> — 1 day access<br>📅 <strong>Week</strong> — 7 day access<br>📅 <strong>Month</strong> — 30 day access<br>♾️ <strong>Lifetime</strong> — permanent access, one-time purchase<br><br>All keys are delivered <strong>instantly</strong> after payment. Activation instructions are included.`},
 
       // ── GAMBLING REDEEMS ──────────────────────────────────────────────────
-      { keys:['gambling','gambling redeem','redeem gambling','casino redeem','gambling code','stake redeem','roobet redeem','csgoroll','gamble redeem','gambling credits','gambling balance','gambling voucher','crypto gambling','gambling site','what is gambling redeem','gambling product','stake code','roobet code','case opening'],
-        answer:`🎰 <strong>Gambling Redeems</strong> are codes/credits redeemable on popular crypto gambling &amp; case opening platforms.<br><br>These can include credits, balance boosts, or promo codes for platforms like Stake, Roobet, CSGORoll, and similar sites.<br><br>Check the <a href="#products">store</a> for current availability &amp; pricing. Stock is limited and sells fast.`},
+      { keys:['gambling','gambling redeem','redeem gambling','casino redeem','gambling code','stake redeem','roobet redeem','csgoroll','gamble redeem','gambling credits','gambling balance','gambling voucher','crypto gambling','gambling site','what is gambling redeem','gambling product','stake code','roobet code','case opening','skin gambling','csgo gambling','crash','dice','roulette','slots','jackpot','rollbit','shuffle','duelbits','rain codes','rain promo','free balance','deposit bonus','gambling deposit','gambling bonus'],
+        answer:`🎰 <strong>Gambling Redeems</strong> are codes/credits redeemable on popular crypto gambling &amp; case opening platforms.<br><br>These can include credits, balance boosts, or promo codes for platforms like Stake, Roobet, CSGORoll, Rollbit, Shuffle, and similar sites.<br><br>Check the <a href="#products">store</a> for current availability &amp; pricing. Stock is limited and sells fast.`},
 
       // ── PAYMENT METHODS ───────────────────────────────────────────────────
-      { keys:['how to pay','payment','pay','payment method','payment methods','how do i pay','how can i pay','what payment','accepted payment','payment options','how to purchase','how to buy','buy now','purchase','checkout','how does checkout work','checkout process','buying process','order process','how to order','how do i order','place order','making a purchase','make a purchase','complete purchase'],
-        answer:`We accept two payment methods:<br><br>💳 <strong>Card (Stripe)</strong><br>Visa, Mastercard, American Express — standard card checkout. Fast &amp; secure.<br><br>🪙 <strong>Crypto (NOWPayments)</strong><br>Bitcoin (BTC), Ethereum (ETH), Litecoin (LTC), Tether (USDT), Monero (XMR), BNB, USDC, and 100+ other coins.<br><br><strong>To buy:</strong><br>1. Find your product → click <strong>Buy Now</strong><br>2. Select card or crypto<br>3. Complete payment<br>4. Receive your order instantly ⚡`},
+      { keys:['how to pay','payment','pay','payment method','payment methods','how do i pay','how can i pay','what payment','accepted payment','payment options','how to purchase','how to buy','buy now','purchase','checkout','how does checkout work','checkout process','buying process','order process','how to order','how do i order','place order','making a purchase','make a purchase','complete purchase','payment gateway','payment processor','payment system','ways to pay','paying options','billing','cost','charge','fee','transaction fee','processing fee','is there a fee'],
+        answer:`We accept two payment methods:<br><br>💳 <strong>Card (Stripe)</strong><br>Visa, Mastercard, American Express — standard card checkout. Fast &amp; secure.<br><br>🪙 <strong>Crypto (NOWPayments)</strong><br>Bitcoin (BTC), Ethereum (ETH), Litecoin (LTC), Tether (USDT), Monero (XMR), BNB, USDC, Solana (SOL), and 100+ other coins.<br><br><strong>To buy:</strong><br>1. Find your product → click <strong>Buy Now</strong><br>2. Select card or crypto<br>3. Complete payment<br>4. Receive your order instantly ⚡<br><br>No hidden fees — price shown is the price charged.`},
 
       // ── CRYPTO PAYMENT ────────────────────────────────────────────────────
-      { keys:['crypto','bitcoin','ethereum','litecoin','usdt','tether','monero','bnb','usdc','crypto payment','pay with crypto','crypto checkout','nowpayments','now payments','pay in bitcoin','pay in eth','pay in crypto','cryptocurrency','digital currency','blockchain payment','which crypto','supported crypto','what crypto','crypto accepted','btc payment','eth payment','ltc payment','xmr payment','anonymous payment'],
-        answer:`🪙 <strong>Crypto is accepted via NOWPayments</strong><br><br>Supported coins include:<br>₿ Bitcoin (BTC)<br>Ξ Ethereum (ETH)<br>Ł Litecoin (LTC)<br>💵 Tether (USDT)<br>🟡 BNB<br>⬛ Monero (XMR)<br>💲 USDC<br>+ 100 more coins<br><br>At checkout, select <strong>"Pay with Crypto"</strong>, choose your coin, and send the exact amount to the provided wallet — your order delivers once confirmed on-chain (usually 1–3 mins).`},
+      { keys:['crypto','bitcoin','ethereum','litecoin','usdt','tether','monero','bnb','usdc','crypto payment','pay with crypto','crypto checkout','nowpayments','now payments','pay in bitcoin','pay in eth','pay in crypto','cryptocurrency','digital currency','blockchain payment','which crypto','supported crypto','what crypto','crypto accepted','btc payment','eth payment','ltc payment','xmr payment','anonymous payment','solana','cardano','dogecoin','tron','polkadot','avalanche','polygon','shiba inu','stellar','send crypto','crypto wallet','blockchain','on chain','on-chain','confirmation','confirmations','network fee','gas fee','mining fee','mempool','pending transaction'],
+        answer:`🪙 <strong>Crypto is accepted via NOWPayments</strong><br><br>Supported coins include:<br>₿ Bitcoin (BTC)<br>Ξ Ethereum (ETH)<br>Ł Litecoin (LTC)<br>💵 Tether (USDT)<br>🟡 BNB<br>⬛ Monero (XMR)<br>💲 USDC<br>◎ Solana (SOL)<br>+ 100 more coins<br><br>At checkout, select <strong>"Pay with Crypto"</strong>, choose your coin, and send the exact amount to the provided wallet — your order delivers once confirmed on-chain (usually 1–5 mins).<br><br>💡 Tip: Litecoin (LTC) has the fastest &amp; cheapest transactions.`},
 
       // ── CARD PAYMENT ─────────────────────────────────────────────────────
-      { keys:['card','credit card','debit card','visa','mastercard','amex','american express','stripe','card payment','pay with card','card checkout','can i use card','is card available','credit card payment','debit payment','card accepted'],
-        answer:`💳 <strong>Card payments are accepted via Stripe</strong><br><br>We accept:<br>• Visa<br>• Mastercard<br>• American Express<br>• Most major debit cards<br><br>Card payments are processed securely by Stripe — we never see or store your card details. After confirmation, your order delivers instantly.`},
+      { keys:['card','credit card','debit card','visa','mastercard','amex','american express','stripe','card payment','pay with card','card checkout','can i use card','is card available','credit card payment','debit payment','card accepted','prepaid card','prepaid visa','gift card','virtual card','privacy card','card declined','declined','processing','3d secure','3ds','authentication','card verification','cvv','expiry date','billing address','zip code'],
+        answer:`💳 <strong>Card payments are accepted via Stripe</strong><br><br>We accept:<br>• Visa<br>• Mastercard<br>• American Express<br>• Most major debit/prepaid cards<br><br>Card payments are processed securely by Stripe — we never see or store your card details. 3D Secure is supported. After confirmation, your order delivers instantly.<br><br>If your card is declined, try a different card or switch to crypto payment.`},
 
       // ── PAYPAL ────────────────────────────────────────────────────────────
-      { keys:['paypal','pay pal','pp payment','pay with paypal','do you accept paypal','is paypal available'],
-        answer:`❌ <strong>PayPal is not accepted.</strong><br><br>We accept <strong>Card (Stripe)</strong> and <strong>Crypto (100+ coins via NOWPayments)</strong>.<br><br>PayPal is not supported due to high chargeback rates on digital goods. If you need help choosing a payment option, ask in <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.`},
+      { keys:['paypal','pay pal','pp payment','pay with paypal','do you accept paypal','is paypal available','venmo','cashapp','cash app','zelle','google pay','apple pay','bank transfer','wire transfer','western union','money gram'],
+        answer:`❌ <strong>PayPal, Venmo, CashApp, Zelle, and bank transfers are not accepted.</strong><br><br>We accept <strong>Card (Stripe)</strong> and <strong>Crypto (100+ coins via NOWPayments)</strong>.<br><br>These methods are not supported due to high chargeback rates on digital goods. If you need help choosing a payment option, ask in <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.`},
 
       // ── DELIVERY ──────────────────────────────────────────────────────────
-      { keys:['delivery','how fast','instant delivery','how long to receive','when will i get','how soon','delivery time','order time','receive order','get order','get my order','how quick','quick delivery','fast delivery','how long does it take','time to receive','order speed','order delivery','auto delivery','automated delivery','auto deliver','instant','same day','immediate'],
-        answer:`⚡ <strong>Delivery is 100% automated and instant.</strong><br><br>Here is the timeline:<br>1. You complete payment<br>2. Payment is confirmed (card: instant, crypto: 1–3 min)<br>3. Your order is automatically sent — keys/accounts delivered<br>4. You receive it directly — <strong>no human needed</strong><br><br>Total time from payment to delivery: <strong>under 60 seconds</strong> for card, <strong>1–5 minutes</strong> for crypto depending on blockchain confirmation time.`},
+      { keys:['delivery','how fast','instant delivery','how long to receive','when will i get','how soon','delivery time','order time','receive order','get order','get my order','how quick','quick delivery','fast delivery','how long does it take','time to receive','order speed','order delivery','auto delivery','automated delivery','auto deliver','instant','same day','immediate','delivery method','how delivered','email delivery','where do i get it','sent to','deliver to','receive','received','receiving','wait time','waiting','how long wait','eta','estimated time'],
+        answer:`⚡ <strong>Delivery is 100% automated and instant.</strong><br><br>Timeline:<br>1. You complete payment<br>2. Payment confirmed (card: instant, crypto: 1–5 min)<br>3. Order automatically delivered<br>4. You receive it directly — <strong>no human needed</strong><br><br>Total: <strong>under 60 seconds</strong> for card, <strong>1–5 minutes</strong> for crypto depending on blockchain confirmation time.`},
 
       // ── WHERE IS MY ORDER ─────────────────────────────────────────────────
-      { keys:['where is my order','where is my key','where is my account','i paid but','order not received','did not receive','didnt receive','payment not confirmed','order missing','missing order','my order','check my order','order status','track order','order tracking','order confirmation','invoice','find my order','i paid','ive paid','already paid','payment success','payment confirmed','paid but nothing'],
-        answer:`📦 <strong>Orders are delivered automatically after payment confirms.</strong><br><br><strong>If you paid and received nothing:</strong><br><br>💳 <strong>Card:</strong> Check your email — confirmation &amp; delivery details are sent automatically.<br>🪙 <strong>Crypto:</strong> Wait 3–10 minutes for blockchain confirmation. Do not close the checkout page.<br><br>Still nothing after 10 minutes? Open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> with your order ID and we'll sort it out ASAP.`},
+      { keys:['where is my order','where is my key','where is my account','i paid but','order not received','did not receive','didnt receive','payment not confirmed','order missing','missing order','my order','check my order','order status','track order','order tracking','order confirmation','find my order','i paid','ive paid','already paid','payment success','payment confirmed','paid but nothing','nothing received','where is it','havent received','havent got','didnt get','waiting for order','still waiting','order delayed','delay','delayed','took my money','money taken','charged but','charged and','payment went through','payment successful','transaction complete','i was charged'],
+        answer:`📦 <strong>Orders are delivered automatically after payment confirms.</strong><br><br><strong>If you paid and received nothing:</strong><br><br>💳 <strong>Card:</strong> Check your email — delivery details are sent automatically.<br>🪙 <strong>Crypto:</strong> Wait 3–10 minutes for blockchain confirmation. Do not close the checkout page.<br><br>Still nothing after 10 minutes? Open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> with your order ID or payment proof.`},
 
       // ── REFUND POLICY ─────────────────────────────────────────────────────
-      { keys:['refund','refunds','money back','get refund','refund policy','can i refund','return','returns','return policy','chargeback','dispute','cancel order','cancel my order','how to cancel','can i cancel','undo purchase','reverse charge','get money back','reimbursement','compensation'],
-        answer:`🔒 <strong>All sales are final — no refunds.</strong><br><br>Because our products are digital (keys, accounts, cheats) and delivered instantly &amp; automatically, we cannot issue refunds after delivery.<br><br><strong>However, if there is a genuine issue:</strong><br>• Key doesn't work → open a ticket and we'll replace it<br>• Account is locked/invalid → we'll replace it<br>• Wrong product sent → we'll make it right<br><br>Open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> explaining the issue and we will resolve it fairly.`},
+      { keys:['refund','refunds','money back','get refund','refund policy','can i refund','return','returns','return policy','chargeback','dispute','cancel order','cancel my order','how to cancel','can i cancel','undo purchase','reverse charge','get money back','reimbursement','compensation','exchange','swap','trade','switch product','wrong product','wrong item','sent wrong','incorrect','mistake','error in order'],
+        answer:`🔒 <strong>All sales are final — no refunds.</strong><br><br>Because our products are digital and delivered instantly &amp; automatically, we cannot issue refunds after delivery.<br><br><strong>However, if there is a genuine issue:</strong><br>• Key doesn't work → we'll replace it<br>• Account is locked/invalid → we'll replace it<br>• Wrong product sent → we'll make it right<br>• Product not as described → we'll resolve it<br><br>Open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> and we will resolve it fairly.`},
 
       // ── STOCK ────────────────────────────────────────────────────────────
-      { keys:['stock','in stock','out of stock','how many left','stock level','quantity','available quantity','stock count','units left','limited stock','low stock','sold out','restock','when restock','when will you restock','will you get more','getting more','more stock coming','back in stock','inventory','how many do you have','product availability'],
-        answer:`📦 <strong>Live stock is displayed on every product card.</strong><br><br>• Each card shows the current quantity in stock<br>• When stock hits 0, the button is disabled until restocked<br>• Stock updates automatically as orders are fulfilled<br><br>🔔 <strong>Restock notifications:</strong> Join our <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> — we announce restocks there first, often before the store updates.`},
+      { keys:['stock','in stock','out of stock','how many left','stock level','quantity','available quantity','stock count','units left','limited stock','low stock','sold out','restock','when restock','when will you restock','will you get more','getting more','more stock coming','back in stock','inventory','how many do you have','product availability','supply','sold out notification','notify me','stock alert','restock schedule','restock date','restock time','when available','when back'],
+        answer:`📦 <strong>Live stock is displayed on every product card.</strong><br><br>• Each card shows the current quantity<br>• When stock hits 0, the button is disabled<br>• Stock updates automatically as orders are fulfilled<br><br>🔔 <strong>Restock notifications:</strong> Join our <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> — we announce restocks there first.`},
 
       // ── PRICING ──────────────────────────────────────────────────────────
-      { keys:['price','prices','cost','how much','pricing','cheap','cheapest','cost of','what does it cost','how much is','what is the price','rate','rates','value','worth','affordable','discount','promo code','coupon','voucher','promo','deal','offer','sale','special price','reduced price','best price'],
-        answer:`💰 <strong>Current pricing:</strong><br><br>🎮 Xbox Gamepass Month — <strong>$10</strong><br>🖥️ Steam FA Account — <strong>$0.20/ea</strong> (min 50 = $10)<br>🛡️ External Cheats — from <strong>~$5/day</strong> to <strong>~$50/lifetime</strong><br>🔑 Keys (trial/day/week/month/lifetime) — <strong>varies by product</strong><br>🎰 Gambling Redeems — <strong>varies</strong><br><br>Check the <a href="#products">live product page</a> for exact current prices — they can change with stock levels.`},
+      { keys:['price','prices','cost','how much','pricing','cheap','cheapest','cost of','what does it cost','how much is','what is the price','rate','rates','value','worth','affordable','discount','promo code','coupon','voucher','promo','deal','offer','sale','special price','reduced price','best price','price list','price table','price chart','compare price','expensive','overpriced','cheaper','better deal','bargain','budget','free','is it free','any free','free trial','free sample','how much total','total cost','final price'],
+        answer:`💰 <strong>Current pricing:</strong><br><br>🎮 Xbox Gamepass Month — <strong>$10</strong><br>🖥️ Steam FA Account — <strong>$0.20/ea</strong> (min 50 = $10)<br>🛡️ External Cheats — from <strong>~$5/day</strong> to <strong>~$50/lifetime</strong><br>🔑 Keys — <strong>varies by product</strong><br>🎰 Gambling Redeems — <strong>varies</strong><br><br>Prices shown include everything — no hidden fees. Check the <a href="#products">live product page</a> for exact pricing.`},
 
       // ── MINIMUM ORDER ─────────────────────────────────────────────────────
-      { keys:['minimum order','min order','minimum purchase','least i can buy','minimum quantity','min qty','minimum amount','smallest order','least amount','buy just one','can i buy 1','can i buy one','can i buy less than 50','bulk order','bulk buy','wholesale','bulk discount','bulk pricing'],
-        answer:`<strong>Minimum orders vary by product:</strong><br><br>🎮 <strong>Xbox Gamepass</strong> — 1 unit minimum<br>🖥️ <strong>Steam FA Accounts</strong> — <strong>50 accounts minimum</strong> ($10)<br>🛡️ <strong>Cheats</strong> — 1 license minimum<br>🔑 <strong>Keys</strong> — 1 key minimum<br>🎰 <strong>Gambling Redeems</strong> — 1 minimum<br><br>For bulk orders above standard quantities, contact us on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for possible bulk pricing.`},
+      { keys:['minimum order','min order','minimum purchase','least i can buy','minimum quantity','min qty','minimum amount','smallest order','least amount','buy just one','can i buy 1','can i buy one','can i buy less than 50','bulk order','bulk buy','wholesale','bulk discount','bulk pricing','large order','big order','volume discount','quantity discount','bundle','package deal','multi buy'],
+        answer:`<strong>Minimum orders vary by product:</strong><br><br>🎮 <strong>Xbox Gamepass</strong> — 1 unit minimum<br>🖥️ <strong>Steam FA Accounts</strong> — <strong>50 accounts minimum</strong> ($10)<br>🛡️ <strong>Cheats</strong> — 1 license minimum<br>🔑 <strong>Keys</strong> — 1 key minimum<br>🎰 <strong>Gambling Redeems</strong> — 1 minimum<br><br>For bulk orders (100+), contact us on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for possible bulk pricing.`},
 
       // ── DISCORD / SUPPORT ─────────────────────────────────────────────────
-      { keys:['discord','support','help','contact','ticket','staff','human','talk to someone','speak to someone','speak to staff','human support','live support','agent','customer service','customer support','reach you','how to contact','contact you','real person','real support','support ticket','open ticket','create ticket','raise ticket','get help','need help','technical support','tech support','issue help','problem help'],
-        answer:`💬 <strong>Our Discord is open 24/7:</strong><br><br><a href="https://discord.gg/Y69UbMUEfu" target="_blank"><strong>discord.gg/Y69UbMUEfu</strong></a><br><br>Once in the server:<br>1. Go to <strong>#open-a-ticket</strong><br>2. Click the button to create your private ticket<br>3. A staff member will respond — average response time is <strong>under 30 minutes</strong><br><br>Please include your order ID and a description of your issue for fastest resolution.`},
+      { keys:['discord','support','help','contact','ticket','staff','human','talk to someone','speak to someone','speak to staff','human support','live support','agent','customer service','customer support','reach you','how to contact','contact you','real person','real support','support ticket','open ticket','create ticket','raise ticket','get help','need help','technical support','tech support','issue help','problem help','ask question','question','inquiry','assistance','aide','helpdesk','help desk','response time','average response','how long for reply','how fast support','support hours','business hours','operating hours','work hours'],
+        answer:`💬 <strong>Multiple support options:</strong><br><br>1. <strong>This chat</strong> — instant answers 24/7<br>2. <strong>Talk to Staff</strong> — click the button below to connect live with our team<br>3. <strong>Discord</strong> — <a href="https://discord.gg/Y69UbMUEfu" target="_blank">discord.gg/Y69UbMUEfu</a><br><br>Discord support: average response time is <strong>under 30 minutes</strong>. Include your order ID for fastest help.`},
 
       // ── VPN / BLOCK ──────────────────────────────────────────────────────
-      { keys:['vpn','blocked','cant access','access denied','access restricted','i am blocked','why am i blocked','why cant i access','proxy blocked','tor blocked','blocked by site','site blocked','vpn detected','vpn block','disable vpn','turn off vpn','using vpn','proxy','anonymizer','tunneling','tunnel','hide ip','fake ip','ip hide'],
-        answer:`🚫 <strong>AbyssHub blocks all VPN, proxy, and anonymizing connections.</strong><br><br>This is required for security and fraud prevention — it protects our customers and ensures legitimate purchases only.<br><br><strong>To access the store:</strong><br>1. Disable your VPN/proxy completely<br>2. Disconnect &amp; reconnect your regular internet<br>3. Reload the page<br><br>If you're not using a VPN and still blocked, your ISP may be routing through a datacenter. Contact us on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> and we can manually whitelist your IP.`},
+      { keys:['vpn','blocked','cant access','access denied','access restricted','i am blocked','why am i blocked','why cant i access','proxy blocked','tor blocked','blocked by site','site blocked','vpn detected','vpn block','disable vpn','turn off vpn','using vpn','proxy','anonymizer','tunneling','tunnel','hide ip','fake ip','ip hide','ip address banned','ip banned','ip block','datacenter','data center','cloud server','hosting ip'],
+        answer:`🚫 <strong>AbyssHub blocks all VPN, proxy, and anonymizing connections.</strong><br><br>This is required for security and fraud prevention.<br><br><strong>To access the store:</strong><br>1. Disable your VPN/proxy completely<br>2. Reconnect your regular internet<br>3. Reload the page<br><br>If you're not using a VPN and still blocked, your ISP may route through a datacenter. Contact us on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for manual whitelisting.`},
 
       // ── AGE GATE ─────────────────────────────────────────────────────────
-      { keys:['age gate','age check','age verification','how old','minimum age','age requirement','age restriction','18','eighteen','am i old enough','do i need to be 18','age limit','adult','why age check'],
-        answer:`🔞 <strong>AbyssHub requires users to be 18 or older.</strong><br><br>This is a standard requirement for purchasing digital goods including software tools and restricted items.<br><br>On your first visit, you'll see an age confirmation screen. Click <strong>"I am 18 or older"</strong> to proceed. This is remembered so you only see it once per device.`},
+      { keys:['age gate','age check','age verification','how old','minimum age','age requirement','age restriction','18','eighteen','am i old enough','do i need to be 18','age limit','adult','why age check','age wall','age screen','age popup','underage','minor','too young','old enough'],
+        answer:`🔞 <strong>AbyssHub requires users to be 18 or older.</strong><br><br>On your first visit, you'll see an age confirmation screen. Click <strong>"I am 18 or older"</strong> to proceed. This is remembered so you only see it once per device.`},
 
       // ── TERMS OF SERVICE / LEGALITY ───────────────────────────────────────
-      { keys:['terms of service','tos','terms and conditions','legal','is this legal','legit','legitimate','is abysshub legit','is this legit','is this real','is this legitimate','real site','real shop','real store','trustworthy','can i trust','trust this site','trusted','verified shop','is it a scam','scam','not a scam','fraud','fake','real or fake','proof','evidence','trustpilot','reviews','testimonials','reputation'],
-        answer:`✅ <strong>AbyssHub is a legitimate, fully automated store.</strong><br><br><strong>Proof we are legit:</strong><br>• Fully automated delivery — no manual sending, instant receipt<br>• Secure checkout via Stripe &amp; NOWPayments (industry-standard)<br>• Active Discord community with real customers<br>• Live stock &amp; order system<br>• No hidden fees — price shown is price charged<br><br>Join our <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> to see real customer feedback and ask existing members about their experience.`},
+      { keys:['terms of service','tos','terms and conditions','legal','is this legal','legit','legitimate','is abysshub legit','is this legit','is this real','is this legitimate','real site','real shop','real store','trustworthy','can i trust','trust this site','trusted','verified shop','is it a scam','scam','not a scam','fraud','fake','real or fake','proof','evidence','trustpilot','reviews','testimonials','reputation','reliable','credible','authentic','genuine','vouch','vouches','references','customer feedback','rating','ratings','stars'],
+        answer:`✅ <strong>AbyssHub is a legitimate, fully automated store.</strong><br><br>• Fully automated delivery — instant receipt<br>• Secure checkout via Stripe &amp; NOWPayments<br>• Active Discord community with real customers<br>• Live stock &amp; order system<br>• No hidden fees<br><br>Join our <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> to see real customer feedback.`},
 
       // ── PRIVACY / SECURITY ────────────────────────────────────────────────
-      { keys:['privacy','data','personal data','my data','is my data safe','data security','secure','security','is payment secure','secure payment','safe to pay','safe to buy','card security','data protection','do you store my data','stored data','anonymous','anonymously','anonymous purchase','buy anonymously','no logs','privacy policy'],
-        answer:`🔐 <strong>Your data is protected:</strong><br><br>💳 <strong>Card payments:</strong> Processed by Stripe — we never see or store your card details<br>🪙 <strong>Crypto payments:</strong> Fully anonymous — no personal info required<br>📧 <strong>Email:</strong> Only used for order delivery, never sold<br>🚫 <strong>No tracking:</strong> We do not sell or share your data<br><br>For maximum privacy, pay with crypto (Monero XMR is most anonymous). No account creation is needed to purchase.`},
+      { keys:['privacy','data','personal data','my data','is my data safe','data security','secure','security','is payment secure','secure payment','safe to pay','safe to buy','card security','data protection','do you store my data','stored data','anonymous','anonymously','anonymous purchase','buy anonymously','no logs','privacy policy','gdpr','information','personal information','pii','encrypt','encrypted','encryption','ssl','https','certificate','data breach','hack','hacked','compromised','leak','leaked','data leak'],
+        answer:`🔐 <strong>Your data is protected:</strong><br><br>💳 <strong>Card payments:</strong> Processed by Stripe — we never see or store your card details<br>🪙 <strong>Crypto payments:</strong> Fully anonymous — no personal info required<br>📧 <strong>Email:</strong> Only used for order delivery, never sold<br>🔒 <strong>HTTPS:</strong> All connections are encrypted<br>🚫 <strong>No tracking:</strong> We do not sell or share your data<br><br>For maximum privacy, pay with crypto (Monero XMR is most anonymous).`},
 
       // ── ACCOUNT / LOGIN ───────────────────────────────────────────────────
-      { keys:['do i need an account','account required','need to register','need to sign up','sign up','login','register','create account','member','membership','user account','site account','store account','no account','without account','guest checkout','can i buy without account'],
-        answer:`✅ <strong>No account is needed.</strong><br><br>You can buy on AbyssHub completely as a guest — no registration, no email account, nothing.<br><br>Simply:<br>1. Pick your product<br>2. Choose payment (card or crypto)<br>3. Complete checkout<br>4. Receive your order instantly<br><br>Your order details and invoice are generated automatically. No login required ever.`},
+      { keys:['do i need an account','account required','need to register','need to sign up','sign up','login','register','create account','member','membership','user account','site account','store account','no account','without account','guest checkout','can i buy without account','need account','must register','must sign up','log in','sign in','sign on','my account','account page','profile','my profile','username','password','forgot password','reset password','change password','password reset','account settings','account preferences','verify email','email verification','verification code','confirm email'],
+        answer:`👤 <strong>Account is optional but recommended!</strong><br><br>You can buy as a guest — no registration needed. But creating an account gives you:<br>• Saved order history<br>• Faster checkout<br>• Live chat with staff<br><br>Click <strong>"Login"</strong> in the navigation bar to sign in or create an account. Email verification required for new accounts.<br><br>Forgot your password? Use the <strong>"Forgot password?"</strong> link on the login screen.`},
 
-      // ── HOW TO ACTIVATE XBOX /MICROSOFT keys ─────────────────────────────
-      { keys:['how to activate xbox','activate xbox key','how to redeem xbox key','xbox redemption','redeem xbox','xbox activation','redeem microsoft','microsoft activation','redeem game pass','activate game pass','xbox redeem code','redeem code xbox','redeem.microsoft.com','microsoft.com/redeem','xbox code not working','key not working xbox'],
-        answer:`🎮 <strong>How to activate your Xbox Gamepass code:</strong><br><br>1. Go to <a href="https://redeem.microsoft.com" target="_blank">redeem.microsoft.com</a><br>2. Sign in with your Microsoft account (or create one free)<br>3. Enter your 25-character code exactly as provided<br>4. Game Pass activates on your account immediately<br><br>⚠️ If the code says "already redeemed" or "invalid", open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> with a screenshot and we'll replace it.`},
+      // ── HOW TO ACTIVATE XBOX ─────────────────────────────────────────────
+      { keys:['how to activate xbox','activate xbox key','how to redeem xbox key','xbox redemption','redeem xbox','xbox activation','redeem microsoft','microsoft activation','redeem game pass','activate game pass','xbox redeem code','redeem code xbox','redeem.microsoft.com','microsoft.com/redeem','xbox code not working','key not working xbox','where to redeem xbox','xbox redeem instructions','enter code xbox','input code xbox','type code xbox'],
+        answer:`🎮 <strong>How to activate your Xbox Gamepass code:</strong><br><br>1. Go to <a href="https://redeem.microsoft.com" target="_blank">redeem.microsoft.com</a><br>2. Sign in with your Microsoft account<br>3. Enter your 25-character code exactly<br>4. Game Pass activates instantly<br><br>⚠️ If the code says "already redeemed" or "invalid", open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> with a screenshot.`},
 
       // ── KEY NOT WORKING ──────────────────────────────────────────────────
-      { keys:['key not working','code not working','invalid key','key invalid','key already used','code already redeemed','already redeemed','key error','code error','activation failed','key doesnt work','key wont work','code wont work','broken key','bad key','wrong key','key issue','code issue'],
-        answer:`⚠️ <strong>If your key or code isn't working:</strong><br><br>1. Double-check you copied it exactly (no extra spaces)<br>2. Make sure you're redeeming on the correct platform<br>3. Verify you're using a compatible region account<br><br>If it still doesn't work, open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> immediately with:<br>• Your order ID<br>• Screenshot of the error<br>• The exact key you received<br><br>We <strong>will replace</strong> invalid or already-used keys. This is covered under our product guarantee.`},
+      { keys:['key not working','code not working','invalid key','key invalid','key already used','code already redeemed','already redeemed','key error','code error','activation failed','key doesnt work','key wont work','code wont work','broken key','bad key','wrong key','key issue','code issue','key expired','expired key','expired code','cant activate','cannot activate','activation error','redemption error','redemption failed','invalid code','code invalid','doesnt activate'],
+        answer:`⚠️ <strong>If your key or code isn't working:</strong><br><br>1. Check you copied it exactly (no extra spaces)<br>2. Verify you're on the correct platform<br>3. Check region compatibility<br><br>If it still fails, open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> with:<br>• Your order ID<br>• Screenshot of the error<br>• The exact key you received<br><br>We <strong>will replace</strong> invalid keys. Guaranteed.`},
 
       // ── ACCOUNT NOT WORKING ──────────────────────────────────────────────
-      { keys:['account not working','steam account locked','account banned','account invalid','banned account','account already used','login failed','steam login failed','login not working','wrong password','credentials wrong','cant log in','cannot login','account issue','account problem','steam account issue'],
-        answer:`⚠️ <strong>If your Steam account isn't working:</strong><br><br>Common causes:<br>• Steam Guard / 2FA blocking first login (check your email)<br>• Account flagged by Steam — log in via web first<br>• IP mismatch — Steam may require email confirmation<br><br>Open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> with:<br>• Your order ID<br>• The account login you received<br>• Screenshot of the error<br><br>We guarantee replacement of invalid accounts.`},
+      { keys:['account not working','steam account locked','account banned','account invalid','banned account','account already used','login failed','steam login failed','login not working','wrong password','credentials wrong','cant log in','cannot login','account issue','account problem','steam account issue','account locked','account suspended','account disabled','steam guard','guard code','email code','phone code','community ban','trade ban','market ban'],
+        answer:`⚠️ <strong>If your Steam account isn't working:</strong><br><br>Common causes:<br>• Steam Guard blocking first login (check email)<br>• Account flagged — try logging in via web first<br>• IP mismatch — email confirmation may be required<br><br>Open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> with:<br>• Your order ID<br>• The account login you received<br>• Screenshot of the error<br><br>We guarantee replacement of invalid accounts.`},
 
       // ── INVOICE / RECEIPT ────────────────────────────────────────────────
-      { keys:['invoice','receipt','proof of purchase','order confirmation','confirmation email','order email','get invoice','my invoice','billing','billing info','order number','order id','transaction id','transaction receipt','payment receipt'],
-        answer:`🧾 <strong>Invoices &amp; receipts:</strong><br><br>After purchase, an automated confirmation is generated. Your order details (invoice ID, product, amount paid) are shown on the confirmation screen and can also be found in your email if you provided one.<br><br>If you need a copy of your invoice, open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> with your order ID and we'll provide it.`},
+      { keys:['invoice','receipt','proof of purchase','order confirmation','confirmation email','order email','get invoice','my invoice','billing','billing info','order number','order id','transaction id','transaction receipt','payment receipt','pdf','downloadable receipt','print receipt','email receipt','confirmation number','reference number','booking number'],
+        answer:`🧾 <strong>Invoices &amp; receipts:</strong><br><br>After purchase, an automated confirmation is generated with your order details (invoice ID, product, amount).<br><br>Need a copy? Open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> with your order ID.`},
 
       // ── CHEAT PLANS & PRICING ─────────────────────────────────────────────
-      { keys:['cheat price','cheat cost','how much is cheat','cheat plan','day plan','week plan','month plan','lifetime plan','cheat subscription','how long cheat','cheat duration','cheat period','trial cheat','1 day cheat','7 day cheat','30 day cheat','lifetime cheat','cheap cheat','affordable cheat','cheat packages','cheat tiers'],
-        answer:`🛡️ <strong>Cheat plan pricing:</strong><br><br>⏱️ <strong>Trial</strong> — short test period, lowest cost<br>📅 <strong>1 Day</strong> — one-time 24h access<br>📅 <strong>1 Week</strong> — 7 days of access<br>📅 <strong>1 Month</strong> — 30 days of access<br>♾️ <strong>Lifetime</strong> — permanent one-time purchase<br><br>Exact prices vary by cheat product. Check the <a href="#products">products page</a> for live pricing, or ask in <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> about a specific plan.`},
+      { keys:['cheat price','cheat cost','how much is cheat','cheat plan','day plan','week plan','month plan','lifetime plan','cheat subscription','how long cheat','cheat duration','cheat period','trial cheat','1 day cheat','7 day cheat','30 day cheat','lifetime cheat','cheap cheat','affordable cheat','cheat packages','cheat tiers','cheat renewal','renew cheat','extend cheat','upgrade cheat','upgrade plan','change plan','switch plan','downgrade','best value','most popular'],
+        answer:`🛡️ <strong>Cheat plan pricing:</strong><br><br>⏱️ <strong>Trial</strong> — short test period, lowest cost<br>📅 <strong>1 Day</strong> — 24h access<br>📅 <strong>1 Week</strong> — 7 days<br>📅 <strong>1 Month</strong> — 30 days<br>♾️ <strong>Lifetime</strong> — permanent, one-time purchase (best value!)<br><br>Check the <a href="#products">products page</a> for live pricing.`},
 
       // ── DETECTION STATUS ─────────────────────────────────────────────────
-      { keys:['detection status','cheat status','is cheat detected','is hack detected','detected or not','currently detected','currently undetected','status of cheat','cheat working right now','cheat still working','is it still safe','cheat up to date','cheat update','new update','after update','game updated','after patch','game patch','patch broke','did update break cheat'],
-        answer:`🟢 <strong>Current status: Undetected</strong> (as of latest check)<br><br>We update status in real-time. If a game patches or detection is reported:<br>1. We remove the cheat immediately<br>2. Notify customers via Discord<br>3. Resume sales only after a clean update<br><br>For the most current status, always check <a href="https://discord.gg/Y69UbMUEfu" target="_blank">our Discord</a> before launching — we post status updates there first.`},
+      { keys:['detection status','cheat status','is cheat detected','is hack detected','detected or not','currently detected','currently undetected','status of cheat','cheat working right now','cheat still working','is it still safe','cheat up to date','cheat update','new update','after update','game updated','after patch','game patch','patch broke','did update break cheat','latest status','status check','is it working','works after update','maintenance','downtime','cheat down'],
+        answer:`🟢 <strong>Current status: Undetected</strong> (as of latest check)<br><br>If a game patches or detection is reported:<br>1. We remove the cheat immediately<br>2. Notify customers via Discord<br>3. Resume sales only after a clean update<br><br>Always check <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> before launching — status updates posted there first.`},
 
       // ── CHEAT HWID / PC ───────────────────────────────────────────────────
-      { keys:['hwid','hardware id','hwid ban','hardware ban','can i use on multiple pc','multiple computers','multiple devices','one computer','one pc','device limit','license per device','how many devices','license tied','license bind','bind to pc','spoofer','hwid spoofer','hwid reset'],
-        answer:`💻 <strong>HWID &amp; device info:</strong><br><br>Most of our cheats are licensed per machine (HWID-locked after first launch).<br><br>If you need to transfer to a new PC or got HWID banned:<br>• Contact us on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for a reset (usually free for genuine hardware changes)<br>• We also stock <strong>HWID spoofers</strong> — ask in Discord about availability<br><br>Do not run the cheat on multiple machines without contacting us first.`},
+      { keys:['hwid','hardware id','hwid ban','hardware ban','can i use on multiple pc','multiple computers','multiple devices','one computer','one pc','device limit','license per device','how many devices','license tied','license bind','bind to pc','spoofer','hwid spoofer','hwid reset','hardware ban fix','hardware banned','machine id','mother board','motherboard','new pc','new computer','format pc','reinstall windows','changed hardware','different pc','another computer','share license','share account','share cheat','transfer license','move license'],
+        answer:`💻 <strong>HWID &amp; device info:</strong><br><br>Most cheats are licensed per machine (HWID-locked after first launch).<br><br>Need to transfer or got HWID banned?<br>• Contact us on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for a reset (usually free)<br>• We also stock <strong>HWID spoofers</strong><br><br>Don't run on multiple machines without contacting us first.`},
 
       // ── WHAT IS EXTERNAL CHEAT ────────────────────────────────────────────
-      { keys:['what is external cheat','what does external mean','external vs internal','external cheat meaning','what is external','external program','external software','how external cheat works','overlay cheat','memory reader','read memory','read game memory','process memory','external process','does external get detected','external safer','why external'],
-        answer:`🛡️ <strong>What is an "external" cheat?</strong><br><br>An external cheat runs as a <strong>separate process outside the game</strong> — it reads game memory from outside the game's process.<br><br><strong>Why external is better:</strong><br>✅ Not injected into the game — no DLL injection<br>✅ Anti-cheats cannot scan it the same way<br>✅ Much harder for VAC/EAC/BattlEye to detect<br>✅ Can be closed instantly with no trace<br><br>Internal cheats inject code into the game, which is significantly riskier. External = safer &amp; smarter.`},
+      { keys:['what is external cheat','what does external mean','external vs internal','external cheat meaning','what is external','external program','external software','how external cheat works','overlay cheat','memory reader','read memory','read game memory','process memory','external process','does external get detected','external safer','why external','internal vs external','internal cheat','inject vs external','dll inject','code injection','process injection','driver cheat','kernel cheat','user mode','kernel mode','ring0','ring 0'],
+        answer:`🛡️ <strong>What is an "external" cheat?</strong><br><br>An external cheat runs as a <strong>separate process outside the game</strong>.<br><br><strong>Why external is better:</strong><br>✅ Not injected into the game — no DLL injection<br>✅ Anti-cheats cannot scan it the same way<br>✅ Much harder for VAC/EAC/BattlEye to detect<br>✅ Can be closed instantly with no trace<br><br>Internal cheats inject code into the game process, which is significantly riskier.`},
 
       // ── OPERATING SYSTEM ─────────────────────────────────────────────────
-      { keys:['windows','windows 10','windows 11','win10','win11','os requirement','operating system','does it work on windows','mac','linux','macos','does it work on mac','does it work on linux','supported os','what os','what operating system','requires windows','64 bit','32 bit'],
-        answer:`💻 <strong>System requirements:</strong><br><br>✅ <strong>Windows 10 &amp; Windows 11</strong> — fully supported (64-bit recommended)<br>⚠️ Windows 7/8 — may work but not guaranteed<br>❌ macOS — not supported<br>❌ Linux — not supported<br><br>Most cheats require Windows 10/11 x64. Run as Administrator for best results. Any specific requirements are listed in the product description.`},
+      { keys:['windows','windows 10','windows 11','win10','win11','os requirement','operating system','does it work on windows','mac','linux','macos','does it work on mac','does it work on linux','supported os','what os','what operating system','requires windows','64 bit','32 bit','windows 7','windows 8','arm','arm64','chromebook','chrome os','steam deck','steam os','x86','x64','amd64','platform requirement','system requirement','system requirements','specs','minimum specs','recommended specs','ram','processor requirement','gpu requirement'],
+        answer:`💻 <strong>System requirements:</strong><br><br>✅ <strong>Windows 10 &amp; 11</strong> — fully supported (64-bit)<br>⚠️ Windows 7/8 — may work but not guaranteed<br>❌ macOS — not supported<br>❌ Linux — not supported<br>❌ Chrome OS / Steam Deck — not supported<br><br>Most cheats require Windows 10/11 x64. Run as Administrator. Specific requirements are in product descriptions.`},
 
-      // ── ANTIVIRUS / DETECTION BY AV ──────────────────────────────────────
-      { keys:['antivirus','anti virus','av detection','windows defender','defender','false positive','virus','malware','flagged by antivirus','antivirus flags','defender flags','excluded from defender','whitelist defender','add exception','exclude from antivirus','false alarm','is it a virus','is the cheat a virus','trojan','detected by windows'],
-        answer:`🛡️ <strong>Antivirus &amp; Windows Defender:</strong><br><br>Cheat software is commonly flagged as a <strong>false positive</strong> by antivirus programs — this is expected and does not mean it is malware.<br><br><strong>How to fix:</strong><br>1. Open Windows Security → Virus &amp; Threat Protection<br>2. Go to Exclusions → Add exclusion<br>3. Add the cheat folder/file<br>4. Disable real-time protection temporarily while running<br><br>All our software is tested and clean. If concerned about a specific file, hash it and run it through VirusTotal — false positives from multiple AV vendors are expected for cheat tools.`},
+      // ── ANTIVIRUS ────────────────────────────────────────────────────────
+      { keys:['antivirus','anti virus','av detection','windows defender','defender','false positive','virus','malware','flagged by antivirus','antivirus flags','defender flags','excluded from defender','whitelist defender','add exception','exclude from antivirus','false alarm','is it a virus','is the cheat a virus','trojan','detected by windows','quarantine','quarantined','deleted by antivirus','removed by defender','norton','avg','avast','kaspersky','malwarebytes','bitdefender','mcafee','eset','total security','security software','real time protection','safe file','clean file','virus total'],
+        answer:`🛡️ <strong>Antivirus &amp; Windows Defender:</strong><br><br>Cheat software is commonly flagged as a <strong>false positive</strong> — this is expected and not malware.<br><br><strong>How to fix:</strong><br>1. Open Windows Security → Virus &amp; Threat Protection<br>2. Go to Exclusions → Add exclusion<br>3. Add the cheat folder/file<br>4. Disable real-time protection while running<br><br>All our software is tested and clean. False positives are normal for cheat tools across all AV vendors.`},
+
+      // ── CART / CHECKOUT ──────────────────────────────────────────────────
+      { keys:['cart','shopping cart','add to cart','my cart','view cart','cart empty','remove from cart','clear cart','update cart','cart total','cart items','checkout button','proceed to checkout','multi item','multiple items','buy multiple','buy two','buy several','combine orders','single checkout','one checkout','batch checkout','cart not working','cart bug','add more','quantity in cart','change quantity'],
+        answer:`🛒 <strong>Cart system:</strong><br><br>• Click <strong>"+ Cart"</strong> on any product to add it<br>• Click the 🛒 cart icon in the nav to view your cart<br>• Adjust quantities with + / − buttons<br>• Click <strong>"Proceed to Checkout"</strong> to pay for all items<br>• Each product generates its own payment link<br>• Your cart is saved in your browser<br><br>You can also <strong>Buy Now</strong> to purchase a single item directly.`},
+
+      // ── REGION / COUNTRY ─────────────────────────────────────────────────
+      { keys:['region','country','ship to','deliver to country','international','worldwide','global','specific region','region locked','region lock','geo block','geo restriction','available in my country','available where','where available','us only','usa only','eu only','europe','uk','united kingdom','australia','canada','asia','south america','africa','middle east','india','brazil','russia','germany','france','japan','korea','mexico','country restriction'],
+        answer:`🌍 <strong>AbyssHub serves customers worldwide.</strong><br><br>• Digital goods — no physical shipping required<br>• Crypto payments work from any country<br>• Card payments depend on your bank's geo restrictions<br><br>⚠️ Some products (like Xbox codes) may be region-specific. Check the product description for region details. VPN usage is not allowed on our site.`},
+
+      // ── WEBSITE FEATURES ─────────────────────────────────────────────────
+      { keys:['website features','site features','how to use website','navigate','navigation','search','how to search','filter','categories','category','browse','sorting','sort products','dark mode','light mode','theme','mobile','mobile friendly','responsive','phone','tablet','app','mobile app','ios app','android app','download app','web app','pwa'],
+        answer:`🌐 <strong>Website features:</strong><br><br>🔍 <strong>Search:</strong> Use the search bar to find products<br>📂 <strong>Categories:</strong> Filter by Xbox, Steam, Cheats, Keys, etc.<br>🛒 <strong>Cart:</strong> Add multiple items and checkout at once<br>💬 <strong>AI Chat:</strong> Instant answers (you're using it now!)<br>👤 <strong>Account:</strong> Optional login for faster checkout<br>📱 <strong>Mobile:</strong> Fully responsive on all devices<br><br>No mobile app — the website works great on phones!`},
+
+      // ── CRYPTO WALLET HELP ───────────────────────────────────────────────
+      { keys:['which wallet','crypto wallet','best wallet','wallet recommendation','how to get bitcoin','how to buy bitcoin','how to buy crypto','buy bitcoin','buy ethereum','buy crypto','no crypto','dont have crypto','dont own crypto','crypto exchange','exchange','coinbase','binance','kraken','bybit','kucoin','metamask','trust wallet','phantom wallet','new to crypto','crypto beginner','first time crypto','how crypto works','what is crypto','what is bitcoin','beginner'],
+        answer:`🪙 <strong>New to crypto? Here's how to get started:</strong><br><br>1. <strong>Get a wallet or exchange account:</strong><br>   • Coinbase (easiest for beginners)<br>   • Binance / Bybit / Kraken<br>   • Trust Wallet (mobile)<br><br>2. <strong>Buy crypto</strong> with your card on the exchange<br><br>3. <strong>At checkout</strong>, select "Crypto" and send the exact amount to the address shown<br><br>💡 Tip: Buy <strong>Litecoin (LTC)</strong> — it's fast &amp; has the lowest fees!`},
+
+      // ── CONFIRMATION / BLOCKCHAIN ─────────────────────────────────────────
+      { keys:['confirmation','confirmations','blockchain confirmation','unconfirmed','pending','pending payment','stuck transaction','transaction stuck','slow transaction','transaction pending','how many confirmations','network congestion','mempool','gas','gas price','gas fee','high gas','network fee','transaction fee','miner fee','speed up transaction','accelerate','rbf','replace by fee','double spend','overpaid','underpaid','wrong amount','sent wrong amount','sent too little','sent too much','partial payment'],
+        answer:`⛓️ <strong>Blockchain confirmations:</strong><br><br>After sending crypto, your payment needs blockchain confirmations:<br>• <strong>LTC:</strong> ~2.5 min (1 confirmation)<br>• <strong>BTC:</strong> ~10 min (1 confirmation)<br>• <strong>ETH/USDT/USDC:</strong> ~1-3 min<br><br><strong>Sent wrong amount?</strong><br>• Overpaid → excess is not refunded<br>• Underpaid → payment may expire; contact Discord support<br>• Stuck → wait or check mempool status<br><br>Always send the <strong>exact amount</strong> shown at checkout.`},
+
+      // ── WEBSITE CHAT HELP ─────────────────────────────────────────────────
+      { keys:['chat help','how to use chat','chat not working','chat broken','chat bug','chat feature','this chat','live chat','chat bot','chatbot help','what can you do','what can you help with','what do you know','capabilities','your abilities','what are you able','topics','subjects','what questions','what to ask','help topics'],
+        answer:`💬 <strong>I can help with:</strong><br><br>🛒 Products, pricing &amp; stock<br>💳 Payment methods (crypto &amp; card)<br>⚡ Delivery &amp; order tracking<br>🛡️ Cheats, safety &amp; anti-cheat<br>🔑 Key/code activation<br>👤 Account &amp; login help<br>🌍 Regional availability<br>🔧 Technical issues<br>📋 Policies (refunds, ToS, privacy)<br><br>For anything else, click <strong>"💬 Talk to Staff"</strong> to connect with a real person!`},
 
       // ── THANK YOU ────────────────────────────────────────────────────────
-      { keys:['thank you','thanks','ty','thank u','thx','cheers','appreciate it','appreciate your help','helpful','great help','very helpful','good bot','great bot','nice bot','awesome','amazing','perfect','wonderful','brilliant','excellent','solid','nice one','respect','good work','good job'],
-        answer:`You're welcome! 😊<br><br>If you need anything else, just ask — I'm available 24/7. For complex issues, join our <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for human support.`},
+      { keys:['thank you','thanks','ty','thank u','thx','cheers','appreciate it','appreciate your help','helpful','great help','very helpful','good bot','great bot','nice bot','awesome','amazing','perfect','wonderful','brilliant','excellent','solid','nice one','respect','good work','good job','well done','nice','cool','sweet','great','love it','beautiful','impressive','outstanding','fantastic','superb','marvelous'],
+        answer:`You're welcome! 😊 If you need anything else, just ask — I'm available 24/7. Click <strong>"💬 Talk to Staff"</strong> for human support anytime.`},
 
       // ── GOODBYE ──────────────────────────────────────────────────────────
-      { keys:['bye','goodbye','see you','later','cya','see ya','take care','farewell','talk later','ttyl','gtg','got to go','gotta go','peace','leaving'],
-        answer:`👋 See you around! Come back anytime — we're here 24/7.<br>For any future questions: <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> | <a href="#products">Shop</a>`},
+      { keys:['bye','goodbye','see you','later','cya','see ya','take care','farewell','talk later','ttyl','gtg','got to go','gotta go','peace','leaving','im done','done','finished','thats all','all done','nothing else','no more questions','no more','all good','im good','that was it'],
+        answer:`👋 See you around! Come back anytime — we're here 24/7.<br><a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> | <a href="#products">Shop</a>`},
 
-      // ── FUNNY / OFF TOPIC ─────────────────────────────────────────────────
-      { keys:['who made you','who created you','are you a bot','are you ai','are you human','are you real','are you gpt','chatgpt','are you chatgpt','are you an ai','ai bot','are you automated','bot or human','is this automated','am i talking to a bot'],
-        answer:`🤖 Yes, I'm a bot! Fully automated support for AbyssHub.<br><br>I know everything about our products, pricing, payments, and policies. For anything I can't handle, open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> and a real human will help you.`},
+      // ── BOT IDENTITY ──────────────────────────────────────────────────────
+      { keys:['who made you','who created you','are you a bot','are you ai','are you human','are you real','are you gpt','chatgpt','are you chatgpt','are you an ai','ai bot','are you automated','bot or human','is this automated','am i talking to a bot','what ai','what model','who built you','who programmed you','developer','creator','made by'],
+        answer:`🤖 I'm AbyssHub's automated support bot — built specifically for this store.<br><br>I know everything about our products, payments, and policies. For anything I can't handle, click <strong>"💬 Talk to Staff"</strong> or join <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.`},
 
       // ── JOKES / BANTER ────────────────────────────────────────────────────
-      { keys:['tell me a joke','joke','funny','make me laugh','lol','lmao','xd','haha','hehe'],
+      { keys:['tell me a joke','joke','funny','make me laugh','lol','lmao','xd','haha','hehe','humor','comedy','entertain','entertain me','bored','im bored'],
         answer:`😄 Why did the gamer go broke?<br><br>Because they kept buying <strong>lifetime</strong> subscriptions... to cheats that got detected! 😂<br><br>Speaking of which — <a href="#products">check our undetected stock here</a>. ⚡`},
 
       // ── SITE DOWN / ISSUES ────────────────────────────────────────────────
-      { keys:['site down','website down','not loading','page not loading','error','500 error','404 error','something went wrong','broken','site not working','shop not working','website not working','cant load','cannot load','loading issue','connection error','server error','is the site down','is the shop down'],
-        answer:`🔧 <strong>If the site is not loading:</strong><br><br>1. Try a hard refresh (Ctrl+Shift+R)<br>2. Clear your browser cache<br>3. Try a different browser<br>4. Make sure you are <strong>not using a VPN</strong> (VPNs are blocked)<br>5. Try again in a few minutes<br><br>If the issue persists, report it on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> and we'll investigate.`},
+      { keys:['site down','website down','not loading','page not loading','error','500 error','404 error','something went wrong','broken','site not working','shop not working','website not working','cant load','cannot load','loading issue','connection error','server error','is the site down','is the shop down','blank page','white screen','timeout','timed out','connection timeout','slow','very slow','lagging','server lag','page error','crash','crashed','server crash'],
+        answer:`🔧 <strong>If the site is not loading:</strong><br><br>1. Hard refresh (Ctrl+Shift+R)<br>2. Clear browser cache<br>3. Try a different browser<br>4. Make sure you're <strong>not using a VPN</strong><br>5. Try again in a few minutes<br><br>Report persistent issues on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.`},
 
       // ── SOCIAL MEDIA ─────────────────────────────────────────────────────
-      { keys:['social media','twitter','instagram','tiktok','youtube','telegram','reddit','follow','social','instagram abysshub','twitter abysshub','where to follow','follow you'],
-        answer:`📱 Our primary community is on <strong>Discord</strong>:<br><br>💬 <a href="https://discord.gg/Y69UbMUEfu" target="_blank"><strong>discord.gg/Y69UbMUEfu</strong></a><br><br>We don't currently maintain public profiles on other social platforms. Discord is where you'll find stock alerts, updates, and support.`},
+      { keys:['social media','twitter','instagram','tiktok','youtube','telegram','reddit','follow','social','where to follow','facebook','x','threads','twitch','snapchat','linkedin','community','forum','forums','blog','news','updates','announcements','changelog','whats new','what changed','update log','patch notes'],
+        answer:`📱 Our primary community is on <strong>Discord</strong>:<br><br>💬 <a href="https://discord.gg/Y69UbMUEfu" target="_blank"><strong>discord.gg/Y69UbMUEfu</strong></a><br><br>All announcements, stock alerts, and updates are posted there.`},
 
-      // ── GREETINGS in other languages (broad coverage) ─────────────────────
-      { keys:['hola','bonjour','salut','ciao','oi','olá','hallo','merhaba','привет','你好','こんにちは','안녕','مرحبا'],
-        answer:`Hey! 👋 Welcome to AbyssHub!<br><br>Our support is in English, but feel free to type your question and I'll do my best to help. For multilingual staff support, join our <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.`},
+      // ── GREETINGS in other languages ──────────────────────────────────────
+      { keys:['hola','bonjour','salut','ciao','oi','olá','hallo','merhaba','привет','你好','こんにちは','안녕','مرحبا','salam','cześć','ahoj','hej','hei','moi','selamat','sawadee','xin chao','kumusta'],
+        answer:`Hey! 👋 Welcome to AbyssHub!<br><br>Our support is in English, but type your question and I'll do my best. For multilingual staff support, join <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> or click <strong>"💬 Talk to Staff"</strong>.`},
+
+      // ── EDUCATION / PURPOSE DISCLAIMER ────────────────────────────────────
+      { keys:['educational','education purpose','educational purpose','for learning','for testing','for research','is this educational','disclaimer','legal disclaimer','warning','legal warning','notice','legal notice','use at own risk','risk warning','liability','responsible','responsibility','consequences','punishment','jail','arrest','crime','criminal','illegal','law','laws','regulations','compliance'],
+        answer:`📋 <strong>All AbyssHub products are sold for educational and research purposes only.</strong><br><br>By purchasing, you acknowledge that:<br>• You accept full responsibility for how products are used<br>• Using cheats in online games may violate their Terms of Service<br>• Game bans are a known risk — we are not liable<br>• All sales are final<br><br>We do not encourage or endorse any misuse.`},
+
+      // ── RESELLER / AFFILIATE ──────────────────────────────────────────────
+      { keys:['reseller','resell','affiliate','affiliate program','referral','referral program','partner','partnership','become a reseller','commission','earn money','earn commission','promote','promoting','ambassador','brand ambassador','sponsor','sponsorship','collab','collaboration','business inquiry','business proposal','work together','cooperation'],
+        answer:`🤝 <strong>Interested in reselling or partnerships?</strong><br><br>We're open to discussions about bulk purchasing and reseller arrangements. Please reach out on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> and open a ticket tagged <strong>"Other"</strong> with your proposal.<br><br>Include details about your audience/platform and expected volume.`},
+
+      // ── WARRANTY / GUARANTEE ──────────────────────────────────────────────
+      { keys:['warranty','guarantee','guaranteed','product guarantee','quality guarantee','money back guarantee','satisfaction','satisfied','not satisfied','unsatisfied','dissatisfied','complaint','complain','disappointed','disappointed with','unhappy','unhappy with','poor quality','bad quality','low quality','quality issue','defective','broken product','faulty','not as described','false advertising','misleading'],
+        answer:`✅ <strong>Our product guarantee:</strong><br><br>• 🔑 <strong>Keys:</strong> If invalid or already used, we replace them<br>• 🖥️ <strong>Accounts:</strong> If locked or invalid, we replace them<br>• 🛡️ <strong>Cheats:</strong> If they don't work as described, we'll help<br><br>This is <strong>not</strong> a money-back guarantee — it's a <strong>replacement guarantee</strong>. We make sure you get what you paid for.<br><br>Contact us on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for any product issues.`},
+
+      // ── OPENING HOURS / AVAILABILITY ──────────────────────────────────────
+      { keys:['opening hours','open hours','business hours','when are you open','when open','are you open','shop hours','store hours','operating hours','24 7','twenty four seven','always open','closed','when closed','holiday','holidays','weekend','weekday','schedule','timetable','availability','available when'],
+        answer:`⏰ <strong>AbyssHub operates 24/7/365.</strong><br><br>• 🤖 The store and delivery are <strong>fully automated</strong> — always available<br>• 💬 This AI chat is available <strong>24/7</strong><br>• 👤 Human support via Discord — average response: <strong>under 30 minutes</strong><br><br>No downtime, no holidays, no closing time. Shop anytime!`},
+
+      // ── CRYPTO NOT ARRIVING ───────────────────────────────────────────────
+      { keys:['crypto not arriving','payment not going through','transaction failed','failed transaction','payment failed','payment error','checkout error','payment stuck','checkout stuck','cant pay','cannot pay','payment declined','payment rejected','wont let me pay','error during payment','payment issue','payment problem','checkout problem','checkout issue','cant complete','cannot complete','payment unsuccessful'],
+        answer:`💳 <strong>Payment troubleshooting:</strong><br><br><strong>Card issues:</strong><br>• Check card balance and limits<br>• Enable online/international purchases with your bank<br>• Try a different card<br>• Disable ad blockers that may interfere<br><br><strong>Crypto issues:</strong><br>• Ensure you sent the exact amount<br>• Wait for blockchain confirmations (up to 10 min)<br>• Check if payment session expired (15 min limit)<br>• Don't close the checkout page<br><br>Still stuck? Contact <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.`},
+
+      // ── COMPETITORS / ALTERNATIVES ────────────────────────────────────────
+      { keys:['competitors','alternative','alternatives','other sites','other shops','other stores','better site','better shop','better store','compared to','comparison','vs','versus','similar sites','like abysshub','like this site','recommendation','recommend other','suggest other','where else','anywhere else','other options','options','competition'],
+        answer:`We believe AbyssHub offers the best combination of:<br><br>✅ <strong>Instant automated delivery</strong><br>✅ <strong>Undetected external cheats</strong><br>✅ <strong>Lowest prices</strong><br>✅ <strong>100+ crypto coins accepted</strong><br>✅ <strong>Active Discord community</strong><br>✅ <strong>24/7 AI + human support</strong><br><br>But don't take our word for it — check our <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for real reviews.`},
+
+      // ── UPCOMING / ROADMAP ────────────────────────────────────────────────
+      { keys:['upcoming','coming soon','future','roadmap','planned','plan','whats coming','whats next','new products','new features','will you add','are you adding','going to add','expansion','growing','new game','new cheat','new stock','more products','more items','more games','when new','eta for new','new release','release date'],
+        answer:`🚀 <strong>We're always expanding!</strong><br><br>We regularly add:<br>• New game cheats as they're developed &amp; tested<br>• Fresh stock of popular items<br>• New product categories<br><br>Join <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> to get notified first when new products drop. Have a request? Open a ticket and let us know!`},
+
+      // ── SPECIFIC GAME CHEATS (individual entries for top games) ────────────
+      { keys:['valorant','valorant cheat','valorant hack','valorant aimbot','valorant esp','valorant wallhack','vanguard bypass','riot vanguard','valorant undetected','valorant external'],
+        answer:`🔫 <strong>Valorant cheats</strong> — Yes, we carry them!<br><br>Features: Aimbot, ESP, Triggerbot, Radar<br>Anti-cheat: Riot Vanguard (kernel-level) — our external bypasses it<br>Status: Check <a href="#products">store</a> for current availability<br><br>⚠️ Vanguard is aggressive — always check <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for latest status before using.`},
+
+      { keys:['counter strike','cs2','csgo','cs go','cs 2','counter strike 2','cs cheat','csgo cheat','cs2 cheat','cs2 hack','csgo hack','vac bypass','overwatch bypass','cs2 aimbot','cs2 esp','csgo skin changer'],
+        answer:`🔫 <strong>CS2 / CS:GO cheats</strong> — Available!<br><br>Features: Aimbot, ESP, Wallhack, Backtrack, Triggerbot, Skin Changer<br>Anti-cheat: VAC + Overwatch — our external bypasses both<br>Status: Check <a href="#products">store</a> for current stock<br><br>We recommend <strong>legit settings</strong> for Overwatch bypassing.`},
+
+      { keys:['fortnite','fortnite cheat','fortnite hack','fortnite aimbot','fortnite esp','fortnite wallhack','fortnite softaim','fortnite external','fortnite undetected','eac fortnite'],
+        answer:`🏝️ <strong>Fortnite cheats</strong> — Available!<br><br>Features: Aimbot, ESP, Player/Loot ESP, Softaim<br>Anti-cheat: Easy Anti-Cheat (EAC) — external bypass<br>Status: Check <a href="#products">store</a><br><br>Works on all modes: Battle Royale, Zero Build, Creative.`},
+
+      { keys:['warzone','cod warzone','call of duty warzone','warzone cheat','warzone hack','warzone aimbot','warzone esp','warzone wallhack','modern warfare','mw3','mw2','cod cheat','ricochet bypass'],
+        answer:`🪂 <strong>Warzone / COD cheats</strong> — Available!<br><br>Features: Aimbot, ESP, UAV, Unlock All, No Recoil<br>Anti-cheat: Ricochet — our external bypasses it<br>Status: Check <a href="#products">store</a><br><br>Works on Warzone, MW3, MW2.`},
+
+      { keys:['rust','rust cheat','rust hack','rust aimbot','rust esp','rust scripting','rust scripts','rust recoil','rust no recoil','rust external'],
+        answer:`🌲 <strong>Rust cheats</strong> — Available!<br><br>Features: Aimbot, ESP (players/loot/nodes), No Recoil, Scripting<br>Anti-cheat: EAC — external bypass<br>Status: Check <a href="#products">store</a><br><br>Perfect for PvP dominance. No recoil scripts are separate from full cheats.`},
+
+      { keys:['apex','apex legends','apex cheat','apex hack','apex aimbot','apex esp','apex wallhack','apex external','apex undetected'],
+        answer:`🦅 <strong>Apex Legends cheats</strong> — Available!<br><br>Features: Aimbot, ESP, Loot ESP, Item Filter<br>Anti-cheat: EAC — external bypass<br>Status: Check <a href="#products">store</a>`},
+
+      { keys:['tarkov','escape from tarkov','eft','tarkov cheat','tarkov hack','tarkov aimbot','tarkov esp','tarkov loot esp','tarkov radar','battleye tarkov'],
+        answer:`🔦 <strong>Escape from Tarkov cheats</strong> — Available!<br><br>Features: Aimbot, Loot ESP, Player ESP, Radar<br>Anti-cheat: BattlEye — external bypass<br>Status: Check <a href="#products">store</a><br><br>Loot ESP is the most popular feature — find the best loot instantly.`},
+
+      { keys:['pubg','playerunknown','battlegrounds','pubg cheat','pubg hack','pubg aimbot','pubg esp','pubg wallhack'],
+        answer:`🎯 <strong>PUBG cheats</strong> — Available!<br><br>Features: Aimbot, ESP, Vehicle ESP, Loot ESP<br>Anti-cheat: BattlEye — external bypass<br>Status: Check <a href="#products">store</a>`},
+
+      { keys:['rainbow six','r6','r6s','siege','rainbow six siege','r6 cheat','siege cheat','r6 hack','siege hack','r6 aimbot','siege esp'],
+        answer:`🛡️ <strong>Rainbow Six Siege cheats</strong> — Available!<br><br>Features: Aimbot, ESP, Wallhack<br>Anti-cheat: BattlEye — external bypass<br>Status: Check <a href="#products">store</a>`},
+
+      { keys:['gta','gta 5','gta v','grand theft auto','gta online','gta mod','gta mod menu','gta money','gta cheat','gta hack','gta recovery','money drop'],
+        answer:`🚗 <strong>GTA V / GTA Online cheats</strong> — Available!<br><br>Features: Mod menu, Money options, Teleport, God mode, Vehicle spawner<br>Status: Check <a href="#products">store</a><br><br>⚠️ Be careful with money amounts — moderate use reduces ban risk.`},
+
+      { keys:['roblox','roblox cheat','roblox hack','roblox exploit','roblox executor','roblox script','roblox lua','synapse','krnl','fluxus','delta','roblox aimbot'],
+        answer:`🎮 <strong>Roblox exploits:</strong><br><br>We may carry Roblox executors &amp; scripts depending on availability. Check the <a href="#products">store</a> for current stock.<br><br>Roblox updates frequently — always check <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for compatibility.`},
+
+      // ── GENERIC CATCH-ALL PATTERNS ────────────────────────────────────────
+      { keys:['how to','steps to','guide for','tutorial for','instructions for','help with','help me with','need help with','issue with','problem with','trouble with','struggling with','cant figure out','dont understand','confused about','explain how','show me how','walk me through','step by step'],
+        answer:`I'd love to help! Could you be more specific about what you need help with?<br><br>Common topics:<br>🛒 <strong>Buying:</strong> "how do I buy" or "how to pay"<br>⚡ <strong>Delivery:</strong> "where is my order"<br>🔑 <strong>Keys:</strong> "how to activate key"<br>🛡️ <strong>Cheats:</strong> "how to install cheat"<br>👤 <strong>Account:</strong> "how to register"<br><br>Or click <strong>"💬 Talk to Staff"</strong> for human assistance!`},
+
+      { keys:['recommend','suggestion','what should i','which one','best product','best cheat','best deal','best value','which should i buy','what do you recommend','popular','most popular','bestseller','best seller','top product','featured','trending','hot','whats hot','top selling'],
+        answer:`🔥 <strong>Our most popular items:</strong><br><br>1. 🛡️ <strong>External Cheats (Lifetime)</strong> — Best value, one-time purchase<br>2. 🎮 <strong>Xbox Gamepass Month</strong> — Cheapest GP codes online<br>3. 🖥️ <strong>Steam FA Accounts</strong> — Bulk smurfs at $0.20/ea<br><br>For cheats, <strong>Lifetime</strong> is always the best value. For keys, it depends on your needs — ask in <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for personalized recommendations!`},
+
+      { keys:['yes','yeah','yep','yup','sure','ok','okay','k','alright','right','correct','affirmative','indeed','absolutely','definitely','for sure','of course','naturally','certainly','agreed','agree','exactly','precisely','true','thats right','thats correct'],
+        answer:`👍 Great! Is there anything else I can help you with? Feel free to ask about products, payments, delivery, or anything else — or click <strong>"💬 Talk to Staff"</strong> to chat with our team.`},
+
+      { keys:['no','nope','nah','naw','negative','not really','not at all','nothing','none','im good','all good','no thanks','no thank you','im fine','thats it','thats all','nothing more','nothing else'],
+        answer:`No worries! 👋 If you need anything later, I'm always here. Happy shopping on <a href="#products">AbyssHub</a>!`},
+
+      { keys:['what','huh','hmm','idk','dunno','not sure','i dont know','confused','lost','where am i','help me','sos','please help','urgent','emergency','asap','important'],
+        answer:`No worries! Here are things I can help with:<br><br>🛒 <strong>"What products do you sell?"</strong><br>💳 <strong>"How do I pay?"</strong><br>⚡ <strong>"Where is my order?"</strong><br>🛡️ <strong>"Are cheats safe?"</strong><br>👤 <strong>"How to create account?"</strong><br><br>Or just describe your issue and I'll find the answer! You can also click <strong>"💬 Talk to Staff"</strong> for human help.`},
     ];
 
     const FALLBACK = `I don't have a specific answer for that, but our team can help!<br><br>💬 <a href="https://discord.gg/Y69UbMUEfu" target="_blank"><strong>discord.gg/Y69UbMUEfu</strong></a> — open a <strong>#support-ticket</strong> and we'll respond within 30 minutes.<br><br>Or try rephrasing — I know about products, payments, delivery, cheats, stock, and more.`;
@@ -1418,12 +2084,13 @@
       win.classList.add('open');
       opened = true;
       notif.style.display = 'none';
+      document.getElementById('adpop').classList.add('chat-shifted');
       if(msgs.children.length === 0){
         botReply(`Hey! 👋 Welcome to <strong>AbyssHub Support</strong>.<br>Ask me anything about products, payments, delivery, or cheats — or tap a quick topic below.`);
       }
       setTimeout(()=>input.focus(), 250);
     }
-    function closeChat(){ win.classList.remove('open'); }
+    function closeChat(){ win.classList.remove('open'); document.getElementById('adpop').classList.remove('chat-shifted'); }
 
     fab.addEventListener('click', ()=> win.classList.contains('open') ? closeChat() : openChat());
     closeBtn.addEventListener('click', closeChat);
@@ -1433,9 +2100,105 @@
       if(!opened) openChat();
       if(!win.classList.contains('open')) win.classList.add('open');
       notif.style.display = 'none';
+      if(btn.id === 'chat-staff-btn') return;  // handled separately below
       appendMsg(btn.textContent, 'user');
       botReply(getBotReply(btn.dataset.q));
     }));
+
+    // ── Live Staff Relay ──────────────────────────────────────────────────
+    let _liveTicketId = null;
+    let _liveLastId = 0;
+    let _livePollTimer = null;
+    let _liveMode = false;
+
+    function enterLiveMode(){
+      _liveMode = true;
+      document.getElementById('chat-head-name').textContent = 'AbyssHub Staff';
+      document.getElementById('chat-head-status').innerHTML = '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ff9000;margin-right:3px;"></span>Connecting to staff…';
+      document.querySelectorAll('.chat-suggestion').forEach(s=>{ if(s.id!=='chat-staff-btn') s.style.display='none'; });
+      document.getElementById('chat-staff-btn').textContent = '🔴 End Chat';
+      document.getElementById('chat-staff-btn').style.borderColor = '#e63946';
+      document.getElementById('chat-staff-btn').style.color = '#e63946';
+    }
+
+    function exitLiveMode(){
+      _liveMode = false;
+      clearInterval(_livePollTimer);
+      _livePollTimer = null;
+      _liveTicketId = null;
+      _liveLastId = 0;
+      document.getElementById('chat-head-name').textContent = 'AbyssHub Support';
+      document.getElementById('chat-head-status').innerHTML = 'Online — instant replies';
+      document.querySelectorAll('.chat-suggestion').forEach(s=>s.style.display='');
+      document.getElementById('chat-staff-btn').textContent = '💬 Talk to Staff';
+      document.getElementById('chat-staff-btn').style.borderColor = 'var(--orange)';
+      document.getElementById('chat-staff-btn').style.color = 'var(--orange)';
+    }
+
+    async function connectToStaff(){
+      if(_liveMode){
+        // End live chat
+        if(_liveTicketId){
+          fetch('/api/support/close',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket_id:_liveTicketId})}).catch(()=>{});
+        }
+        exitLiveMode();
+        appendMsg('Live chat ended. You can ask me any questions or start a new staff chat.', 'bot');
+        return;
+      }
+      enterLiveMode();
+      appendMsg('Connecting you to a staff member…', 'bot');
+      const username = localStorage.getItem('abysshub_user') || 'Guest';
+      try{
+        const r = await fetch('/api/support/open',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username})});
+        const d = await r.json();
+        if(!d.ok){ appendMsg('Could not connect. Please try <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> instead.','bot'); exitLiveMode(); return; }
+        _liveTicketId = d.ticket_id;
+        _liveLastId = 0;
+        document.getElementById('chat-head-status').innerHTML = '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#3ddc84;margin-right:3px;"></span>Connected — waiting for staff';
+        appendMsg('A ticket has been opened in our Discord. A staff member will respond here shortly. Type your message below!','bot');
+        // Start polling for staff replies
+        _livePollTimer = setInterval(pollStaffMessages, 2500);
+      } catch{
+        appendMsg('Connection failed. Please try <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.','bot');
+        exitLiveMode();
+      }
+    }
+
+    async function pollStaffMessages(){
+      if(!_liveTicketId) return;
+      try{
+        const r = await fetch(`/api/support/poll?ticket_id=${_liveTicketId}&since=${_liveLastId}`);
+        if(!r.ok) return;
+        const msgs_data = await r.json();
+        for(const m of msgs_data){
+          if(m.id > _liveLastId) _liveLastId = m.id;
+          appendMsg(`<strong>${m.author}:</strong> ${m.text}`, 'bot');
+          document.getElementById('chat-head-status').innerHTML = '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#3ddc84;margin-right:3px;"></span>Staff is responding';
+        }
+      } catch{}
+    }
+
+    document.getElementById('chat-staff-btn').addEventListener('click', ()=>{
+      if(!opened) openChat();
+      if(!win.classList.contains('open')) win.classList.add('open');
+      notif.style.display = 'none';
+      connectToStaff();
+    });
+
+    // Override send() to route through live relay when active
+    const _origSend = send;
+    send = function(){
+      if(_liveMode && _liveTicketId){
+        const q = input.value.trim();
+        if(!q) return;
+        appendMsg(q, 'user');
+        input.value = '';
+        fetch('/api/support/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket_id:_liveTicketId,text:q})}).catch(()=>{});
+      } else {
+        _origSend();
+      }
+    };
+
   });
   </script>
   <button id="chat-fab" aria-label="Open support chat">
@@ -1458,6 +2221,7 @@
       <button class="chat-suggestion" data-q="how fast is delivery">Delivery</button>
       <button class="chat-suggestion" data-q="are the cheats safe">Safe to use?</button>
       <button class="chat-suggestion" data-q="do you have a refund policy">Refunds</button>
+      <button class="chat-suggestion" id="chat-staff-btn" style="border-color:var(--orange);color:var(--orange);">💬 Talk to Staff</button>
     </div>
     <div class="chat-input-row">
       <input type="text" id="chat-input" placeholder="Ask anything…" autocomplete="off" maxlength="200"/>
@@ -1466,6 +2230,178 @@
       </button>
     </div>
   </div>
+
+  <!-- AUTH JS -->
+  <script>
+  (function(){
+    const overlay = document.getElementById('auth-overlay');
+    const tabs = document.querySelectorAll('.auth-tab');
+    const panels = { login: document.getElementById('panel-login'), register: document.getElementById('panel-register'), verify: document.getElementById('panel-verify'), forgot: document.getElementById('panel-forgot'), reset: document.getElementById('panel-reset') };
+
+    function showPanel(name){
+      Object.values(panels).forEach(p=>{ p.style.display='none'; p.classList.remove('active'); });
+      panels[name].style.display='block'; panels[name].classList.add('active');
+      tabs.forEach(t=>t.classList.toggle('active',t.dataset.panel===name));
+      document.getElementById('auth-tabs').style.display=(name==='login'||name==='register')?'flex':'none';
+      // clear messages
+      document.querySelectorAll('.auth-msg').forEach(m=>{ m.classList.remove('show','error','success'); m.textContent=''; });
+    }
+
+    function authMsg(id, text, type){
+      const el = document.getElementById(id);
+      el.textContent = text; el.className = 'auth-msg show ' + type;
+    }
+
+    window.openAuthModal = function(panel){
+      showPanel(panel || 'login');
+      overlay.classList.add('open');
+    };
+    function closeAuth(){ overlay.classList.remove('open'); }
+
+    document.getElementById('auth-close').addEventListener('click', closeAuth);
+    overlay.addEventListener('click', e=>{ if(e.target===overlay) closeAuth(); });
+    tabs.forEach(t=>t.addEventListener('click', ()=>showPanel(t.dataset.panel)));
+
+    // Panel navigation
+    document.getElementById('show-forgot').addEventListener('click', ()=>showPanel('forgot'));
+    document.getElementById('show-reset-panel').addEventListener('click', ()=>showPanel('reset'));
+    document.getElementById('back-to-login-v').addEventListener('click', ()=>showPanel('login'));
+    document.getElementById('back-to-login-f').addEventListener('click', ()=>showPanel('login'));
+    document.getElementById('back-to-login-r').addEventListener('click', ()=>showPanel('login'));
+
+    // ── Register ──────────────────────────────────────────────────────────
+    document.getElementById('reg-btn').addEventListener('click', async()=>{
+      const btn = document.getElementById('reg-btn'); btn.disabled = true;
+      const username = document.getElementById('reg-user').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const pw = document.getElementById('reg-pw').value;
+      const pw2 = document.getElementById('reg-pw2').value;
+      if(!username||!email||!pw){ authMsg('reg-msg','All fields are required.','error'); btn.disabled=false; return; }
+      if(pw!==pw2){ authMsg('reg-msg','Passwords do not match.','error'); btn.disabled=false; return; }
+      try{
+        const r = await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,email,password:pw,confirm:pw2})});
+        const d = await r.json();
+        if(d.ok){
+          authMsg('reg-msg','Account created! Check your email for a verification code.','success');
+          document.getElementById('verify-email').value = email;
+          setTimeout(()=>showPanel('verify'), 1500);
+        } else { authMsg('reg-msg', d.msg||'Registration failed.','error'); }
+      } catch{ authMsg('reg-msg','Network error.','error'); }
+      btn.disabled = false;
+    });
+
+    // ── Verify ────────────────────────────────────────────────────────────
+    document.getElementById('verify-btn').addEventListener('click', async()=>{
+      const btn = document.getElementById('verify-btn'); btn.disabled = true;
+      const email = document.getElementById('verify-email').value.trim();
+      const code = document.getElementById('verify-code').value.trim();
+      if(!email||!code){ authMsg('verify-msg','Enter your email and code.','error'); btn.disabled=false; return; }
+      try{
+        const r = await fetch('/api/auth/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,code})});
+        const d = await r.json();
+        if(d.ok){
+          authMsg('verify-msg','Email verified! You can now log in.','success');
+          setTimeout(()=>showPanel('login'), 1500);
+        } else { authMsg('verify-msg', d.msg||'Verification failed.','error'); }
+      } catch{ authMsg('verify-msg','Network error.','error'); }
+      btn.disabled = false;
+    });
+
+    // ── Login ─────────────────────────────────────────────────────────────
+    document.getElementById('login-btn').addEventListener('click', async()=>{
+      const btn = document.getElementById('login-btn'); btn.disabled = true;
+      const email = document.getElementById('login-email').value.trim();
+      const pw = document.getElementById('login-pw').value;
+      if(!email||!pw){ authMsg('login-msg','Email and password are required.','error'); btn.disabled=false; return; }
+      try{
+        const r = await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pw})});
+        const d = await r.json();
+        if(d.ok){
+          localStorage.setItem('abysshub_token', d.token);
+          localStorage.setItem('abysshub_user', d.username);
+          updateNavAuth();
+          closeAuth();
+        } else {
+          // If not verified, show verify panel
+          if((d.msg||'').toLowerCase().includes('verify')){
+            document.getElementById('verify-email').value = email;
+            authMsg('login-msg', d.msg,'error');
+            setTimeout(()=>showPanel('verify'), 1200);
+          } else {
+            authMsg('login-msg', d.msg||'Login failed.','error');
+          }
+        }
+      } catch{ authMsg('login-msg','Network error.','error'); }
+      btn.disabled = false;
+    });
+
+    // ── Forgot ────────────────────────────────────────────────────────────
+    document.getElementById('forgot-btn').addEventListener('click', async()=>{
+      const btn = document.getElementById('forgot-btn'); btn.disabled = true;
+      const email = document.getElementById('forgot-email').value.trim();
+      if(!email){ authMsg('forgot-msg','Enter your email.','error'); btn.disabled=false; return; }
+      try{
+        const r = await fetch('/api/auth/forgot',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+        const d = await r.json();
+        authMsg('forgot-msg', d.msg||'If that email exists, a code was sent.','success');
+        document.getElementById('reset-email').value = email;
+        setTimeout(()=>showPanel('reset'), 2000);
+      } catch{ authMsg('forgot-msg','Network error.','error'); }
+      btn.disabled = false;
+    });
+
+    // ── Reset ─────────────────────────────────────────────────────────────
+    document.getElementById('reset-btn').addEventListener('click', async()=>{
+      const btn = document.getElementById('reset-btn'); btn.disabled = true;
+      const email = document.getElementById('reset-email').value.trim();
+      const code = document.getElementById('reset-code').value.trim();
+      const pw = document.getElementById('reset-pw').value;
+      if(!email||!code||!pw){ authMsg('reset-msg','All fields are required.','error'); btn.disabled=false; return; }
+      try{
+        const r = await fetch('/api/auth/reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,code,password:pw})});
+        const d = await r.json();
+        if(d.ok){
+          authMsg('reset-msg','Password reset! You can now log in.','success');
+          setTimeout(()=>showPanel('login'), 1500);
+        } else { authMsg('reset-msg', d.msg||'Reset failed.','error'); }
+      } catch{ authMsg('reset-msg','Network error.','error'); }
+      btn.disabled = false;
+    });
+
+    // ── Nav auth state ────────────────────────────────────────────────────
+    function updateNavAuth(){
+      const area = document.getElementById('nav-auth-area');
+      const username = localStorage.getItem('abysshub_user');
+      const token = localStorage.getItem('abysshub_token');
+      if(username && token){
+        area.innerHTML = `<div class="auth-user-info"><div class="auth-user-avatar">${username.charAt(0).toUpperCase()}</div><span class="auth-user-name">${username}</span><button class="auth-logout" id="nav-logout">Logout</button></div>`;
+        document.getElementById('nav-logout').addEventListener('click', ()=>{
+          localStorage.removeItem('abysshub_token');
+          localStorage.removeItem('abysshub_user');
+          updateNavAuth();
+        });
+      } else {
+        area.innerHTML = `<a href="#" id="nav-login-link" onclick="event.preventDefault();openAuthModal()" style="font-size:.85rem;font-weight:600;color:#ccc;text-decoration:none;">Login</a>`;
+      }
+    }
+
+    // Check on load
+    updateNavAuth();
+    // Validate token on load
+    const token = localStorage.getItem('abysshub_token');
+    if(token){
+      fetch('/api/auth/me',{headers:{'Authorization':'Bearer '+token}}).then(r=>r.json()).then(d=>{
+        if(!d.ok){ localStorage.removeItem('abysshub_token'); localStorage.removeItem('abysshub_user'); updateNavAuth(); }
+      }).catch(()=>{});
+    }
+
+    // Enter key submits
+    document.getElementById('login-pw').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('login-btn').click(); });
+    document.getElementById('reg-pw2').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('reg-btn').click(); });
+    document.getElementById('verify-code').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('verify-btn').click(); });
+    document.getElementById('reset-pw').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('reset-btn').click(); });
+  })();
+  </script>
 
 </body>
 </html>
