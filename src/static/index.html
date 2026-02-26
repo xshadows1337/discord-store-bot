@@ -237,7 +237,160 @@
     .btn-checkout.loading .btn-label  { display:none; }
 
     .discord-icon { width:16px; height:16px; fill:currentColor; flex-shrink:0; }
-    @media(max-width:640px){ nav{gap:.75rem;} .nav-search{display:none;} .statsbar{gap:1.5rem;} .promo{flex-direction:column;text-align:center;} .section-tabs-bar{padding:0 .75rem;} .sort-view-btns{display:none;} .adpop{width:260px;right:calc(1.5rem + 52px + .5rem);} }
+
+    /* ── MOBILE RESPONSIVE ────────────────────────────────────────────── */
+    @media(max-width:768px){
+      .nav-links a:not(.nav-btn) { display:none; }
+      .footer-grid { grid-template-columns:repeat(2,1fr); gap:1.25rem; }
+    }
+    @media(max-width:640px){
+      /* Nav */
+      nav { gap:.5rem; padding:0 .75rem; height:54px; }
+      .nav-search { display:none; }
+      .nav-links { gap:.5rem; }
+      .nav-btn { padding:.3rem .65rem; font-size:.75rem; }
+      /* Topbar */
+      .topbar { padding:0 .75rem; gap:.6rem; font-size:.66rem; height:30px; }
+      /* Announcement */
+      .ann-strip { height:24px; }
+      .ann-strip span { font-size:.62rem; }
+      /* Stats */
+      .statsbar { gap:.8rem; padding:.5rem .75rem; }
+      .snum { font-size:.85rem; }
+      .slbl { font-size:.56rem; }
+      /* Section tabs */
+      .section-tabs-bar { padding:0 .5rem; }
+      .stab { padding:.5rem .65rem; font-size:.73rem; }
+      /* Categories */
+      .categories { padding:.35rem .6rem; }
+      .cat-pill { padding:.25rem .65rem; font-size:.7rem; }
+      .cat-arrow { display:none; }
+      /* Hero */
+      .hero { padding:1.4rem 1rem 1.2rem; }
+      .hero h1 { font-size:1.35rem; }
+      .hero p { font-size:.8rem; margin-bottom:1rem; }
+      .hero-btns .btn { padding:.5rem 1rem; font-size:.8rem; }
+      /* Main content */
+      .main { padding:.85rem .65rem; }
+      /* Product grid */
+      .products-grid { grid-template-columns:repeat(2,1fr); gap:.55rem; }
+      .card-thumb { aspect-ratio:4/3; }
+      .card-info { padding:.45rem .55rem .55rem; }
+      .card-title { font-size:.74rem; }
+      .card-desc { font-size:.66rem; -webkit-line-clamp:1; }
+      .card-stats-row { gap:.3rem; margin-bottom:.2rem; }
+      .card-views { font-size:.62rem; }
+      .card-rating { font-size:.62rem; }
+      .card-price { font-size:.82rem; }
+      .card-tag { font-size:.52rem; padding:1px 4px; }
+      .card-btns { gap:.3rem; margin-top:.45rem; }
+      .btn-buy { padding:.38rem; font-size:.7rem; }
+      .btn-add-cart { padding:.38rem; font-size:.7rem; }
+      .card-badge,.card-badge-ud,.card-badge-new { font-size:.52rem; padding:1px 4px; }
+      .card-stock { font-size:.58rem; padding:1px 5px; }
+      .card-duration { font-size:.56rem; padding:1px 4px; }
+      .card-author { font-size:.64rem; }
+      .card-meta { flex-wrap:wrap; gap:.25rem; }
+      .card-hover-bar { display:none; }
+      /* Trending */
+      .trending-card { width:140px; }
+      .trending-name { font-size:.68rem; }
+      .trending-price { font-size:.72rem; }
+      /* Sort row */
+      .sort-row { gap:.4rem; }
+      .sort-view-btns { display:none; }
+      .sort-select { font-size:.7rem; padding:.25rem .45rem; }
+      #prod-count-label { font-size:.68rem; }
+      /* Promo */
+      .promo { flex-direction:column; text-align:center; padding:.85rem; gap:.6rem; }
+      .promo h2 { font-size:.95rem; }
+      .promo p { font-size:.76rem; }
+      /* Features */
+      .features-row { grid-template-columns:1fr 1fr; gap:.5rem; }
+      .feat { padding:.65rem .75rem; }
+      .feat-icon { font-size:1.2rem; margin-bottom:.25rem; }
+      .feat h3 { font-size:.76rem; }
+      .feat p { font-size:.68rem; }
+      /* Footer */
+      .footer-grid { grid-template-columns:1fr 1fr; gap:1rem; }
+      .footer-col h4 { font-size:.68rem; }
+      .footer-col a { font-size:.7rem; }
+      .footer-col p { font-size:.68rem; }
+      .footer-bottom { flex-direction:column; text-align:center; gap:.3rem; font-size:.64rem; }
+      footer { padding:1.5rem .75rem .75rem; }
+      /* Modals */
+      .modal-overlay { padding:.5rem; }
+      .modal { max-width:100%; padding:1.15rem; }
+      .modal h2 { font-size:.95rem; }
+      .modal-sub { font-size:.75rem; }
+      .modal-prod-row { padding:.5rem; gap:.55rem; }
+      .modal-prod-img { width:48px; height:30px; }
+      .modal-prod-name { font-size:.78rem; }
+      .form-input { font-size:.82rem; padding:.45rem .65rem; }
+      .method-tab { font-size:.75rem; padding:.4rem; }
+      .btn-checkout { font-size:.82rem; padding:.6rem; }
+      .auth-overlay { padding:.5rem; }
+      .auth-modal { max-width:100%; padding:1.15rem; }
+      .auth-modal h2 { font-size:.95rem; }
+      /* Cart drawer */
+      .cart-drawer { width:100vw; }
+      .cart-item { gap:.45rem; padding:.5rem; }
+      .cart-item-img,.cart-item-img-ph { width:48px; height:30px; }
+      .cart-item-name { font-size:.72rem; }
+      .cart-item-price { font-size:.7rem; }
+      .cart-qty-btn { width:22px; height:22px; font-size:.8rem; }
+      .cart-qty-val { font-size:.76rem; }
+      /* Cart checkout modal */
+      .cco-row { font-size:.76rem; padding:.45rem .6rem; }
+      /* Age gate */
+      .agegate-box { padding:1.4rem .85rem; max-width:100%; }
+      .agegate-box h2 { font-size:1.1rem; }
+      .agegate-box p { font-size:.78rem; }
+      .agegate-check-row { padding:.55rem .7rem; }
+      .agegate-check-row label { font-size:.76rem; }
+      .agegate-btns { flex-direction:column; gap:.45rem; }
+      .agegate-enter,.agegate-exit { width:100%; padding:.6rem; font-size:.82rem; }
+      .agegate-logo { font-size:1.4rem; margin-bottom:1rem; }
+      .agegate-footer { font-size:.65rem; }
+      /* Chat */
+      #chat-window { width:calc(100vw - 1rem); right:.5rem; bottom:4.5rem; max-height:72vh; border-radius:8px; }
+      #chat-fab { width:44px; height:44px; bottom:.85rem; right:.75rem; }
+      #chat-fab svg { width:21px; height:21px; }
+      .chat-messages { min-height:180px; max-height:42vh; }
+      .chat-msg { font-size:.74rem; max-width:88%; }
+      .chat-suggestion { font-size:.66rem; padding:.2rem .5rem; }
+      .chat-input-row { padding:.5rem .65rem .6rem; }
+      #chat-input { font-size:.76rem; padding:.38rem .75rem; }
+      #chat-send { width:30px; height:30px; }
+      .chat-head { padding:.6rem .75rem; }
+      .chat-head-avatar { width:30px; height:30px; font-size:.7rem; }
+      .chat-head-name { font-size:.78rem; }
+      .chat-head-status { font-size:.64rem; }
+      /* Ad popup */
+      .adpop { width:220px; right:calc(.75rem + 44px + .5rem); bottom:.85rem; }
+      .adpop-body { padding:.55rem; }
+      .adpop-name { font-size:.74rem; }
+      .adpop-price { font-size:.88rem; margin-bottom:.45rem; }
+      .adpop-cta { font-size:.75rem; padding:.4rem; }
+      .adpop-thumb,.adpop-thumb-ph { height:90px; }
+      /* Scroll top */
+      #scroll-top { bottom:4.2rem; right:.75rem; width:30px; height:30px; font-size:.8rem; }
+      /* Toast */
+      #toast-stack { bottom:.75rem; left:.65rem; }
+      .toast { max-width:220px; font-size:.7rem; padding:.45rem .6rem; }
+      /* Sidebar search */
+      .sidebar-search { display:flex; }
+    }
+    @media(max-width:380px){
+      .products-grid { grid-template-columns:1fr; }
+      .hero h1 { font-size:1.15rem; }
+      .hero p { font-size:.76rem; }
+      .statsbar { gap:.5rem; }
+      .snum { font-size:.75rem; }
+      .features-row { grid-template-columns:1fr; }
+      .footer-grid { grid-template-columns:1fr; }
+      .trending-card { width:130px; }
+    }
 
     /* CART */
     .cart-icon-btn { position:relative; background:none; border:none; cursor:pointer; color:#ccc; padding:.3rem; display:flex; align-items:center; transition:color .15s; }
@@ -336,6 +489,12 @@
     .sidebar.open { transform:none; }
     .sidebar-head { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.1rem; border-bottom:1px solid var(--border); }
     .sidebar-head .nav-logo { font-size:1.2rem; }
+    .sidebar-search { display:none; padding:.55rem .75rem; border-bottom:1px solid var(--border); gap:.4rem; }
+    .sidebar-search input { flex:1; background:#1a1a1a; border:1px solid #444; color:#fff; padding:.4rem .65rem; font-size:.82rem; border-radius:3px; outline:none; font-family:inherit; }
+    .sidebar-search input::placeholder { color:#666; }
+    .sidebar-search input:focus { border-color:var(--orange); }
+    .sidebar-search button { background:var(--orange); border:none; color:#000; padding:.4rem .65rem; border-radius:3px; font-weight:700; font-size:.76rem; cursor:pointer; flex-shrink:0; font-family:inherit; }
+    .sidebar-search button:hover { background:var(--orange2); }
     .sidebar-close { background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer; transition:color .15s; }
     .sidebar-close:hover { color:var(--text); }
     .sidebar-section { padding:.5rem 0; border-bottom:1px solid var(--border); }
@@ -496,6 +655,10 @@
     <div class="sidebar-head">
       <a class="nav-logo" href="#" onclick="closeSidebar()">ABYSS<span class="hub">HUB</span></a>
       <button class="sidebar-close" id="sidebar-close">&times;</button>
+    </div>
+    <div class="sidebar-search" id="sidebar-search">
+      <input type="text" id="sidebar-search-input" placeholder="Search products…" autocomplete="off" />
+      <button id="sidebar-search-btn" type="button">Search</button>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-section-label">Browse</div>
@@ -917,7 +1080,8 @@
           : `<div class="card-thumb-ph">&#127918;</div>`;
 
         const oos = p.stock === 0;
-        return `<div class="product-card reveal${oos?' oos':''}" style="transition-delay:${(products.indexOf(p)%4)*0.07}s"${!oos?` onclick="openCheckout(${ri})"`:''}>`
+        const clickAttr = oos ? '' : ' onclick="openCheckout('+ri+')'+'"';
+        return `<div class="product-card reveal${oos?' oos':''}" style="transition-delay:${(products.indexOf(p)%4)*0.07}s"${clickAttr}>
           <div class="card-thumb">
             ${thumb}
             <span class="card-badge">INSTANT</span>
@@ -1535,6 +1699,26 @@
     document.getElementById('sidebar-close').addEventListener('click', closeSidebar);
     document.getElementById('sidebar-overlay').addEventListener('click', closeSidebar);
 
+    // ── Sidebar search ────────────────────────────────────────────────────
+    (function(){
+      const ssi = document.getElementById('sidebar-search-input');
+      const ssb = document.getElementById('sidebar-search-btn');
+      function doSidebarSearch(){
+        const q = ssi.value.trim();
+        const mainInput = document.getElementById('search-input');
+        if(mainInput) mainInput.value = q;
+        closeSidebar();
+        if(typeof liveSearch === 'function') liveSearch();
+        document.getElementById('products').scrollIntoView({behavior:'smooth'});
+      }
+      if(ssi){
+        ssi.addEventListener('keydown', e => { if(e.key==='Enter') doSidebarSearch(); });
+      }
+      if(ssb){
+        ssb.addEventListener('click', doSidebarSearch);
+      }
+    })();
+
     // ── AD POPUP ─────────────────────────────────────────────────────────────
     const adpop    = document.getElementById('adpop');
     const adClose  = document.getElementById('adpop-close');
@@ -1976,7 +2160,7 @@
 
       // ── REGION / COUNTRY ─────────────────────────────────────────────────
       { keys:['region','country','ship to','deliver to country','international','worldwide','global','specific region','region locked','region lock','geo block','geo restriction','available in my country','available where','where available','us only','usa only','eu only','europe','uk','united kingdom','australia','canada','asia','south america','africa','middle east','india','brazil','russia','germany','france','japan','korea','mexico','country restriction'],
-        answer:`🌍 <strong>AbyssHub serves customers worldwide.</strong><br><br>• Digital goods — no physical shipping required<br>• Crypto payments work from any country<br>• Card payments depend on your bank's geo restrictions<br><br>⚠️ Some products (like Xbox codes) may be region-specific. Check the product description for region details. VPN usage is not allowed on our site.`},
+        answer:`🌍 <strong>AbyssHub serves customers worldwide.</strong><br><br>• Digital goods — no physical shipping required<br>• Crypto payments work from any country<br>• Card payments depend on your bank's geo restrictions<br><br>⚠️ Some products (like Xbox codes) may be region-specific. Check the product description for region details.`},
 
       // ── WEBSITE FEATURES ─────────────────────────────────────────────────
       { keys:['website features','site features','how to use website','navigate','navigation','search','how to search','filter','categories','category','browse','sorting','sort products','dark mode','light mode','theme','mobile','mobile friendly','responsive','phone','tablet','app','mobile app','ios app','android app','download app','web app','pwa'],
@@ -2012,7 +2196,7 @@
 
       // ── SITE DOWN / ISSUES ────────────────────────────────────────────────
       { keys:['site down','website down','not loading','page not loading','error','500 error','404 error','something went wrong','broken','site not working','shop not working','website not working','cant load','cannot load','loading issue','connection error','server error','is the site down','is the shop down','blank page','white screen','timeout','timed out','connection timeout','slow','very slow','lagging','server lag','page error','crash','crashed','server crash'],
-        answer:`🔧 <strong>If the site is not loading:</strong><br><br>1. Hard refresh (Ctrl+Shift+R)<br>2. Clear browser cache<br>3. Try a different browser<br>4. Make sure you're <strong>not using a VPN</strong><br>5. Try again in a few minutes<br><br>Report persistent issues on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.`},
+        answer:`🔧 <strong>If the site is not loading:</strong><br><br>1. Hard refresh (Ctrl+Shift+R)<br>2. Clear browser cache<br>3. Try a different browser<br>4. Try again in a few minutes<br><br>Report persistent issues on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.`},
 
       // ── SOCIAL MEDIA ─────────────────────────────────────────────────────
       { keys:['social media','twitter','instagram','tiktok','youtube','telegram','reddit','follow','social','where to follow','facebook','x','threads','twitch','snapchat','linkedin','community','forum','forums','blog','news','updates','announcements','changelog','whats new','what changed','update log','patch notes'],
