@@ -2144,9 +2144,15 @@
         appendMsg('Live chat ended. You can ask me any questions or start a new staff chat.', 'bot');
         return;
       }
+      // Require login
+      const username = localStorage.getItem('abysshub_user');
+      const token = localStorage.getItem('abysshub_token');
+      if(!username || !token){
+        appendMsg('You must be <strong>logged in</strong> to talk to staff. Please <button onclick="window.openAuthModal()" style="background:none;border:none;color:var(--orange);cursor:pointer;font-family:inherit;font-size:inherit;padding:0;text-decoration:underline;">create an account or login</button> first.', 'bot');
+        return;
+      }
       enterLiveMode();
       appendMsg('Connecting you to a staff member…', 'bot');
-      const username = localStorage.getItem('abysshub_user') || 'Guest';
       try{
         const r = await fetch('/api/support/open',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username})});
         const d = await r.json();
