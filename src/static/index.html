@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>if('scrollRestoration'in history){history.scrollRestoration='manual';}if(window.location.hash)history.replaceState(null,'',window.location.pathname+window.location.search);window.scrollTo(0,0);window.addEventListener('load',function(){window.scrollTo(0,0);});</script>
   <title>AbyssHub — #1 Cheat Shop</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -964,10 +965,10 @@
       <a class="sidebar-link" href="#" onclick="event.preventDefault();closeSidebar();openOrderLookup()">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Order Lookup
       </a>
-      <a class="sidebar-link" href="#faq" onclick="closeSidebar()">
+      <a class="sidebar-link" href="#" onclick="event.preventDefault();closeSidebar();document.getElementById('faq').scrollIntoView({behavior:'smooth'})">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>FAQ
       </a>
-      <a class="sidebar-link" href="#reviews" onclick="closeSidebar()">
+      <a class="sidebar-link" href="#" onclick="event.preventDefault();closeSidebar();document.getElementById('reviews').scrollIntoView({behavior:'smooth'})">
         <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Reviews
       </a>
       <a class="sidebar-link" href="https://discord.gg/Y69UbMUEfu" target="_blank" rel="noopener">
@@ -1097,8 +1098,8 @@
       <span id="live-user-count">—</span>&nbsp;online now
     </div>
     <a href="https://discord.gg/Y69UbMUEfu" target="_blank" rel="noopener">Discord</a>
-    <a href="#products">Shop</a>
-    <a href="#support">Support</a>
+    <a href="#" onclick="event.preventDefault();document.getElementById('products').scrollIntoView({behavior:'smooth'})">Shop</a>
+    <a href="#" onclick="event.preventDefault();document.getElementById('support').scrollIntoView({behavior:'smooth'})">Support</a>
   </div>
 
   <!-- NAV -->
@@ -1113,11 +1114,11 @@
       <button onclick="doSearch()">Search</button>
     </div>
     <div class="nav-links">
-      <a href="#products">Products</a>
+      <a href="#" onclick="event.preventDefault();document.getElementById('products').scrollIntoView({behavior:'smooth'})">Products</a>
       <a href="#" onclick="event.preventDefault();openOrderLookup()">Orders</a>
-      <a href="#gambling">Casino</a>
-      <a href="#faq">FAQ</a>
-      <a href="#features">Why Us</a>
+      <a href="#" onclick="event.preventDefault();document.getElementById('gambling').scrollIntoView({behavior:'smooth'})">Casino</a>
+      <a href="#" onclick="event.preventDefault();document.getElementById('faq').scrollIntoView({behavior:'smooth'})">FAQ</a>
+      <a href="#" onclick="event.preventDefault();document.getElementById('features').scrollIntoView({behavior:'smooth'})">Why Us</a>
       <div id="nav-auth-area">
         <a href="#" id="nav-login-link" onclick="event.preventDefault();openAuthModal()" style="font-size:.85rem;font-weight:600;color:#ccc;text-decoration:none;">Login</a>
       </div>
@@ -1165,7 +1166,7 @@
     <h1>The <span class="o">#1</span> Cheat<br/>& Digital Goods Shop</h1>
     <p>External cheats, game keys, Steam accounts & more. Undetected. Instant delivery. Fully automated — no middlemen.</p>
     <div class="hero-btns">
-      <a href="#products" class="btn btn-orange">Browse Products</a>
+      <a href="#" onclick="event.preventDefault();document.getElementById('products').scrollIntoView({behavior:'smooth'})" class="btn btn-orange">Browse Products</a>
       <a href="https://discord.gg/Y69UbMUEfu" class="btn btn-outline" target="_blank" rel="noopener">
         <svg class="discord-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.844 19.844 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
         Join Discord
@@ -1573,7 +1574,7 @@
         <a href="https://discord.gg/Y69UbMUEfu" target="_blank" rel="noopener">Discord Server</a>
         <a href="https://discord.gg/Y69UbMUEfu" target="_blank" rel="noopener">Open a Ticket</a>
         <a href="#" onclick="event.preventDefault();openOrderLookup()">Order Lookup</a>
-        <a href="#faq">FAQ</a>
+        <a href="#" onclick="event.preventDefault();document.getElementById('faq').scrollIntoView({behavior:'smooth'})">FAQ</a>
       </div>
       <div class="footer-col">
         <h4>Payments</h4>
