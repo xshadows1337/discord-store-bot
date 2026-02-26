@@ -1096,97 +1096,276 @@
   <!-- AI SUPPORT CHAT JS -->
   <script>
   document.addEventListener('DOMContentLoaded', function(){
+
+    // ── Normalization helpers ─────────────────────────────────────────────────
+    const SYNONYMS = {
+      'u':'you','ur':'your','r':'are','wat':'what','wut':'what','hows':'how is',
+      'howz':'how is','wanna':'want to','gonna':'going to','gimme':'give me',
+      'lemme':'let me','tbh':'to be honest','btw':'by the way','imo':'in my opinion',
+      'tbf':'to be fair','ngl':'not gonna lie','idk':'i dont know','imo':'in my opinion',
+      'lmk':'let me know','asap':'as soon as possible','dm':'direct message',
+      'msg':'message','msgs':'messages','acc':'account','accs':'accounts',
+      'auth':'authentication','2fa':'two factor','mfa':'multi factor',
+      'pw':'password','pwd':'password','pass':'password',
+      'addr':'address','addy':'address','tx':'transaction','txn':'transaction',
+      'inv':'invoice','inv':'invoice','pm':'payment method','py':'pay',
+      'pmt':'payment','pymnt':'payment','chkout':'checkout','ck':'checkout',
+      'dlvry':'delivery','dlv':'deliver','del':'delivery','recv':'receive',
+      'rcv':'receive','recieve':'receive','recieved':'received',
+      'dscrd':'discord','disc':'discord','dc':'discord',
+      'promo':'promotion','disc':'discount','cdoe':'code','cde':'code',
+      'kys':'keys','ky':'key','keyz':'keys','liscense':'license',
+      'licnse':'license','licens':'license','subscripion':'subscription',
+      'subs':'subscription','sub':'subscription','subscrip':'subscription',
+      'purchse':'purchase','purch':'purchase','bght':'bought','bot':'bought',
+      'ordr':'order','ord':'order','orderd':'ordered','oreder':'order',
+      'shpng':'shipping','shiping':'shipping','shiipp':'shipping',
+      'stck':'stock','stok':'stock','qty':'quantity','quant':'quantity',
+      'amt':'amount','amnt':'amount','bal':'balance','blnc':'balance',
+      'wlt':'wallet','walllet':'wallet','crpto':'crypto','crypt':'crypto',
+      'eth':'ethereum','btc':'bitcoin','ltc':'litecoin','usdt':'tether',
+      'xmr':'monero','bnb':'binance','usdc':'usd coin',
+      'cheat':'cheat','cheatz':'cheats','cheating':'cheat','cheated':'cheat',
+      'hack':'cheat','hacks':'cheats','hacking':'cheat',
+      'aimbot':'aimbots','wall':'wallhack','wallhax':'wallhack','esp':'esp',
+      'triggerbot':'trigger bot','spinbot':'spinbot',
+      'vac':'valve anti cheat','eac':'easy anti cheat','be':'battleye',
+      'unfair':'cheat','detected':'detected','undetect':'undetected',
+      'xbx':'xbox','xb':'xbox','ps':'playstation','msft':'microsoft',
+      'msoft':'microsoft','x360':'xbox 360','xone':'xbox one','xsx':'xbox series x',
+      'stm':'steam','stam':'steam','valv':'valve',
+      'gamepss':'gamepass','gpass':'gamepass','gp':'gamepass',
+      'tf2':'team fortress 2','csgo':'cs go','cs2':'counter strike 2',
+      'csgo':'counter strike','valornat':'valorant','valo':'valorant',
+      'warzon':'warzone','wz':'warzone','cod':'call of duty',
+      'pubg':'playerunknowns battlegrounds','r6':'rainbow six siege',
+      'r6s':'rainbow six siege','apex':'apex legends','fortnite':'fortnite',
+      'fn':'fortnite','roblx':'roblox','rblx':'roblox','mc':'minecraft',
+      'lol':'league of legends','dota':'dota 2','ow':'overwatch',
+      'ow2':'overwatch 2','rust':'rust','tarkov':'escape from tarkov','eft':'escape from tarkov',
+      'bf':'battlefield','gta':'grand theft auto','gta5':'gta 5',
+      'scam':'scam','legit':'legitimate','trust':'trustworthy','safe':'safe',
+      'refnd':'refund','rfd':'refund','rtrn':'return','chargbk':'chargeback',
+      'strp':'stripe','pypl':'paypal','pp':'paypal','venmo':'venmo',
+      'cashapp':'cash app','zelle':'zelle',
+      'shop':'store','stor':'store','site':'website','web':'website',
+      'pg':'page','websit':'website','stre':'store',
+      'faq':'frequently asked questions','tos':'terms of service',
+      'tc':'terms and conditions','pp':'privacy policy',
+      'vpn':'vpn','proxy':'proxy','tor':'tor','vps':'vps',
+    };
+
+    function normalize(text){
+      let t = text.toLowerCase()
+        .replace(/[''`]/g,"'").replace(/[""]/g,'"').replace(/[^\w\s']/g,' ')
+        .replace(/\s+/g,' ').trim();
+      return t.split(' ').map(w => SYNONYMS[w] || w).join(' ');
+    }
+
+    // ── Scored matching engine ────────────────────────────────────────────────
+    function score(q, entry){
+      let s = 0;
+      for(const k of entry.keys){
+        if(q === k){ s += 10; continue; }
+        if(q.includes(k)){ s += k.split(' ').length * 2; continue; }
+        // partial word matches
+        const kw = k.split(' ');
+        const qw = q.split(' ');
+        for(const w of kw) if(w.length > 3 && qw.some(qword => qword.includes(w) || w.includes(qword))) s += 1;
+      }
+      return s;
+    }
+
+    function getBotReply(input){
+      const q = normalize(input);
+      let best = null, bestScore = 0;
+      for(const entry of KB){
+        const s = score(q, entry);
+        if(s > bestScore){ bestScore = s; best = entry; }
+      }
+      return bestScore >= 1 ? best.answer : FALLBACK;
+    }
+
     // ── Knowledge base ────────────────────────────────────────────────────────
     const KB = [
-      {
-        keys: ['what do you sell','products','catalog','what is abysshub','what is this','what is xshadows'],
-        answer: `We sell <strong>digital goods & game cheats</strong>:<br><br>
-🎮 <strong>Xbox Gamepass Month</strong> — $10 (standard key, instant)<br>
-🖥️ <strong>Steam FA Account Fresh</strong> — $0.20 each (min 50)<br>
-🛡️ <strong>External Cheats</strong> — undetected, for various games<br>
-🔑 <strong>Keys & Codes</strong> — day/week/month/lifetime<br>
-🎰 <strong>Gambling Redeems</strong><br><br>
-Browse everything at <a href="#products">the store</a>.`
-      },
-      {
-        keys: ['how do i pay','payment','how to pay','crypto','card','accept','bitcoin','stripe','nowpayments','pay with'],
-        answer: `We accept two payment methods:<br><br>
-💳 <strong>Card</strong> — Visa/Mastercard via Stripe (instant)<br>
-🪙 <strong>Crypto</strong> — BTC, ETH, LTC, USDT and 100+ coins via NOWPayments<br><br>
-Select your product → click <em>Buy Now</em> → choose your payment method at checkout.`
-      },
-      {
-        keys: ['how fast','delivery','auto','instant','how long','when will i','get my','receive'],
-        answer: `⚡ <strong>Fully automated & instant.</strong><br><br>
-Once payment is confirmed, your order is delivered automatically — no waiting for a human. Keys and accounts are sent directly to you. Most orders complete in under <strong>60 seconds</strong>.`
-      },
-      {
-        keys: ['safe','undetected','ban','vac','anticheat','detected','get banned','easy anti cheat','battleye'],
-        answer: `Our external cheats are <strong>currently undetected</strong>. We only list cheats that are confirmed to bypass VAC, EAC, and BattlEye.<br><br>
-⚠️ No cheat is 100% risk-free forever. We update our status regularly. If a cheat gets detected we pull it immediately. Always check <a href="https://discord.gg/Y69UbMUEfu" target="_blank">our Discord</a> for the latest status.`
-      },
-      {
-        keys: ['refund','money back','return','chargeback','dispute'],
-        answer: `🔒 <strong>All sales are final.</strong> Due to the digital nature of our products (keys and accounts are delivered instantly), we do not offer refunds.<br><br>
-If you have an issue with a product (e.g. key doesn't work, account is locked), please open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> and we'll make it right.`
-      },
-      {
-        keys: ['stock','how many','left','available','in stock','out of stock'],
-        answer: `Stock levels are shown <strong>live on each product card</strong>. Once stock hits 0, the product is greyed out until restocked.<br><br>
-For restock notifications, join our <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord server</a> — we announce new stock there first.`
-      },
-      {
-        keys: ['discord','support','help','contact','ticket','staff','human','talk to','speak to','agent'],
-        answer: `You can reach us at any time on Discord:<br><br>
-💬 <a href="https://discord.gg/Y69UbMUEfu" target="_blank"><strong>discord.gg/Y69UbMUEfu</strong></a><br><br>
-Open a <strong>#support-ticket</strong> and a staff member will assist you ASAP. Average response time is under 30 minutes.`
-      },
-      {
-        keys: ['xbox','gamepass','game pass','microsoft','xgp'],
-        answer: `🎮 <strong>Xbox Gamepass Month</strong> — <strong>$10</strong><br><br>
-A standard Xbox Game Pass code redeemable on Xbox or PC. You'll receive the code instantly after payment. Enter it at <a href="https://redeem.microsoft.com" target="_blank">redeem.microsoft.com</a>.<br><br>
-Stock is limited — grab it before it's gone!`
-      },
-      {
-        keys: ['steam','fa account','fresh','2fa','steam account','smurf'],
-        answer: `🖥️ <strong>Steam FA Account Fresh</strong> — <strong>$0.20 each</strong> (minimum order: 50)<br><br>
-Fresh Steam accounts with SMS/2FA already set up. Useful for smurfing, new starts, or testing. Delivered instantly in bulk.<br><br>
-Minimum order is 50 accounts ($10 total).`
-      },
-      {
-        keys: ['price','cost','how much','pricing','cheap'],
-        answer: `Our current prices:<br><br>
-🎮 Xbox Gamepass Month — <strong>$10</strong><br>
-🖥️ Steam FA Account — <strong>$0.20</strong> (min 50)<br>
-🛡️ External cheats — varies by plan (day/week/month/lifetime)<br>
-🔑 Keys — varies<br>
-🎰 Gambling redeems — varies<br><br>
-Check the <a href="#products">products section</a> for live pricing.`
-      },
-      {
-        keys: ['vpn', 'blocked', 'cant access', 'access denied', 'restricted'],
-        answer: `⚠️ AbyssHub <strong>does not allow VPN or proxy connections</strong> for security and fraud prevention.<br><br>
-If you are seeing an access block, please disable your VPN and reload the page. If the issue persists, contact us on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.`
-      },
-      {
-        keys: ['hello','hi','hey','sup','what up','yo','good morning','good evening'],
-        answer: `Hey! 👋 Welcome to <strong>AbyssHub</strong>.<br>I'm your automated support assistant. Ask me anything about our products, payments, or delivery — or pick a topic below!`
-      },
-      {
-        keys: ['thank','thanks','ty','appreciate','helpful'],
-        answer: `You're welcome! 😊 If there's anything else I can help with, just ask.<br>For complex issues, join our <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> and open a ticket.`
-      },
+      // ── GREETINGS ────────────────────────────────────────────────────────
+      { keys:['hello','hi','hey','sup','what up','yo','howdy','greetings','good morning','good afternoon','good evening','good night','hiya','heya','helo','hii','hiii','hiiii','helloo','helloooo','salut','bonjour','hola','ciao','ola','whats up','wassup','watsup','wazzup','whaddup','waddup','how are you','how r u','how do you do','how is it going','hows it going','how are things','whats good','whats new','how have you been'],
+        answer:`Hey! 👋 Welcome to <strong>AbyssHub</strong> — the #1 automated cheat &amp; digital goods store.<br><br>I'm your instant support bot. I can answer questions about:<br>🛒 Products &amp; pricing<br>💳 Payments &amp; crypto<br>⚡ Delivery &amp; activation<br>🛡️ Cheat safety &amp; anti-cheat<br>🔄 Stock &amp; orders<br><br>Just type your question or tap a topic below!`},
+
+      // ── WHAT IS THIS SITE ────────────────────────────────────────────────
+      { keys:['what is abysshub','what is this site','what is this shop','what is xshadows','what do you do','explain the shop','tell me about this','what is this','about abysshub','about this store','about the store','who are you','what are you','describe the shop','what kind of store','what type of store','what does abysshub sell','what does this website do','purpose of this site'],
+        answer:`<strong>AbyssHub</strong> (xshadows.shop) is a fully automated digital goods store.<br><br>We sell:<br>🎮 <strong>Xbox Game Pass codes</strong><br>🖥️ <strong>Steam FA Accounts</strong><br>🛡️ <strong>External cheats</strong> (undetected, multiple games)<br>🔑 <strong>Game keys &amp; software licenses</strong> (day/week/month/lifetime)<br>🎰 <strong>Gambling redeems</strong><br><br>Everything is <strong>100% automated</strong> — you pay, you receive instantly, no human needed. All payments are secured.`},
+
+      // ── PRODUCTS LIST ────────────────────────────────────────────────────
+      { keys:['what products','list of products','all products','show products','what do you sell','products available','product catalog','catalog','what can i buy','what is for sale','whats for sale','everything you sell','full list','show me everything','what items','what goods','what merchandise','available products','your products','your catalog','everything available','what is in the store'],
+        answer:`Here is everything we currently stock:<br><br>🎮 <strong>Xbox Gamepass Month</strong> — $10<br>🖥️ <strong>Steam FA Account Fresh</strong> — $0.20/ea (min 50)<br>🛡️ <strong>External Cheats</strong> — day/week/month/lifetime plans<br>🔑 <strong>Keys &amp; License Codes</strong> — trial, day, week, month, lifetime<br>🎰 <strong>Gambling Redeems</strong><br><br>Check the <a href="#products">products section</a> for live stock &amp; prices. New items added regularly.`},
+
+      // ── XBOX GAMEPASS ─────────────────────────────────────────────────────
+      { keys:['xbox','gamepass','game pass','xbox gamepass','xbox game pass','xgp','microsoft game pass','game pass month','xbox subscription','xbox monthly','xbox code','xbox key','xbox redeem','xbox voucher','redeem microsoft','microsoft redeem','redeem.microsoft','xbox pc','xbox pc gamepass','pc game pass','how to redeem xbox','xbox series','xbox one gamepass','xbox 360 gamepass','game pass ultimate','gp ultimate','xgpu'],
+        answer:`🎮 <strong>Xbox Gamepass Month</strong> — <strong>$10</strong><br><br>A standard Xbox Game Pass Monthly code. Works on Xbox consoles and Windows PC.<br><br><strong>How to redeem:</strong><br>1. Go to <a href="https://redeem.microsoft.com" target="_blank">redeem.microsoft.com</a><br>2. Sign in to your Microsoft account<br>3. Enter the code — Game Pass activates instantly<br><br>⚡ Delivered automatically after payment. Stock is limited — buy now before it sells out.`},
+
+      // ── STEAM ACCOUNTS ────────────────────────────────────────────────────
+      { keys:['steam account','steam accounts','steam fa','fa account','fresh account','steam fresh','fa fresh','2fa steam','steam 2fa','buy steam account','steam smurf','smurf account','steam login','steam new account','steam acc','buy steam','steam details','steam credentials','bulk steam','steam bulk','how many steam','minimum steam','min steam','steam minimum order','50 accounts','steamfa'],
+        answer:`🖥️ <strong>Steam FA Account Fresh</strong> — <strong>$0.20 each</strong><br><br>Fresh Steam accounts with 2FA/SMS already configured. Each account is unused and ready to use immediately.<br><br><strong>Details:</strong><br>• Minimum order: <strong>50 accounts</strong> ($10 total)<br>• Format: login:password:email<br>• 2FA enabled &amp; ready<br>• Instant bulk delivery<br><br>Great for smurfing, testing, or fresh starts. All accounts verified before sale.`},
+
+      // ── EXTERNAL CHEATS ──────────────────────────────────────────────────
+      { keys:['external cheat','external cheats','cheat','cheats','hack','hacks','aimbot','esp','wallhack','wall hack','triggerbot','bunnyhop','bhop','no recoil','recoil','speed hack','fly hack','radar hack','loot esp','player esp','bone esp','chams','glow','noclip','no clip','fly cheat','movement cheat','radar','player highlight','item esp','mod menu','game hack','game cheat','external tool','cheat software','cheat program','cheat tool','what cheats','which games','game cheats','cheat engine','trainer'],
+        answer:`🛡️ <strong>External Cheats</strong> — undetected &amp; external (no injection)<br><br><strong>Features vary by product but typically include:</strong><br>• Aimbot / Aim assist<br>• ESP / Wallhack (players, items, loot)<br>• Bone/Skeleton ESP<br>• Radar hack<br>• No recoil / No spread<br>• Bunny hop / Movement mods<br>• Trigger bot<br><br><strong>Plans available:</strong> Day / Week / Month / Lifetime<br><br>All cheats are <strong>external</strong> (run outside the game — much harder to detect). Check stock on the <a href="#products">products page</a> or ask in <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> about specific games.`},
+
+      // ── WHICH GAMES ──────────────────────────────────────────────────────
+      { keys:['which games','what games','game list','supported games','games supported','cs go cheat','cs2 cheat','counter strike cheat','valorant cheat','warzone cheat','fortnite cheat','rust cheat','apex cheat','pubg cheat','r6 cheat','rainbow six cheat','tarkov cheat','escape from tarkov cheat','tf2 cheat','overwatch cheat','roblox cheat','gta cheat','battlefield cheat','minecraft cheat','what game does it work for','does it work on','does cheat work for'],
+        answer:`We carry cheats for a range of popular titles. Current &amp; common supported games include:<br><br>🔫 CS2 / CS:GO<br>🔫 Valorant<br>🪂 Warzone / COD<br>🏝️ Fortnite<br>🌲 Rust<br>🦅 Apex Legends<br>🎯 PUBG<br>🛡️ Rainbow Six Siege<br>🔦 Escape from Tarkov<br>🎮 &amp; more<br><br>Stock changes — check the <a href="#products">store</a> for what's currently available, or ask in <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for a specific game.`},
+
+      // ── CHEAT SAFETY / ANTICHEAT ─────────────────────────────────────────
+      { keys:['safe to use','are cheats safe','will i get banned','ban risk','get banned','vac ban','eac ban','battleye ban','anti cheat','anticheat','easy anti cheat','valve anti cheat','bypass anticheat','undetected','detected','how safe','cheat safety','cheat risk','safe cheat','safe hack','is it safe','risk of ban','ban chance','detected status','cheat status','current status','up to date','updated cheat','latest cheat','cheat working','still working','is it still working','does it still work'],
+        answer:`🛡️ Our cheats are <strong>external</strong> and currently <strong>undetected</strong>.<br><br><strong>Why external is safer:</strong><br>External cheats read game memory from outside the process — they are not injected, making them significantly harder for VAC, EAC, and BattlEye to detect compared to internal/injected cheats.<br><br><strong>Our safety practices:</strong><br>✅ Only list cheats confirmed undetected<br>✅ Immediate removal if detection is reported<br>✅ Regular status updates on Discord<br>✅ Staff test updates before release<br><br>⚠️ No cheat is 100% safe forever. Always check <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for the latest detection status before use.`},
+
+      // ── HOW TO USE CHEATS ─────────────────────────────────────────────────
+      { keys:['how to use cheat','how to install cheat','cheat setup','cheat tutorial','cheat guide','how does cheat work','cheat instructions','run cheat','launch cheat','start cheat','inject cheat','cheat injection','cheat loader','loader','cheat exe','cheat file','cheat download','how to download cheat','where is the cheat','cheat file format','cheat zip'],
+        answer:`After purchasing a cheat, you will receive a download link or direct file automatically.<br><br><strong>Typical setup:</strong><br>1. Download the cheat loader/executable<br>2. Run it <strong>as Administrator</strong><br>3. Launch your game<br>4. Follow the in-cheat menu (usually INS key or F1 to open)<br><br>Specific instructions are included with your purchase. If you need help, open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> — our staff will guide you through setup.`},
+
+      // ── KEYS & CODES ─────────────────────────────────────────────────────
+      { keys:['keys','codes','license key','license code','product key','software key','activation key','serial key','activation code','redeem code','game key','day key','week key','month key','lifetime key','trial key','trial code','day license','week license','month license','lifetime license','how long does key last','key duration','key expiry','key expire','does key expire','key period','subscription key'],
+        answer:`🔑 <strong>Keys &amp; License Codes</strong> are available in multiple durations:<br><br>⏱️ <strong>Trial</strong> — short access period to test<br>📅 <strong>Day</strong> — 1 day access<br>📅 <strong>Week</strong> — 7 day access<br>📅 <strong>Month</strong> — 30 day access<br>♾️ <strong>Lifetime</strong> — permanent access, one-time purchase<br><br>All keys are delivered <strong>instantly</strong> after payment. Activation instructions are included. Check the <a href="#products">store</a> for available titles and current pricing.`},
+
+      // ── GAMBLING REDEEMS ──────────────────────────────────────────────────
+      { keys:['gambling','gambling redeem','redeem gambling','casino redeem','gambling code','stake redeem','roobet redeem','csgoroll','gamble redeem','gambling credits','gambling balance','gambling voucher','crypto gambling','gambling site','what is gambling redeem','gambling product','stake code','roobet code','case opening'],
+        answer:`🎰 <strong>Gambling Redeems</strong> are codes/credits redeemable on popular crypto gambling &amp; case opening platforms.<br><br>These can include credits, balance boosts, or promo codes for platforms like Stake, Roobet, CSGORoll, and similar sites.<br><br>Check the <a href="#products">store</a> for current availability &amp; pricing. Stock is limited and sells fast.`},
+
+      // ── PAYMENT METHODS ───────────────────────────────────────────────────
+      { keys:['how to pay','payment','pay','payment method','payment methods','how do i pay','how can i pay','what payment','accepted payment','payment options','how to purchase','how to buy','buy now','purchase','checkout','how does checkout work','checkout process','buying process','order process','how to order','how do i order','place order','making a purchase','make a purchase','complete purchase'],
+        answer:`We accept two payment methods:<br><br>💳 <strong>Card (Stripe)</strong><br>Visa, Mastercard, American Express — standard card checkout. Fast &amp; secure.<br><br>🪙 <strong>Crypto (NOWPayments)</strong><br>Bitcoin (BTC), Ethereum (ETH), Litecoin (LTC), Tether (USDT), Monero (XMR), BNB, USDC, and 100+ other coins.<br><br><strong>To buy:</strong><br>1. Find your product → click <strong>Buy Now</strong><br>2. Select card or crypto<br>3. Complete payment<br>4. Receive your order instantly ⚡`},
+
+      // ── CRYPTO PAYMENT ────────────────────────────────────────────────────
+      { keys:['crypto','bitcoin','ethereum','litecoin','usdt','tether','monero','bnb','usdc','crypto payment','pay with crypto','crypto checkout','nowpayments','now payments','pay in bitcoin','pay in eth','pay in crypto','cryptocurrency','digital currency','blockchain payment','which crypto','supported crypto','what crypto','crypto accepted','btc payment','eth payment','ltc payment','xmr payment','anonymous payment'],
+        answer:`🪙 <strong>Crypto is accepted via NOWPayments</strong><br><br>Supported coins include:<br>₿ Bitcoin (BTC)<br>Ξ Ethereum (ETH)<br>Ł Litecoin (LTC)<br>💵 Tether (USDT)<br>🟡 BNB<br>⬛ Monero (XMR)<br>💲 USDC<br>+ 100 more coins<br><br>At checkout, select <strong>"Pay with Crypto"</strong>, choose your coin, and send the exact amount to the provided wallet — your order delivers once confirmed on-chain (usually 1–3 mins).`},
+
+      // ── CARD PAYMENT ─────────────────────────────────────────────────────
+      { keys:['card','credit card','debit card','visa','mastercard','amex','american express','stripe','card payment','pay with card','card checkout','can i use card','is card available','credit card payment','debit payment','card accepted'],
+        answer:`💳 <strong>Card payments are accepted via Stripe</strong><br><br>We accept:<br>• Visa<br>• Mastercard<br>• American Express<br>• Most major debit cards<br><br>Card payments are processed securely by Stripe — we never see or store your card details. After confirmation, your order delivers instantly.`},
+
+      // ── PAYPAL ────────────────────────────────────────────────────────────
+      { keys:['paypal','pay pal','pp payment','pay with paypal','do you accept paypal','is paypal available'],
+        answer:`❌ <strong>PayPal is not accepted.</strong><br><br>We accept <strong>Card (Stripe)</strong> and <strong>Crypto (100+ coins via NOWPayments)</strong>.<br><br>PayPal is not supported due to high chargeback rates on digital goods. If you need help choosing a payment option, ask in <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.`},
+
+      // ── DELIVERY ──────────────────────────────────────────────────────────
+      { keys:['delivery','how fast','instant delivery','how long to receive','when will i get','how soon','delivery time','order time','receive order','get order','get my order','how quick','quick delivery','fast delivery','how long does it take','time to receive','order speed','order delivery','auto delivery','automated delivery','auto deliver','instant','same day','immediate'],
+        answer:`⚡ <strong>Delivery is 100% automated and instant.</strong><br><br>Here is the timeline:<br>1. You complete payment<br>2. Payment is confirmed (card: instant, crypto: 1–3 min)<br>3. Your order is automatically sent — keys/accounts delivered<br>4. You receive it directly — <strong>no human needed</strong><br><br>Total time from payment to delivery: <strong>under 60 seconds</strong> for card, <strong>1–5 minutes</strong> for crypto depending on blockchain confirmation time.`},
+
+      // ── WHERE IS MY ORDER ─────────────────────────────────────────────────
+      { keys:['where is my order','where is my key','where is my account','i paid but','order not received','did not receive','didnt receive','payment not confirmed','order missing','missing order','my order','check my order','order status','track order','order tracking','order confirmation','invoice','find my order','i paid','ive paid','already paid','payment success','payment confirmed','paid but nothing'],
+        answer:`📦 <strong>Orders are delivered automatically after payment confirms.</strong><br><br><strong>If you paid and received nothing:</strong><br><br>💳 <strong>Card:</strong> Check your email — confirmation &amp; delivery details are sent automatically.<br>🪙 <strong>Crypto:</strong> Wait 3–10 minutes for blockchain confirmation. Do not close the checkout page.<br><br>Still nothing after 10 minutes? Open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> with your order ID and we'll sort it out ASAP.`},
+
+      // ── REFUND POLICY ─────────────────────────────────────────────────────
+      { keys:['refund','refunds','money back','get refund','refund policy','can i refund','return','returns','return policy','chargeback','dispute','cancel order','cancel my order','how to cancel','can i cancel','undo purchase','reverse charge','get money back','reimbursement','compensation'],
+        answer:`🔒 <strong>All sales are final — no refunds.</strong><br><br>Because our products are digital (keys, accounts, cheats) and delivered instantly &amp; automatically, we cannot issue refunds after delivery.<br><br><strong>However, if there is a genuine issue:</strong><br>• Key doesn't work → open a ticket and we'll replace it<br>• Account is locked/invalid → we'll replace it<br>• Wrong product sent → we'll make it right<br><br>Open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> explaining the issue and we will resolve it fairly.`},
+
+      // ── STOCK ────────────────────────────────────────────────────────────
+      { keys:['stock','in stock','out of stock','how many left','stock level','quantity','available quantity','stock count','units left','limited stock','low stock','sold out','restock','when restock','when will you restock','will you get more','getting more','more stock coming','back in stock','inventory','how many do you have','product availability'],
+        answer:`📦 <strong>Live stock is displayed on every product card.</strong><br><br>• Each card shows the current quantity in stock<br>• When stock hits 0, the button is disabled until restocked<br>• Stock updates automatically as orders are fulfilled<br><br>🔔 <strong>Restock notifications:</strong> Join our <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> — we announce restocks there first, often before the store updates.`},
+
+      // ── PRICING ──────────────────────────────────────────────────────────
+      { keys:['price','prices','cost','how much','pricing','cheap','cheapest','cost of','what does it cost','how much is','what is the price','rate','rates','value','worth','affordable','discount','promo code','coupon','voucher','promo','deal','offer','sale','special price','reduced price','best price'],
+        answer:`💰 <strong>Current pricing:</strong><br><br>🎮 Xbox Gamepass Month — <strong>$10</strong><br>🖥️ Steam FA Account — <strong>$0.20/ea</strong> (min 50 = $10)<br>🛡️ External Cheats — from <strong>~$5/day</strong> to <strong>~$50/lifetime</strong><br>🔑 Keys (trial/day/week/month/lifetime) — <strong>varies by product</strong><br>🎰 Gambling Redeems — <strong>varies</strong><br><br>Check the <a href="#products">live product page</a> for exact current prices — they can change with stock levels.`},
+
+      // ── MINIMUM ORDER ─────────────────────────────────────────────────────
+      { keys:['minimum order','min order','minimum purchase','least i can buy','minimum quantity','min qty','minimum amount','smallest order','least amount','buy just one','can i buy 1','can i buy one','can i buy less than 50','bulk order','bulk buy','wholesale','bulk discount','bulk pricing'],
+        answer:`<strong>Minimum orders vary by product:</strong><br><br>🎮 <strong>Xbox Gamepass</strong> — 1 unit minimum<br>🖥️ <strong>Steam FA Accounts</strong> — <strong>50 accounts minimum</strong> ($10)<br>🛡️ <strong>Cheats</strong> — 1 license minimum<br>🔑 <strong>Keys</strong> — 1 key minimum<br>🎰 <strong>Gambling Redeems</strong> — 1 minimum<br><br>For bulk orders above standard quantities, contact us on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for possible bulk pricing.`},
+
+      // ── DISCORD / SUPPORT ─────────────────────────────────────────────────
+      { keys:['discord','support','help','contact','ticket','staff','human','talk to someone','speak to someone','speak to staff','human support','live support','agent','customer service','customer support','reach you','how to contact','contact you','real person','real support','support ticket','open ticket','create ticket','raise ticket','get help','need help','technical support','tech support','issue help','problem help'],
+        answer:`💬 <strong>Our Discord is open 24/7:</strong><br><br><a href="https://discord.gg/Y69UbMUEfu" target="_blank"><strong>discord.gg/Y69UbMUEfu</strong></a><br><br>Once in the server:<br>1. Go to <strong>#open-a-ticket</strong><br>2. Click the button to create your private ticket<br>3. A staff member will respond — average response time is <strong>under 30 minutes</strong><br><br>Please include your order ID and a description of your issue for fastest resolution.`},
+
+      // ── VPN / BLOCK ──────────────────────────────────────────────────────
+      { keys:['vpn','blocked','cant access','access denied','access restricted','i am blocked','why am i blocked','why cant i access','proxy blocked','tor blocked','blocked by site','site blocked','vpn detected','vpn block','disable vpn','turn off vpn','using vpn','proxy','anonymizer','tunneling','tunnel','hide ip','fake ip','ip hide'],
+        answer:`🚫 <strong>AbyssHub blocks all VPN, proxy, and anonymizing connections.</strong><br><br>This is required for security and fraud prevention — it protects our customers and ensures legitimate purchases only.<br><br><strong>To access the store:</strong><br>1. Disable your VPN/proxy completely<br>2. Disconnect &amp; reconnect your regular internet<br>3. Reload the page<br><br>If you're not using a VPN and still blocked, your ISP may be routing through a datacenter. Contact us on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> and we can manually whitelist your IP.`},
+
+      // ── AGE GATE ─────────────────────────────────────────────────────────
+      { keys:['age gate','age check','age verification','how old','minimum age','age requirement','age restriction','18','eighteen','am i old enough','do i need to be 18','age limit','adult','why age check'],
+        answer:`🔞 <strong>AbyssHub requires users to be 18 or older.</strong><br><br>This is a standard requirement for purchasing digital goods including software tools and restricted items.<br><br>On your first visit, you'll see an age confirmation screen. Click <strong>"I am 18 or older"</strong> to proceed. This is remembered so you only see it once per device.`},
+
+      // ── TERMS OF SERVICE / LEGALITY ───────────────────────────────────────
+      { keys:['terms of service','tos','terms and conditions','legal','is this legal','legit','legitimate','is abysshub legit','is this legit','is this real','is this legitimate','real site','real shop','real store','trustworthy','can i trust','trust this site','trusted','verified shop','is it a scam','scam','not a scam','fraud','fake','real or fake','proof','evidence','trustpilot','reviews','testimonials','reputation'],
+        answer:`✅ <strong>AbyssHub is a legitimate, fully automated store.</strong><br><br><strong>Proof we are legit:</strong><br>• Fully automated delivery — no manual sending, instant receipt<br>• Secure checkout via Stripe &amp; NOWPayments (industry-standard)<br>• Active Discord community with real customers<br>• Live stock &amp; order system<br>• No hidden fees — price shown is price charged<br><br>Join our <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> to see real customer feedback and ask existing members about their experience.`},
+
+      // ── PRIVACY / SECURITY ────────────────────────────────────────────────
+      { keys:['privacy','data','personal data','my data','is my data safe','data security','secure','security','is payment secure','secure payment','safe to pay','safe to buy','card security','data protection','do you store my data','stored data','anonymous','anonymously','anonymous purchase','buy anonymously','no logs','privacy policy'],
+        answer:`🔐 <strong>Your data is protected:</strong><br><br>💳 <strong>Card payments:</strong> Processed by Stripe — we never see or store your card details<br>🪙 <strong>Crypto payments:</strong> Fully anonymous — no personal info required<br>📧 <strong>Email:</strong> Only used for order delivery, never sold<br>🚫 <strong>No tracking:</strong> We do not sell or share your data<br><br>For maximum privacy, pay with crypto (Monero XMR is most anonymous). No account creation is needed to purchase.`},
+
+      // ── ACCOUNT / LOGIN ───────────────────────────────────────────────────
+      { keys:['do i need an account','account required','need to register','need to sign up','sign up','login','register','create account','member','membership','user account','site account','store account','no account','without account','guest checkout','can i buy without account'],
+        answer:`✅ <strong>No account is needed.</strong><br><br>You can buy on AbyssHub completely as a guest — no registration, no email account, nothing.<br><br>Simply:<br>1. Pick your product<br>2. Choose payment (card or crypto)<br>3. Complete checkout<br>4. Receive your order instantly<br><br>Your order details and invoice are generated automatically. No login required ever.`},
+
+      // ── HOW TO ACTIVATE XBOX /MICROSOFT keys ─────────────────────────────
+      { keys:['how to activate xbox','activate xbox key','how to redeem xbox key','xbox redemption','redeem xbox','xbox activation','redeem microsoft','microsoft activation','redeem game pass','activate game pass','xbox redeem code','redeem code xbox','redeem.microsoft.com','microsoft.com/redeem','xbox code not working','key not working xbox'],
+        answer:`🎮 <strong>How to activate your Xbox Gamepass code:</strong><br><br>1. Go to <a href="https://redeem.microsoft.com" target="_blank">redeem.microsoft.com</a><br>2. Sign in with your Microsoft account (or create one free)<br>3. Enter your 25-character code exactly as provided<br>4. Game Pass activates on your account immediately<br><br>⚠️ If the code says "already redeemed" or "invalid", open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> with a screenshot and we'll replace it.`},
+
+      // ── KEY NOT WORKING ──────────────────────────────────────────────────
+      { keys:['key not working','code not working','invalid key','key invalid','key already used','code already redeemed','already redeemed','key error','code error','activation failed','key doesnt work','key wont work','code wont work','broken key','bad key','wrong key','key issue','code issue'],
+        answer:`⚠️ <strong>If your key or code isn't working:</strong><br><br>1. Double-check you copied it exactly (no extra spaces)<br>2. Make sure you're redeeming on the correct platform<br>3. Verify you're using a compatible region account<br><br>If it still doesn't work, open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> immediately with:<br>• Your order ID<br>• Screenshot of the error<br>• The exact key you received<br><br>We <strong>will replace</strong> invalid or already-used keys. This is covered under our product guarantee.`},
+
+      // ── ACCOUNT NOT WORKING ──────────────────────────────────────────────
+      { keys:['account not working','steam account locked','account banned','account invalid','banned account','account already used','login failed','steam login failed','login not working','wrong password','credentials wrong','cant log in','cannot login','account issue','account problem','steam account issue'],
+        answer:`⚠️ <strong>If your Steam account isn't working:</strong><br><br>Common causes:<br>• Steam Guard / 2FA blocking first login (check your email)<br>• Account flagged by Steam — log in via web first<br>• IP mismatch — Steam may require email confirmation<br><br>Open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> with:<br>• Your order ID<br>• The account login you received<br>• Screenshot of the error<br><br>We guarantee replacement of invalid accounts.`},
+
+      // ── INVOICE / RECEIPT ────────────────────────────────────────────────
+      { keys:['invoice','receipt','proof of purchase','order confirmation','confirmation email','order email','get invoice','my invoice','billing','billing info','order number','order id','transaction id','transaction receipt','payment receipt'],
+        answer:`🧾 <strong>Invoices &amp; receipts:</strong><br><br>After purchase, an automated confirmation is generated. Your order details (invoice ID, product, amount paid) are shown on the confirmation screen and can also be found in your email if you provided one.<br><br>If you need a copy of your invoice, open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> with your order ID and we'll provide it.`},
+
+      // ── CHEAT PLANS & PRICING ─────────────────────────────────────────────
+      { keys:['cheat price','cheat cost','how much is cheat','cheat plan','day plan','week plan','month plan','lifetime plan','cheat subscription','how long cheat','cheat duration','cheat period','trial cheat','1 day cheat','7 day cheat','30 day cheat','lifetime cheat','cheap cheat','affordable cheat','cheat packages','cheat tiers'],
+        answer:`🛡️ <strong>Cheat plan pricing:</strong><br><br>⏱️ <strong>Trial</strong> — short test period, lowest cost<br>📅 <strong>1 Day</strong> — one-time 24h access<br>📅 <strong>1 Week</strong> — 7 days of access<br>📅 <strong>1 Month</strong> — 30 days of access<br>♾️ <strong>Lifetime</strong> — permanent one-time purchase<br><br>Exact prices vary by cheat product. Check the <a href="#products">products page</a> for live pricing, or ask in <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> about a specific plan.`},
+
+      // ── DETECTION STATUS ─────────────────────────────────────────────────
+      { keys:['detection status','cheat status','is cheat detected','is hack detected','detected or not','currently detected','currently undetected','status of cheat','cheat working right now','cheat still working','is it still safe','cheat up to date','cheat update','new update','after update','game updated','after patch','game patch','patch broke','did update break cheat'],
+        answer:`🟢 <strong>Current status: Undetected</strong> (as of latest check)<br><br>We update status in real-time. If a game patches or detection is reported:<br>1. We remove the cheat immediately<br>2. Notify customers via Discord<br>3. Resume sales only after a clean update<br><br>For the most current status, always check <a href="https://discord.gg/Y69UbMUEfu" target="_blank">our Discord</a> before launching — we post status updates there first.`},
+
+      // ── CHEAT HWID / PC ───────────────────────────────────────────────────
+      { keys:['hwid','hardware id','hwid ban','hardware ban','can i use on multiple pc','multiple computers','multiple devices','one computer','one pc','device limit','license per device','how many devices','license tied','license bind','bind to pc','spoofer','hwid spoofer','hwid reset'],
+        answer:`💻 <strong>HWID &amp; device info:</strong><br><br>Most of our cheats are licensed per machine (HWID-locked after first launch).<br><br>If you need to transfer to a new PC or got HWID banned:<br>• Contact us on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for a reset (usually free for genuine hardware changes)<br>• We also stock <strong>HWID spoofers</strong> — ask in Discord about availability<br><br>Do not run the cheat on multiple machines without contacting us first.`},
+
+      // ── WHAT IS EXTERNAL CHEAT ────────────────────────────────────────────
+      { keys:['what is external cheat','what does external mean','external vs internal','external cheat meaning','what is external','external program','external software','how external cheat works','overlay cheat','memory reader','read memory','read game memory','process memory','external process','does external get detected','external safer','why external'],
+        answer:`🛡️ <strong>What is an "external" cheat?</strong><br><br>An external cheat runs as a <strong>separate process outside the game</strong> — it reads game memory from outside the game's process.<br><br><strong>Why external is better:</strong><br>✅ Not injected into the game — no DLL injection<br>✅ Anti-cheats cannot scan it the same way<br>✅ Much harder for VAC/EAC/BattlEye to detect<br>✅ Can be closed instantly with no trace<br><br>Internal cheats inject code into the game, which is significantly riskier. External = safer &amp; smarter.`},
+
+      // ── OPERATING SYSTEM ─────────────────────────────────────────────────
+      { keys:['windows','windows 10','windows 11','win10','win11','os requirement','operating system','does it work on windows','mac','linux','macos','does it work on mac','does it work on linux','supported os','what os','what operating system','requires windows','64 bit','32 bit'],
+        answer:`💻 <strong>System requirements:</strong><br><br>✅ <strong>Windows 10 &amp; Windows 11</strong> — fully supported (64-bit recommended)<br>⚠️ Windows 7/8 — may work but not guaranteed<br>❌ macOS — not supported<br>❌ Linux — not supported<br><br>Most cheats require Windows 10/11 x64. Run as Administrator for best results. Any specific requirements are listed in the product description.`},
+
+      // ── ANTIVIRUS / DETECTION BY AV ──────────────────────────────────────
+      { keys:['antivirus','anti virus','av detection','windows defender','defender','false positive','virus','malware','flagged by antivirus','antivirus flags','defender flags','excluded from defender','whitelist defender','add exception','exclude from antivirus','false alarm','is it a virus','is the cheat a virus','trojan','detected by windows'],
+        answer:`🛡️ <strong>Antivirus &amp; Windows Defender:</strong><br><br>Cheat software is commonly flagged as a <strong>false positive</strong> by antivirus programs — this is expected and does not mean it is malware.<br><br><strong>How to fix:</strong><br>1. Open Windows Security → Virus &amp; Threat Protection<br>2. Go to Exclusions → Add exclusion<br>3. Add the cheat folder/file<br>4. Disable real-time protection temporarily while running<br><br>All our software is tested and clean. If concerned about a specific file, hash it and run it through VirusTotal — false positives from multiple AV vendors are expected for cheat tools.`},
+
+      // ── THANK YOU ────────────────────────────────────────────────────────
+      { keys:['thank you','thanks','ty','thank u','thx','cheers','appreciate it','appreciate your help','helpful','great help','very helpful','good bot','great bot','nice bot','awesome','amazing','perfect','wonderful','brilliant','excellent','solid','nice one','respect','good work','good job'],
+        answer:`You're welcome! 😊<br><br>If you need anything else, just ask — I'm available 24/7. For complex issues, join our <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> for human support.`},
+
+      // ── GOODBYE ──────────────────────────────────────────────────────────
+      { keys:['bye','goodbye','see you','later','cya','see ya','take care','farewell','talk later','ttyl','gtg','got to go','gotta go','peace','leaving'],
+        answer:`👋 See you around! Come back anytime — we're here 24/7.<br>For any future questions: <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> | <a href="#products">Shop</a>`},
+
+      // ── FUNNY / OFF TOPIC ─────────────────────────────────────────────────
+      { keys:['who made you','who created you','are you a bot','are you ai','are you human','are you real','are you gpt','chatgpt','are you chatgpt','are you an ai','ai bot','are you automated','bot or human','is this automated','am i talking to a bot'],
+        answer:`🤖 Yes, I'm a bot! Fully automated support for AbyssHub.<br><br>I know everything about our products, pricing, payments, and policies. For anything I can't handle, open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> and a real human will help you.`},
+
+      // ── JOKES / BANTER ────────────────────────────────────────────────────
+      { keys:['tell me a joke','joke','funny','make me laugh','lol','lmao','xd','haha','hehe'],
+        answer:`😄 Why did the gamer go broke?<br><br>Because they kept buying <strong>lifetime</strong> subscriptions... to cheats that got detected! 😂<br><br>Speaking of which — <a href="#products">check our undetected stock here</a>. ⚡`},
+
+      // ── SITE DOWN / ISSUES ────────────────────────────────────────────────
+      { keys:['site down','website down','not loading','page not loading','error','500 error','404 error','something went wrong','broken','site not working','shop not working','website not working','cant load','cannot load','loading issue','connection error','server error','is the site down','is the shop down'],
+        answer:`🔧 <strong>If the site is not loading:</strong><br><br>1. Try a hard refresh (Ctrl+Shift+R)<br>2. Clear your browser cache<br>3. Try a different browser<br>4. Make sure you are <strong>not using a VPN</strong> (VPNs are blocked)<br>5. Try again in a few minutes<br><br>If the issue persists, report it on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> and we'll investigate.`},
+
+      // ── SOCIAL MEDIA ─────────────────────────────────────────────────────
+      { keys:['social media','twitter','instagram','tiktok','youtube','telegram','reddit','follow','social','instagram abysshub','twitter abysshub','where to follow','follow you'],
+        answer:`📱 Our primary community is on <strong>Discord</strong>:<br><br>💬 <a href="https://discord.gg/Y69UbMUEfu" target="_blank"><strong>discord.gg/Y69UbMUEfu</strong></a><br><br>We don't currently maintain public profiles on other social platforms. Discord is where you'll find stock alerts, updates, and support.`},
+
+      // ── GREETINGS in other languages (broad coverage) ─────────────────────
+      { keys:['hola','bonjour','salut','ciao','oi','olá','hallo','merhaba','привет','你好','こんにちは','안녕','مرحبا'],
+        answer:`Hey! 👋 Welcome to AbyssHub!<br><br>Our support is in English, but feel free to type your question and I'll do my best to help. For multilingual staff support, join our <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.`},
     ];
 
-    const FALLBACK = `I'm not sure about that one. For anything not covered here, our team is available 24/7 on Discord:<br><br>💬 <a href="https://discord.gg/Y69UbMUEfu" target="_blank"><strong>discord.gg/Y69UbMUEfu</strong></a> — open a <strong>#support-ticket</strong> and we'll help you out!`;
-
-    function getBotReply(input) {
-      const q = input.toLowerCase().replace(/[^\w\s]/g,'');
-      for(const entry of KB){
-        if(entry.keys.some(k => q.includes(k))) return entry.answer;
-      }
-      return FALLBACK;
-    }
+    const FALLBACK = `I don't have a specific answer for that, but our team can help!<br><br>💬 <a href="https://discord.gg/Y69UbMUEfu" target="_blank"><strong>discord.gg/Y69UbMUEfu</strong></a> — open a <strong>#support-ticket</strong> and we'll respond within 30 minutes.<br><br>Or try rephrasing — I know about products, payments, delivery, cheats, stock, and more.`;
 
     // ── DOM refs ──────────────────────────────────────────────────────────────
     const fab      = document.getElementById('chat-fab');
