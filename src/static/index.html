@@ -1089,7 +1089,7 @@
 
   <!-- AI SUPPORT CHAT JS -->
   <script>
-  (function(){
+  document.addEventListener('DOMContentLoaded', function(){
     // ── Knowledge base ────────────────────────────────────────────────────────
     const KB = [
       {
@@ -1251,7 +1251,7 @@ If you are seeing an access block, please disable your VPN and reload the page. 
       appendMsg(btn.textContent, 'user');
       botReply(getBotReply(btn.dataset.q));
     }));
-  })();
+  });
   </script>
   <button id="chat-fab" aria-label="Open support chat">
     <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
