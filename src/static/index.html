@@ -291,6 +291,43 @@
     .adpop-cta { width:100%; padding:.5rem; background:var(--orange); color:#000; border:none;
       border-radius:3px; font-weight:700; font-size:.82rem; cursor:pointer; font-family:inherit; }
     .adpop-cta:hover { background:var(--orange2); }
+
+    /* ── AI SUPPORT CHAT ─────────────────────────────────────────────────── */
+    #chat-fab { position:fixed; bottom:1.5rem; right:1.5rem; z-index:1400; width:52px; height:52px; border-radius:50%; background:var(--orange); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 18px rgba(255,144,0,.45); transition:transform .2s, background .15s; }
+    #chat-fab:hover { transform:scale(1.08); background:var(--orange2); }
+    #chat-fab svg { width:26px; height:26px; fill:#000; }
+    #chat-fab .chat-notif { position:absolute; top:-3px; right:-3px; width:18px; height:18px; background:#e63946; border-radius:50%; font-size:.62rem; font-weight:900; color:#fff; display:flex; align-items:center; justify-content:center; border:2px solid var(--bg); }
+    #chat-window { position:fixed; bottom:5.5rem; right:1.5rem; z-index:1400; width:340px; max-height:520px; background:var(--surface); border:1px solid var(--border); border-radius:10px; box-shadow:0 12px 40px rgba(0,0,0,.6); display:flex; flex-direction:column; transform:scale(.92) translateY(16px); opacity:0; pointer-events:none; transition:transform .25s cubic-bezier(.22,1,.36,1), opacity .2s; transform-origin:bottom right; }
+    #chat-window.open { transform:none; opacity:1; pointer-events:all; }
+    .chat-head { background:#000; border-radius:10px 10px 0 0; padding:.75rem 1rem; display:flex; align-items:center; gap:.65rem; border-bottom:1px solid var(--border); }
+    .chat-head-avatar { width:34px; height:34px; border-radius:50%; background:var(--orange); display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:900; color:#000; flex-shrink:0; }
+    .chat-head-info { flex:1; }
+    .chat-head-name { font-size:.82rem; font-weight:700; }
+    .chat-head-status { font-size:.68rem; color:#3ddc84; display:flex; align-items:center; gap:.3rem; }
+    .chat-head-status::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:#3ddc84; }
+    .chat-head-close { background:none; border:none; color:var(--muted); font-size:1.2rem; cursor:pointer; padding:.1rem .3rem; transition:color .15s; }
+    .chat-head-close:hover { color:var(--text); }
+    .chat-messages { flex:1; overflow-y:auto; padding:.85rem; display:flex; flex-direction:column; gap:.55rem; min-height:280px; max-height:360px; }
+    .chat-messages::-webkit-scrollbar { width:4px; } .chat-messages::-webkit-scrollbar-track { background:transparent; } .chat-messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+    .chat-msg { max-width:82%; padding:.5rem .75rem; border-radius:10px; font-size:.8rem; line-height:1.55; word-break:break-word; }
+    .chat-msg.bot { background:var(--card); color:var(--text); border-bottom-left-radius:2px; align-self:flex-start; }
+    .chat-msg.user { background:var(--orange); color:#000; font-weight:600; border-bottom-right-radius:2px; align-self:flex-end; }
+    .chat-msg a { color:var(--orange); text-decoration:underline; }
+    .chat-msg.bot a { color:var(--orange2); }
+    .chat-typing { display:flex; gap:4px; align-items:center; padding:.5rem .75rem; background:var(--card); border-radius:10px; border-bottom-left-radius:2px; align-self:flex-start; }
+    .chat-typing span { width:6px; height:6px; border-radius:50%; background:var(--muted); animation:chat-bounce .9s infinite; }
+    .chat-typing span:nth-child(2) { animation-delay:.15s; } .chat-typing span:nth-child(3) { animation-delay:.3s; }
+    @keyframes chat-bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+    .chat-suggestions { display:flex; flex-wrap:wrap; gap:.4rem; padding:.5rem .85rem .35rem; border-top:1px solid var(--border); }
+    .chat-suggestion { background:transparent; border:1px solid var(--border); color:#ccc; border-radius:20px; padding:.28rem .7rem; font-size:.72rem; cursor:pointer; font-family:inherit; transition:border-color .12s,color .12s,background .12s; white-space:nowrap; }
+    .chat-suggestion:hover { border-color:var(--orange); color:var(--orange); background:rgba(255,144,0,.06); }
+    .chat-input-row { display:flex; gap:.5rem; padding:.65rem .85rem .75rem; border-top:1px solid var(--border); }
+    #chat-input { flex:1; background:var(--card); border:1px solid var(--border); border-radius:20px; color:var(--text); padding:.42rem .9rem; font-size:.8rem; font-family:inherit; outline:none; transition:border-color .15s; }
+    #chat-input:focus { border-color:var(--orange); }
+    #chat-input::placeholder { color:var(--muted); }
+    #chat-send { background:var(--orange); border:none; border-radius:50%; width:32px; height:32px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s; }
+    #chat-send:hover { background:var(--orange2); }
+    #chat-send svg { width:15px; height:15px; fill:#000; }
   </style>
 </head>
 <body>
@@ -1049,5 +1086,201 @@
     pingVisitor(); setInterval(pingVisitor,20000);
     window.addEventListener('beforeunload',()=>{ if(_sid)navigator.sendBeacon('/api/visitors/leave',JSON.stringify({sid:_sid})); });
   </script>
+
+  <!-- AI SUPPORT CHAT JS -->
+  <script>
+  (function(){
+    // ── Knowledge base ────────────────────────────────────────────────────────
+    const KB = [
+      {
+        keys: ['what do you sell','products','catalog','what is abysshub','what is this','what is xshadows'],
+        answer: `We sell <strong>digital goods & game cheats</strong>:<br><br>
+🎮 <strong>Xbox Gamepass Month</strong> — $10 (standard key, instant)<br>
+🖥️ <strong>Steam FA Account Fresh</strong> — $0.20 each (min 50)<br>
+🛡️ <strong>External Cheats</strong> — undetected, for various games<br>
+🔑 <strong>Keys & Codes</strong> — day/week/month/lifetime<br>
+🎰 <strong>Gambling Redeems</strong><br><br>
+Browse everything at <a href="#products">the store</a>.`
+      },
+      {
+        keys: ['how do i pay','payment','how to pay','crypto','card','accept','bitcoin','stripe','nowpayments','pay with'],
+        answer: `We accept two payment methods:<br><br>
+💳 <strong>Card</strong> — Visa/Mastercard via Stripe (instant)<br>
+🪙 <strong>Crypto</strong> — BTC, ETH, LTC, USDT and 100+ coins via NOWPayments<br><br>
+Select your product → click <em>Buy Now</em> → choose your payment method at checkout.`
+      },
+      {
+        keys: ['how fast','delivery','auto','instant','how long','when will i','get my','receive'],
+        answer: `⚡ <strong>Fully automated & instant.</strong><br><br>
+Once payment is confirmed, your order is delivered automatically — no waiting for a human. Keys and accounts are sent directly to you. Most orders complete in under <strong>60 seconds</strong>.`
+      },
+      {
+        keys: ['safe','undetected','ban','vac','anticheat','detected','get banned','easy anti cheat','battleye'],
+        answer: `Our external cheats are <strong>currently undetected</strong>. We only list cheats that are confirmed to bypass VAC, EAC, and BattlEye.<br><br>
+⚠️ No cheat is 100% risk-free forever. We update our status regularly. If a cheat gets detected we pull it immediately. Always check <a href="https://discord.gg/Y69UbMUEfu" target="_blank">our Discord</a> for the latest status.`
+      },
+      {
+        keys: ['refund','money back','return','chargeback','dispute'],
+        answer: `🔒 <strong>All sales are final.</strong> Due to the digital nature of our products (keys and accounts are delivered instantly), we do not offer refunds.<br><br>
+If you have an issue with a product (e.g. key doesn't work, account is locked), please open a ticket on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> and we'll make it right.`
+      },
+      {
+        keys: ['stock','how many','left','available','in stock','out of stock'],
+        answer: `Stock levels are shown <strong>live on each product card</strong>. Once stock hits 0, the product is greyed out until restocked.<br><br>
+For restock notifications, join our <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord server</a> — we announce new stock there first.`
+      },
+      {
+        keys: ['discord','support','help','contact','ticket','staff','human','talk to','speak to','agent'],
+        answer: `You can reach us at any time on Discord:<br><br>
+💬 <a href="https://discord.gg/Y69UbMUEfu" target="_blank"><strong>discord.gg/Y69UbMUEfu</strong></a><br><br>
+Open a <strong>#support-ticket</strong> and a staff member will assist you ASAP. Average response time is under 30 minutes.`
+      },
+      {
+        keys: ['xbox','gamepass','game pass','microsoft','xgp'],
+        answer: `🎮 <strong>Xbox Gamepass Month</strong> — <strong>$10</strong><br><br>
+A standard Xbox Game Pass code redeemable on Xbox or PC. You'll receive the code instantly after payment. Enter it at <a href="https://redeem.microsoft.com" target="_blank">redeem.microsoft.com</a>.<br><br>
+Stock is limited — grab it before it's gone!`
+      },
+      {
+        keys: ['steam','fa account','fresh','2fa','steam account','smurf'],
+        answer: `🖥️ <strong>Steam FA Account Fresh</strong> — <strong>$0.20 each</strong> (minimum order: 50)<br><br>
+Fresh Steam accounts with SMS/2FA already set up. Useful for smurfing, new starts, or testing. Delivered instantly in bulk.<br><br>
+Minimum order is 50 accounts ($10 total).`
+      },
+      {
+        keys: ['price','cost','how much','pricing','cheap'],
+        answer: `Our current prices:<br><br>
+🎮 Xbox Gamepass Month — <strong>$10</strong><br>
+🖥️ Steam FA Account — <strong>$0.20</strong> (min 50)<br>
+🛡️ External cheats — varies by plan (day/week/month/lifetime)<br>
+🔑 Keys — varies<br>
+🎰 Gambling redeems — varies<br><br>
+Check the <a href="#products">products section</a> for live pricing.`
+      },
+      {
+        keys: ['vpn', 'blocked', 'cant access', 'access denied', 'restricted'],
+        answer: `⚠️ AbyssHub <strong>does not allow VPN or proxy connections</strong> for security and fraud prevention.<br><br>
+If you are seeing an access block, please disable your VPN and reload the page. If the issue persists, contact us on <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a>.`
+      },
+      {
+        keys: ['hello','hi','hey','sup','what up','yo','good morning','good evening'],
+        answer: `Hey! 👋 Welcome to <strong>AbyssHub</strong>.<br>I'm your automated support assistant. Ask me anything about our products, payments, or delivery — or pick a topic below!`
+      },
+      {
+        keys: ['thank','thanks','ty','appreciate','helpful'],
+        answer: `You're welcome! 😊 If there's anything else I can help with, just ask.<br>For complex issues, join our <a href="https://discord.gg/Y69UbMUEfu" target="_blank">Discord</a> and open a ticket.`
+      },
+    ];
+
+    const FALLBACK = `I'm not sure about that one. For anything not covered here, our team is available 24/7 on Discord:<br><br>💬 <a href="https://discord.gg/Y69UbMUEfu" target="_blank"><strong>discord.gg/Y69UbMUEfu</strong></a> — open a <strong>#support-ticket</strong> and we'll help you out!`;
+
+    function getBotReply(input) {
+      const q = input.toLowerCase().replace(/[^\w\s]/g,'');
+      for(const entry of KB){
+        if(entry.keys.some(k => q.includes(k))) return entry.answer;
+      }
+      return FALLBACK;
+    }
+
+    // ── DOM refs ──────────────────────────────────────────────────────────────
+    const fab      = document.getElementById('chat-fab');
+    const win      = document.getElementById('chat-window');
+    const closeBtn = document.getElementById('chat-close');
+    const msgs     = document.getElementById('chat-messages');
+    const input    = document.getElementById('chat-input');
+    const sendBtn  = document.getElementById('chat-send');
+    const notif    = document.getElementById('chat-notif');
+    const suggestions = document.querySelectorAll('.chat-suggestion');
+
+    let opened = false;
+
+    function scrollBottom(){ msgs.scrollTop = msgs.scrollHeight; }
+
+    function appendMsg(html, type){
+      const d = document.createElement('div');
+      d.className = 'chat-msg ' + type;
+      d.innerHTML = html;
+      msgs.appendChild(d);
+      scrollBottom();
+      return d;
+    }
+
+    function showTyping(){
+      const t = document.createElement('div');
+      t.className = 'chat-typing';
+      t.id = 'chat-typing';
+      t.innerHTML = '<span></span><span></span><span></span>';
+      msgs.appendChild(t);
+      scrollBottom();
+    }
+    function removeTyping(){ const t=document.getElementById('chat-typing'); if(t) t.remove(); }
+
+    function botReply(text){
+      showTyping();
+      const delay = 600 + Math.min(text.length * 1.2, 900);
+      setTimeout(()=>{ removeTyping(); appendMsg(text, 'bot'); }, delay);
+    }
+
+    function send(){
+      const q = input.value.trim();
+      if(!q) return;
+      appendMsg(q, 'user');
+      input.value = '';
+      botReply(getBotReply(q));
+    }
+
+    function openChat(){
+      win.classList.add('open');
+      opened = true;
+      notif.style.display = 'none';
+      if(msgs.children.length === 0){
+        botReply(`Hey! 👋 Welcome to <strong>AbyssHub Support</strong>.<br>Ask me anything about products, payments, delivery, or cheats — or tap a quick topic below.`);
+      }
+      setTimeout(()=>input.focus(), 250);
+    }
+    function closeChat(){ win.classList.remove('open'); }
+
+    fab.addEventListener('click', ()=> win.classList.contains('open') ? closeChat() : openChat());
+    closeBtn.addEventListener('click', closeChat);
+    sendBtn.addEventListener('click', send);
+    input.addEventListener('keydown', e=>{ if(e.key==='Enter') send(); });
+    suggestions.forEach(btn => btn.addEventListener('click', ()=>{
+      if(!opened) openChat();
+      if(!win.classList.contains('open')) win.classList.add('open');
+      notif.style.display = 'none';
+      appendMsg(btn.textContent, 'user');
+      botReply(getBotReply(btn.dataset.q));
+    }));
+  })();
+  </script>
+  <button id="chat-fab" aria-label="Open support chat">
+    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    <div class="chat-notif" id="chat-notif">1</div>
+  </button>
+  <div id="chat-window">
+    <div class="chat-head">
+      <div class="chat-head-avatar">AH</div>
+      <div class="chat-head-info">
+        <div class="chat-head-name">AbyssHub Support</div>
+        <div class="chat-head-status">Online &mdash; instant replies</div>
+      </div>
+      <button class="chat-head-close" id="chat-close">&times;</button>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-suggestions" id="chat-suggestions">
+      <button class="chat-suggestion" data-q="what products do you sell">Products</button>
+      <button class="chat-suggestion" data-q="how do i pay">Payment</button>
+      <button class="chat-suggestion" data-q="how fast is delivery">Delivery</button>
+      <button class="chat-suggestion" data-q="are the cheats safe">Safe to use?</button>
+      <button class="chat-suggestion" data-q="do you have a refund policy">Refunds</button>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chat-input" placeholder="Ask anything…" autocomplete="off" maxlength="200"/>
+      <button id="chat-send">
+        <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+      </button>
+    </div>
+  </div>
+
 </body>
 </html>
