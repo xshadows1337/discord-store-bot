@@ -22,25 +22,8 @@ _VPN_CACHE_TTL = 3600   # cache result for 1 hour
 _PRIVATE_PREFIXES = ('10.', '172.', '192.168.', '127.', '::1', 'localhost')
 
 async def _is_vpn(ip: str) -> bool:
-    """Return True if the IP is a known VPN, proxy, or datacenter host."""
-    if any(ip.startswith(p) for p in _PRIVATE_PREFIXES):
-        return False
-    now = time.time()
-    cached = _vpn_cache.get(ip)
-    if cached and now < cached[1]:
-        return cached[0]
-    try:
-        url = f'http://ip-api.com/json/{ip}?fields=status,proxy,hosting'
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, timeout=aiohttp.ClientTimeout(total=3)) as resp:
-                data = await resp.json(content_type=None)
-        blocked = bool(data.get('proxy') or data.get('hosting'))
-    except Exception:
-        blocked = False   # fail open — don't block on API error
-    _vpn_cache[ip] = (blocked, now + _VPN_CACHE_TTL)
-    if blocked:
-        logger.warning(f"[VPN-BLOCK] Blocked VPN/proxy IP: {ip}")
-    return blocked
+    """VPN/proxy check — currently disabled."""
+    return False
 
 _VPN_BLOCK_PAGE = """\
 <!DOCTYPE html>
@@ -489,6 +472,165 @@ async def start_api_server(secret: str, port: int = 8080):
 
     # VPN check
     app.router.add_get('/api/vpn-check', vpn_check)
+
+    # ── Auth endpoints ──────────────────────────────────────────────────────
+
+    async def auth_register(request):
+        ip = _get_ip(request)
+        if _sliding_window(_rate_co, ip, _CO_WINDOW, _CO_MAX):
+            return web.Response(status=429, text='Too many requests.')
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+        username = (body.get('username') or '').strip()
+        email    = (body.get('email') or '').strip()
+        password = body.get('password') or ''
+        confirm  = body.get('confirm') or ''
+        if password != confirm:
+            return web.json_response({'ok': False, 'msg': 'Passwords do not match.'}, status=422)
+        from utils.auth import register_user, send_verification_email
+        ok, msg, uid = register_user(username, email, password)
+        if not ok:
+            return web.json_response({'ok': False, 'msg': msg}, status=422)
+        # Send verification email
+        try:
+            await send_verification_email(email, msg)  # msg is the verify code on success
+        except Exception as e:
+            logger.error(f'Failed to send verify email: {e}')
+        return web.json_response({'ok': True, 'msg': 'Account created! Check your email for a verification code.'})
+
+    async def auth_verify(request):
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+        email = (body.get('email') or '').strip()
+        code  = (body.get('code') or '').strip()
+        from utils.auth import verify_email
+        ok, msg = verify_email(email, code)
+        return web.json_response({'ok': ok, 'msg': msg}, status=200 if ok else 422)
+
+    async def auth_login(request):
+        ip = _get_ip(request)
+        if _sliding_window(_rate_co, ip, _CO_WINDOW, _CO_MAX):
+            return web.Response(status=429, text='Too many requests.')
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+        email    = (body.get('email') or '').strip()
+        password = body.get('password') or ''
+        from utils.auth import login_user
+        ok, msg, token = login_user(email, password)
+        if not ok:
+            return web.json_response({'ok': False, 'msg': msg}, status=401)
+        return web.json_response({'ok': True, 'username': msg, 'token': token})
+
+    async def auth_forgot(request):
+        ip = _get_ip(request)
+        if _sliding_window(_rate_co, ip, _CO_WINDOW, _CO_MAX):
+            return web.Response(status=429, text='Too many requests.')
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+        email = (body.get('email') or '').strip()
+        from utils.auth import request_password_reset, send_reset_email
+        ok, msg, code = request_password_reset(email)
+        if code:
+            try:
+                await send_reset_email(email, code)
+            except Exception as e:
+                logger.error(f'Failed to send reset email: {e}')
+        return web.json_response({'ok': True, 'msg': 'If that email exists, a reset code has been sent.'})
+
+    async def auth_reset(request):
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+        email    = (body.get('email') or '').strip()
+        code     = (body.get('code') or '').strip()
+        password = body.get('password') or ''
+        from utils.auth import reset_password
+        ok, msg = reset_password(email, code, password)
+        return web.json_response({'ok': ok, 'msg': msg}, status=200 if ok else 422)
+
+    async def auth_me(request):
+        auth_header = request.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return web.json_response({'ok': False}, status=401)
+        from utils.auth import verify_token, get_user_by_id
+        data = verify_token(auth_header[7:])
+        if not data:
+            return web.json_response({'ok': False}, status=401)
+        user = get_user_by_id(data['uid'])
+        if not user:
+            return web.json_response({'ok': False}, status=401)
+        return web.json_response({'ok': True, 'user': user})
+
+    app.router.add_post('/api/auth/register', auth_register)
+    app.router.add_post('/api/auth/verify',   auth_verify)
+    app.router.add_post('/api/auth/login',    auth_login)
+    app.router.add_post('/api/auth/forgot',   auth_forgot)
+    app.router.add_post('/api/auth/reset',    auth_reset)
+    app.router.add_get('/api/auth/me',        auth_me)
+
+    # ── Live Support Relay ──────────────────────────────────────────────────
+
+    async def support_open(request):
+        ip = _get_ip(request)
+        if _sliding_window(_rate_co, ip, _CO_WINDOW, _CO_MAX):
+            return web.Response(status=429, text='Too many requests.')
+        try:
+            body = await request.json()
+        except Exception:
+            body = {}
+        username = (body.get('username') or 'Guest').strip()[:20]
+        from utils.support_relay import create_web_ticket
+        ticket = await create_web_ticket(username)
+        if not ticket:
+            return web.json_response({'ok': False, 'msg': 'Could not create ticket. Try Discord.'}, status=503)
+        return web.json_response({'ok': True, 'ticket_id': ticket.ticket_id})
+
+    async def support_send(request):
+        try:
+            body = await request.json()
+        except Exception:
+            return web.Response(status=400, text='Invalid JSON')
+        ticket_id = body.get('ticket_id', '')
+        text = (body.get('text') or '').strip()[:1000]
+        if not ticket_id or not text:
+            return web.Response(status=422, text='ticket_id and text required')
+        from utils.support_relay import send_user_message
+        ok = await send_user_message(ticket_id, text)
+        return web.json_response({'ok': ok})
+
+    async def support_poll(request):
+        ticket_id = request.rel_url.query.get('ticket_id', '')
+        try:
+            since = int(request.rel_url.query.get('since', 0))
+        except (ValueError, TypeError):
+            since = 0
+        from utils.support_relay import poll_staff_messages
+        msgs = poll_staff_messages(ticket_id, since)
+        return web.json_response(msgs)
+
+    async def support_close(request):
+        try:
+            body = await request.json()
+        except Exception:
+            body = {}
+        ticket_id = body.get('ticket_id', '')
+        from utils.support_relay import close_web_ticket
+        await close_web_ticket(ticket_id)
+        return web.json_response({'ok': True})
+
+    app.router.add_post('/api/support/open',  support_open)
+    app.router.add_post('/api/support/send',  support_send)
+    app.router.add_get('/api/support/poll',   support_poll)
+    app.router.add_post('/api/support/close', support_close)
 
     # Bot API routes
     app.router.add_get('/health',        health)

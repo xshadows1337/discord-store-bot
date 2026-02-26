@@ -1412,34 +1412,8 @@
     }
     setTimeout(()=>{ pollEvents(); setInterval(pollEvents, 8000); }, 5000);
 
-    // ── VPN CHECK (client-side mid-session guard) ────────────────────────────
-    async function checkVPN(){
-      try{
-        const r = await fetch('/api/vpn-check');
-        if(!r.ok) return;
-        const d = await r.json();
-        if(d.blocked){
-          document.body.innerHTML = `
-<div style="position:fixed;inset:0;background:#000;z-index:99999;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem;font-family:Arial,sans-serif;color:#fff;">
-  <div style="font-size:2rem;font-weight:900;margin:2.5rem 0 2rem;">ABYSS<span style="background:#ff9000;color:#000;border-radius:4px;padding:2px 10px 3px;margin-left:3px;">HUB</span></div>
-  <div style="max-width:620px;width:100%;">
-    <h1 style="font-size:1.4rem;font-weight:900;margin-bottom:1.5rem;text-align:center;">ACCESS RESTRICTED &mdash; VPN DETECTED</h1>
-    <div style="width:100%;max-width:380px;margin:0 auto 2rem;border:2px solid #333;border-radius:4px;background:#0a0a0a;display:flex;align-items:center;justify-content:center;height:180px;font-size:4rem;opacity:.3;">&#128683;</div>
-    <div style="display:flex;flex-direction:column;gap:.75rem;align-items:center;margin-bottom:2rem;">
-      <div style="background:#ff9000;color:#000;border-radius:4px;padding:.7rem 2.5rem;font-size:.95rem;font-weight:900;width:260px;text-align:center;">Notice to Users</div>
-      <div style="background:transparent;color:#fff;border:2px solid #ff9000;border-radius:4px;padding:.7rem 2.5rem;font-size:.95rem;font-weight:700;width:260px;text-align:center;">Why Am I Blocked?</div>
-    </div>
-    <p style="color:#ccc;font-size:.88rem;line-height:1.75;margin-bottom:1rem;">Dear user,</p>
-    <p style="color:#ccc;font-size:.88rem;line-height:1.75;margin-bottom:1rem;">We have detected that you are accessing AbyssHUB through a <strong>VPN, proxy, or anonymizing network</strong>. Please disable your VPN and reload the page.</p>
-    <p style="color:#ccc;font-size:.88rem;line-height:1.75;">If you believe this is an error, <a href="https://discord.gg/Y69UbMUEfu" style="color:#ff9000;">contact us on Discord</a>.</p>
-  </div>
-  <div style="margin-top:3rem;color:#333;font-size:.72rem;">&copy; 2026 AbyssHUB &mdash; All rights reserved.</div>
-</div>`;
-        }
-      } catch{}
-    }
-    checkVPN();
-    setInterval(checkVPN, 30000);
+    // ── VPN CHECK (disabled) ────────────────────────────────────────────────
+    // checkVPN(); — currently disabled
 
     // ── AGE GATE ──────────────────────────────────────────────────────────────
     (function(){
