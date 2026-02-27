@@ -454,6 +454,7 @@
       .chat-input-row { padding:.5rem .65rem .6rem; }
       #chat-input { font-size:.76rem; padding:.38rem .75rem; }
       #chat-send { width:30px; height:30px; }
+      #chat-attach { width:26px; height:26px; }
       .chat-head { padding:.6rem .75rem; }
       .chat-head-avatar { width:30px; height:30px; font-size:.7rem; }
       .chat-head-name { font-size:.78rem; }
@@ -670,6 +671,19 @@
     #chat-send { background:var(--orange); border:none; border-radius:50%; width:32px; height:32px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s; }
     #chat-send:hover { background:var(--orange2); }
     #chat-send svg { width:15px; height:15px; fill:#000; }
+    #chat-attach { background:transparent; border:none; color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center; width:28px; height:28px; flex-shrink:0; border-radius:50%; transition:color .15s,background .15s; padding:0; }
+    #chat-attach:hover { color:var(--orange); background:rgba(255,144,0,.08); }
+    #chat-attach svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    #chat-attach.has-file { color:var(--orange); }
+    .chat-file-preview { display:none; align-items:center; gap:.4rem; padding:.3rem .85rem .15rem; font-size:.72rem; color:var(--muted); border-top:1px solid var(--border); overflow:hidden; }
+    .chat-file-preview.visible { display:flex; }
+    .chat-file-preview svg { flex-shrink:0; stroke:var(--orange); }
+    .chat-file-preview-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text); }
+    .chat-file-preview-size { color:var(--muted); flex-shrink:0; font-size:.68rem; }
+    #chat-file-clear { background:none; border:none; color:var(--muted); cursor:pointer; font-size:1rem; line-height:1; flex-shrink:0; padding:0 2px; transition:color .15s; }
+    #chat-file-clear:hover { color:#e63946; }
+    .chat-msg img { max-width:180px; max-height:140px; border-radius:6px; display:block; cursor:pointer; margin-top:2px; }
+    .chat-msg video { max-width:200px; max-height:130px; border-radius:6px; display:block; margin-top:2px; }
 
     /* ── AUTH MODALS ─────────────────────────────────────────────────────── */
     .auth-overlay { display:none; position:fixed; inset:0; z-index:1500; background:rgba(0,0,0,.85); align-items:center; justify-content:center; padding:1rem; }
@@ -3205,6 +3219,42 @@
     const suggestions = document.querySelectorAll('.chat-suggestion');
 
     let opened = false;
+    let _attachedFile = null;
+    const _fileInput    = document.getElementById('chat-file-input');
+    const _filePreview  = document.getElementById('chat-file-preview');
+    const _fileNameEl   = document.getElementById('chat-file-name');
+    const _fileSizeEl   = document.getElementById('chat-file-size');
+    const _MAX_FILE     = 200 * 1024 * 1024; // 200 MB
+
+    function _fmtBytes(b){ if(b<1024) return b+'B'; if(b<1048576) return (b/1024).toFixed(1)+'KB'; return (b/1048576).toFixed(1)+'MB'; }
+    function clearAttachment(){
+      _attachedFile = null;
+      _fileInput.value = '';
+      _filePreview.classList.remove('visible');
+      document.getElementById('chat-attach').classList.remove('has-file');
+    }
+    document.getElementById('chat-attach').addEventListener('click', ()=> _fileInput.click());
+    document.getElementById('chat-file-clear').addEventListener('click', clearAttachment);
+    _fileInput.addEventListener('change', ()=>{
+      const f = _fileInput.files[0];
+      if(!f) return;
+      if(f.size > _MAX_FILE){ appendMsg('⚠️ File too large — max 200MB. Please choose a smaller file.','bot'); _fileInput.value=''; return; }
+      _attachedFile = f;
+      _fileNameEl.textContent = f.name;
+      _fileSizeEl.textContent = _fmtBytes(f.size);
+      _filePreview.classList.add('visible');
+      document.getElementById('chat-attach').classList.add('has-file');
+    });
+    function renderAttachmentInChat(file){
+      const url = URL.createObjectURL(file);
+      let html;
+      if(file.type.startsWith('image/')){
+        html = `<img src="${url}" alt="${file.name}" onclick="window.open('${url}')">` ;
+      } else {
+        html = `<video src="${url}" controls></video>`;
+      }
+      appendMsg(html, 'user');
+    }
 
     function scrollBottom(){ msgs.scrollTop = msgs.scrollHeight; }
 
@@ -3235,10 +3285,17 @@
 
     function send(){
       const q = input.value.trim();
-      if(!q) return;
-      appendMsg(q, 'user');
+      const file = _attachedFile;
+      if(!q && !file) return;
+      if(q) appendMsg(q, 'user');
+      if(file) renderAttachmentInChat(file);
       input.value = '';
-      botReply(getBotReply(q));
+      clearAttachment();
+      if(file && !q){
+        botReply('Our bot can\'t analyze attachments, but staff can! Tap <strong>💬 Talk to Staff</strong> below to send this to a real person.');
+      } else {
+        botReply(getBotReply(q));
+      }
     }
 
     function openChat(){
@@ -3370,10 +3427,21 @@
     send = function(){
       if(_liveMode && _liveTicketId){
         const q = input.value.trim();
-        if(!q) return;
-        appendMsg(q, 'user');
+        const file = _attachedFile;
+        if(!q && !file) return;
+        if(q) appendMsg(q, 'user');
+        if(file) renderAttachmentInChat(file);
         input.value = '';
-        fetch('/api/support/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket_id:_liveTicketId,text:q})}).catch(()=>{});
+        clearAttachment();
+        if(file){
+          const fd = new FormData();
+          fd.append('ticket_id', _liveTicketId);
+          if(q) fd.append('text', q);
+          fd.append('file', file);
+          fetch('/api/support/send-file', {method:'POST', body:fd}).catch(()=>{});
+        } else {
+          fetch('/api/support/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket_id:_liveTicketId,text:q})}).catch(()=>{});
+        }
       } else {
         _origSend();
       }
@@ -3404,7 +3472,17 @@
       <button class="chat-suggestion" id="chat-staff-btn" style="border-color:var(--orange);color:var(--orange);">💬 Talk to Staff</button>
     </div>
     <div class="chat-char-count" id="chat-char-count"></div>
+    <div class="chat-file-preview" id="chat-file-preview">
+      <svg viewBox="0 0 24 24" width="13" height="13"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l8.57-8.57A4 4 0 0118 8.84L9.41 17.41A2 2 0 016.59 14.6L15.17 6"/></svg>
+      <span class="chat-file-preview-name" id="chat-file-name"></span>
+      <span class="chat-file-preview-size" id="chat-file-size"></span>
+      <button id="chat-file-clear" title="Remove attachment">&#215;</button>
+    </div>
     <div class="chat-input-row">
+      <input type="file" id="chat-file-input" accept="image/*,video/*" style="display:none">
+      <button id="chat-attach" title="Attach image or video (max 200MB)">
+        <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l8.57-8.57A4 4 0 0118 8.84L9.41 17.41A2 2 0 016.59 14.6L15.17 6"/></svg>
+      </button>
       <input type="text" id="chat-input" placeholder="Ask anything…" autocomplete="off" maxlength="200" oninput="updateChatCount()"/>
       <button id="chat-send">
         <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>

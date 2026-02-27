@@ -141,6 +141,29 @@ async def send_user_message(ticket_id: str, text: str) -> bool:
         logger.error(f'[RELAY] Failed to send user message: {e}')
         return False
 
+async def send_user_file_url(ticket_id: str, url: str, filename: str, text: str = '') -> bool:
+    """Post an attachment URL to the Discord ticket channel."""
+    ticket = _tickets.get(ticket_id)
+    if not ticket or ticket.closed or not ticket.channel_id or not _discord_client:
+        return False
+    try:
+        channel = _discord_client.get_channel(ticket.channel_id)
+        if not channel:
+            return False
+        import discord as _d
+        parts = []
+        if text:
+            parts.append(text)
+        parts.append(f'📎 [{filename}]({url})')
+        embed = _d.Embed(color=0xFF9000, description='\n'.join(parts))
+        embed.set_author(name=f'🌐 {ticket.username}')
+        embed.set_footer(text='Website Chat — Attachment')
+        await channel.send(embed=embed)
+        return True
+    except Exception as e:
+        logger.error(f'[RELAY] Failed to send file url: {e}')
+        return False
+
 # ── Receive staff message (called from bot on_message) ───────────────────────
 
 def push_staff_message(channel_id: int, author: str, text: str):

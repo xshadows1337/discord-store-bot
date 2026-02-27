@@ -3,6 +3,7 @@ import hashlib
 import hmac
 import json
 import os
+import re
 import secrets as _secrets
 import sqlite3 as _sql
 import time
@@ -1126,6 +1127,54 @@ async def start_api_server(secret: str, port: int = 8080):
             return web.json_response({'ok': False, 'msg': 'Could not create ticket. Try Discord.'}, status=503)
         return web.json_response({'ok': True, 'ticket_id': ticket.ticket_id})
 
+    async def support_send_file(request):
+        """Accept multipart upload (ticket_id, optional text, file) → save to /data/uploads/ → post URL to Discord."""
+        _MAX_UPLOAD = 200 * 1024 * 1024  # 200 MB
+        _ALLOWED_TYPES = ('image/', 'video/')
+        try:
+            reader = await request.multipart()
+        except Exception:
+            return web.Response(status=400, text='Expected multipart/form-data')
+        ticket_id = ''
+        text = ''
+        file_bytes = None
+        file_name = 'upload'
+        content_type = ''
+        async for field in reader:
+            if field.name == 'ticket_id':
+                ticket_id = (await field.read()).decode('utf-8', errors='replace').strip()
+            elif field.name == 'text':
+                text = (await field.read()).decode('utf-8', errors='replace').strip()[:1000]
+            elif field.name == 'file':
+                file_name = getattr(field, 'filename', None) or 'upload'
+                content_type = field.content_type or ''
+                if not any(content_type.startswith(t) for t in _ALLOWED_TYPES):
+                    return web.Response(status=422, text='Only image and video files are accepted')
+                chunks = []
+                total = 0
+                while True:
+                    chunk = await field.read_chunk(65536)
+                    if not chunk:
+                        break
+                    total += len(chunk)
+                    if total > _MAX_UPLOAD:
+                        return web.Response(status=413, text='File too large (max 200MB)')
+                    chunks.append(chunk)
+                file_bytes = b''.join(chunks)
+        if not ticket_id or file_bytes is None:
+            return web.Response(status=422, text='ticket_id and file are required')
+        upload_dir = _DATA_DIR / 'uploads'
+        upload_dir.mkdir(parents=True, exist_ok=True)
+        uid = uuid.uuid4().hex[:14]
+        safe_name = re.sub(r'[^\w.\-]', '_', file_name)[:80]
+        saved = upload_dir / f'{uid}_{safe_name}'
+        saved.write_bytes(file_bytes)
+        base = str(request.url.origin())
+        file_url = f'{base}/uploads/{uid}_{safe_name}'
+        from utils.support_relay import send_user_file_url
+        ok = await send_user_file_url(ticket_id, file_url, safe_name, text)
+        return web.json_response({'ok': ok, 'url': file_url})
+
     async def support_send(request):
         try:
             body = await request.json()
@@ -1159,10 +1208,15 @@ async def start_api_server(secret: str, port: int = 8080):
         await close_web_ticket(ticket_id)
         return web.json_response({'ok': True})
 
-    app.router.add_post('/api/support/open',  support_open)
-    app.router.add_post('/api/support/send',  support_send)
-    app.router.add_get('/api/support/poll',   support_poll)
-    app.router.add_post('/api/support/close', support_close)
+    app.router.add_post('/api/support/open',      support_open)
+    app.router.add_post('/api/support/send',      support_send)
+    app.router.add_post('/api/support/send-file', support_send_file)
+    app.router.add_get('/api/support/poll',       support_poll)
+    app.router.add_post('/api/support/close',     support_close)
+    # Serve uploaded files
+    _upload_dir = _DATA_DIR / 'uploads'
+    _upload_dir.mkdir(parents=True, exist_ok=True)
+    app.router.add_static('/uploads/', path=str(_upload_dir), name='uploads', show_index=False)
 
     # Bot API routes
     app.router.add_get('/health',        health)
