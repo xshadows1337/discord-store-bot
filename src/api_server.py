@@ -168,7 +168,7 @@ def _is_rate_limited(ip: str) -> bool:
 
 # ── Live visitors tracking (in-memory) ───────────────────────────────────────
 _visitors: dict[str, float] = {}   # sid → last_ping_time
-_VISITOR_TTL = 45  # seconds before a session is considered gone
+_VISITOR_TTL = 35  # seconds before a session is considered gone
 
 def _prune_visitors():
     cutoff = time.time() - _VISITOR_TTL

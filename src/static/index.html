@@ -2651,16 +2651,32 @@
 
   <script>
     const liveEl=document.getElementById('live-user-count');
-    let _sid=null;
+    // Persist sid in sessionStorage so a same-tab refresh reuses the same slot
+    // (sessionStorage is cleared when the tab is closed, not on refresh)
+    let _sid = sessionStorage.getItem('abysshub_sid') || null;
     async function pingVisitor(){
       try{
         const r=await fetch('/api/visitors/ping',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid:_sid})});
-        const d=await r.json(); _sid=d.sid; liveEl.textContent=d.count;
+        const d=await r.json();
+        _sid=d.sid;
+        sessionStorage.setItem('abysshub_sid', _sid);
+        liveEl.textContent=d.count;
         const sv=document.getElementById('stat-visitors'); if(sv) sv.textContent=d.count;
       }catch{}
     }
-    pingVisitor(); setInterval(pingVisitor,20000);
-    window.addEventListener('beforeunload',()=>{ if(_sid)navigator.sendBeacon('/api/visitors/leave',new Blob([JSON.stringify({sid:_sid})],{type:'application/json'})); });
+    function sendLeave(){
+      if(!_sid) return;
+      navigator.sendBeacon('/api/visitors/leave',new Blob([JSON.stringify({sid:_sid})],{type:'application/json'}));
+    }
+    pingVisitor();
+    setInterval(pingVisitor, 20000);
+    // beforeunload: fires on desktop refresh/close
+    window.addEventListener('beforeunload', sendLeave);
+    // visibilitychange: fires reliably on mobile when user switches away or closes tab
+    document.addEventListener('visibilitychange', ()=>{
+      if(document.visibilityState === 'hidden') sendLeave();
+      else pingVisitor(); // re-ping immediately when coming back
+    });
   </script>
 
   <!-- AI SUPPORT CHAT JS -->
