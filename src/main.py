@@ -1,3 +1,4 @@
+import asyncio
 import os
 import hashlib
 import discord
@@ -123,14 +124,6 @@ class aclient(discord.Client):
         from commands.tickets.views.ticket_channel_view import TicketChannelView
         self.add_view(TicketPanelView())
         self.add_view(TicketChannelView())
-        # Start the web/API server immediately on bot startup
-        api_secret = os.environ.get('BOT_API_SECRET') or config.get('bot_api_secret', '')
-        api_port = int(os.environ.get('PORT', 8080))
-        if api_secret:
-            from api_server import start_api_server
-            await start_api_server(api_secret, api_port)
-        else:
-            logger.warning("BOT_API_SECRET not set — API server disabled")
 
     async def on_message(self, message: discord.Message):
         """Forward staff replies in web-ticket channels to the support relay."""
@@ -338,4 +331,32 @@ client = aclient()
 tree = app_commands.CommandTree(client)
 commandHandler = CommandHander(
     client, tree, config)
-client.run(config['bot_token'])
+
+async def runner():
+    # Start the API server first so the website is up even if Discord 429s
+    api_secret = os.environ.get('BOT_API_SECRET') or config.get('bot_api_secret', '')
+    api_port = int(os.environ.get('PORT', 8080))
+    if api_secret:
+        from api_server import start_api_server
+        await start_api_server(api_secret, api_port)
+    else:
+        logger.warning("BOT_API_SECRET not set — API server disabled")
+
+    # Connect to Discord with exponential backoff on rate-limit (429)
+    import discord as _discord
+    delay = 10
+    while True:
+        try:
+            await client.start(config['bot_token'])
+            break
+        except _discord.errors.HTTPException as e:
+            if e.status == 429:
+                logger.warning(f"Discord login rate-limited (429). Retrying in {delay}s...")
+                await asyncio.sleep(delay)
+                delay = min(delay * 2, 300)  # cap at 5 minutes
+            else:
+                raise
+        except Exception:
+            raise
+
+asyncio.run(runner())
