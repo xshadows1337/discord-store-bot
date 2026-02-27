@@ -684,6 +684,10 @@
     #chat-file-clear:hover { color:#e63946; }
     .chat-msg img { max-width:180px; max-height:140px; border-radius:6px; display:block; cursor:pointer; margin-top:2px; }
     .chat-msg video { max-width:200px; max-height:130px; border-radius:6px; display:block; margin-top:2px; }
+    #chat-screenshot-btn { display:none; align-items:center; gap:.3rem; background:rgba(255,144,0,.12); border:1px solid rgba(255,144,0,.35); color:var(--orange); border-radius:12px; padding:.22rem .6rem; font-size:.68rem; font-weight:700; cursor:pointer; font-family:inherit; transition:background .15s,border-color .15s; white-space:nowrap; margin-left:.3rem; flex-shrink:0; }
+    #chat-screenshot-btn svg { width:11px; height:11px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+    #chat-screenshot-btn:hover { background:rgba(255,144,0,.22); border-color:var(--orange); }
+    #chat-screenshot-btn.active { background:rgba(61,220,132,.12); border-color:#3ddc84; color:#3ddc84; cursor:default; }
 
     /* ── AUTH MODALS ─────────────────────────────────────────────────────── */
     .auth-overlay { display:none; position:fixed; inset:0; z-index:1500; background:rgba(0,0,0,.85); align-items:center; justify-content:center; padding:1rem; }
@@ -3350,6 +3354,7 @@
       document.getElementById('chat-staff-btn').textContent = '🔴 End Chat';
       document.getElementById('chat-staff-btn').style.borderColor = '#e63946';
       document.getElementById('chat-staff-btn').style.color = '#e63946';
+      document.getElementById('chat-screenshot-btn').style.display = 'flex';
     }
 
     function exitLiveMode(){
@@ -3364,6 +3369,11 @@
       document.getElementById('chat-staff-btn').textContent = '💬 Talk to Staff';
       document.getElementById('chat-staff-btn').style.borderColor = 'var(--orange)';
       document.getElementById('chat-staff-btn').style.color = 'var(--orange)';
+      const ssBtn = document.getElementById('chat-screenshot-btn');
+      ssBtn.style.display = 'none';
+      ssBtn.disabled = false;
+      ssBtn.classList.remove('active');
+      ssBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/></svg> Share Screen';
     }
 
     async function connectToStaff(){
@@ -3422,6 +3432,59 @@
       connectToStaff();
     });
 
+
+    // ── Screenshot capture & send ─────────────────────────────────────
+    document.getElementById('chat-screenshot-btn').addEventListener('click', async ()=>{
+      if(!_liveTicketId) return;
+      if(!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia){
+        appendMsg('Screen sharing is not supported in this browser. Try Chrome or Edge.','bot'); return;
+      }
+      const btn = document.getElementById('chat-screenshot-btn');
+      btn.disabled = true;
+      btn.classList.add('active');
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/></svg> Capturing\u2026';
+      let stream = null;
+      try{
+        stream = await navigator.mediaDevices.getDisplayMedia({video:{cursor:'always'}, audio:false});
+        const track = stream.getVideoTracks()[0];
+        let blob;
+        if(typeof ImageCapture !== 'undefined'){
+          const ic = new ImageCapture(track);
+          const bmp = await ic.grabFrame();
+          const cnv = document.createElement('canvas');
+          cnv.width = bmp.width; cnv.height = bmp.height;
+          cnv.getContext('2d').drawImage(bmp, 0, 0);
+          blob = await new Promise(r => cnv.toBlob(r, 'image/png'));
+        } else {
+          const vid = document.createElement('video');
+          vid.srcObject = stream; vid.muted = true;
+          await new Promise(r =>{ vid.onloadedmetadata = r; vid.play(); });
+          await new Promise(r => setTimeout(r, 200));
+          const cnv = document.createElement('canvas');
+          cnv.width = vid.videoWidth; cnv.height = vid.videoHeight;
+          cnv.getContext('2d').drawImage(vid, 0, 0);
+          blob = await new Promise(r => cnv.toBlob(r, 'image/png'));
+        }
+        track.stop(); stream = null;
+        const previewUrl = URL.createObjectURL(blob);
+        appendMsg(`<img src="${previewUrl}" alt="screenshot" onclick="window.open('${previewUrl}')">`, 'user');
+        const fd = new FormData();
+        fd.append('ticket_id', _liveTicketId);
+        fd.append('text', '📸 Screenshot from user');
+        fd.append('file', blob, 'screenshot.png');
+        const resp = await fetch('/api/support/send-file', {method:'POST', body:fd});
+        const data = await resp.json();
+        if(!data.ok) appendMsg('Screenshot upload failed. Try the attach button instead.','bot');
+      } catch(e){
+        if(stream) stream.getTracks().forEach(t=>t.stop());
+        if(!e || e.name !== 'NotAllowedError') appendMsg('Could not capture screen. Please try again.','bot');
+      } finally{
+        btn.disabled = false;
+        btn.classList.remove('active');
+        btn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/></svg> Share Screen';
+      }
+    });
+
     // Override send() to route through live relay when active
     const _origSend = send;
     send = function(){
@@ -3461,6 +3524,10 @@
         <div class="chat-head-status" id="chat-head-status">Online &mdash; instant replies</div>
       </div>
       <button class="chat-head-close" id="chat-close">&times;</button>
+      <button id="chat-screenshot-btn" title="Capture your screen and send to staff">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/></svg>
+        Share Screen
+      </button>
     </div>
     <div class="chat-messages" id="chat-messages"></div>
     <div class="chat-suggestions" id="chat-suggestions">
