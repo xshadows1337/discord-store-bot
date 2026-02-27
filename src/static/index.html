@@ -3237,7 +3237,13 @@
       _filePreview.classList.remove('visible');
       document.getElementById('chat-attach').classList.remove('has-file');
     }
-    document.getElementById('chat-attach').addEventListener('click', ()=> _fileInput.click());
+    document.getElementById('chat-attach').addEventListener('click', ()=>{
+      if(!localStorage.getItem('abysshub_token')){
+        appendMsg('You must be <strong>logged in</strong> to send attachments. Please <button onclick="window.openAuthModal()" style="background:none;border:none;color:var(--orange);cursor:pointer;font-family:inherit;font-size:inherit;padding:0;text-decoration:underline;">create an account or login</button> first.', 'bot');
+        return;
+      }
+      _fileInput.click();
+    });
     document.getElementById('chat-file-clear').addEventListener('click', clearAttachment);
     _fileInput.addEventListener('change', ()=>{
       const f = _fileInput.files[0];
@@ -3436,6 +3442,10 @@
     // ── Screenshot capture & send ─────────────────────────────────────
     document.getElementById('chat-screenshot-btn').addEventListener('click', async ()=>{
       if(!_liveTicketId) return;
+      if(!localStorage.getItem('abysshub_token')){
+        appendMsg('You must be <strong>logged in</strong> to share your screen. Please <button onclick="window.openAuthModal()" style="background:none;border:none;color:var(--orange);cursor:pointer;font-family:inherit;font-size:inherit;padding:0;text-decoration:underline;">create an account or login</button> first.', 'bot');
+        return;
+      }
       if(!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia){
         appendMsg('Screen sharing is not supported in this browser. Try Chrome or Edge.','bot'); return;
       }
