@@ -18,6 +18,24 @@ import secrets
 from dataclasses import dataclass, field
 from loguru import logger
 
+# ── Retry helper ──────────────────────────────────────────────────────────────
+
+async def _discord_retry(coro_fn, *args, retries=4, base_delay=5, **kwargs):
+    """Call an async discord operation, retrying on 429 with exponential backoff."""
+    import discord as _d
+    delay = base_delay
+    for attempt in range(retries):
+        try:
+            return await coro_fn(*args, **kwargs)
+        except _d.errors.HTTPException as e:
+            if e.status == 429 and attempt < retries - 1:
+                logger.warning(f'[RELAY] Discord 429 on attempt {attempt+1}, retrying in {delay}s...')
+                await asyncio.sleep(delay)
+                delay = min(delay * 2, 60)
+            else:
+                raise
+    return None
+
 # ── Types ─────────────────────────────────────────────────────────────────────
 
 @dataclass
@@ -87,7 +105,8 @@ async def create_web_ticket(username: str = 'Guest') -> WebTicket | None:
         ticket_category = guild.get_channel(1476294089703034900)
 
         channel_name = f"web-{username.lower()[:12]}-{ticket_id[:6]}"
-        channel = await guild.create_text_channel(
+        channel = await _discord_retry(
+            guild.create_text_channel,
             name=channel_name,
             overwrites=overwrites,
             category=ticket_category,
@@ -101,18 +120,18 @@ async def create_web_ticket(username: str = 'Guest') -> WebTicket | None:
         # Send initial embed
         import discord as _d
         embed = _d.Embed(color=0xFF9000, timestamp=__import__('datetime').datetime.utcnow())
-        embed.set_author(name="🌐 Website Live Chat")
+        embed.set_author(name="\U0001f310 Website Live Chat")
         embed.title = "New Website Support Ticket"
         embed.description = (
             f"**User:** {username}\n"
-            f"**Source:** Website AI Chat → Talk to Staff\n"
+            f"**Source:** Website AI Chat \u2192 Talk to Staff\n"
             f"**Ticket ID:** `{ticket_id}`\n\n"
             f"Messages from the website user will appear here.\n"
-            f"Reply normally — your messages will be sent back to the user's browser in real-time.\n"
+            f"Reply normally \u2014 your messages will be sent back to the user's browser in real-time.\n"
             f"\u200b"
         )
-        embed.set_footer(text="AbyssHub • Website Live Chat Relay")
-        await channel.send(embed=embed)
+        embed.set_footer(text="AbyssHub \u2022 Website Live Chat Relay")
+        await _discord_retry(channel.send, embed=embed)
 
         logger.info(f'[RELAY] Web ticket {ticket_id} created → #{channel_name}')
         return ticket
@@ -133,9 +152,9 @@ async def send_user_message(ticket_id: str, text: str) -> bool:
             return False
         import discord as _d
         embed = _d.Embed(color=0xFF9000, description=text)
-        embed.set_author(name=f"🌐 {ticket.username}")
+        embed.set_author(name=f"\U0001f310 {ticket.username}")
         embed.set_footer(text="Website Chat")
-        await channel.send(embed=embed)
+        await _discord_retry(channel.send, embed=embed)
         return True
     except Exception as e:
         logger.error(f'[RELAY] Failed to send user message: {e}')
@@ -156,9 +175,9 @@ async def send_user_file_url(ticket_id: str, url: str, filename: str, text: str 
             parts.append(text)
         parts.append(f'📎 [{filename}]({url})')
         embed = _d.Embed(color=0xFF9000, description='\n'.join(parts))
-        embed.set_author(name=f'🌐 {ticket.username}')
-        embed.set_footer(text='Website Chat — Attachment')
-        await channel.send(embed=embed)
+        embed.set_author(name=f'\U0001f310 {ticket.username}')
+        embed.set_footer(text='Website Chat \u2014 Attachment')
+        await _discord_retry(channel.send, embed=embed)
         return True
     except Exception as e:
         logger.error(f'[RELAY] Failed to send file url: {e}')
