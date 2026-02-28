@@ -117,21 +117,23 @@ async def create_web_ticket(username: str = 'Guest') -> WebTicket | None:
         ticket.channel_id = channel.id
         _channel_to_ticket[channel.id] = ticket_id
 
-        # Send initial embed
+        # Send initial embed (matches Discord ticket style)
         import discord as _d
+        from commands.tickets.views.ticket_channel_view import TicketChannelView
         embed = _d.Embed(color=0xFF9000, timestamp=__import__('datetime').datetime.utcnow())
-        embed.set_author(name="\U0001f310 Website Live Chat")
-        embed.title = "New Website Support Ticket"
+        embed.set_author(name="\U0001f310  Website Live Chat")
+        embed.title = "Website Support Ticket Opened"
         embed.description = (
-            f"**User:** {username}\n"
-            f"**Source:** Website AI Chat \u2192 Talk to Staff\n"
-            f"**Ticket ID:** `{ticket_id}`\n\n"
-            f"Messages from the website user will appear here.\n"
-            f"Reply normally \u2014 your messages will be sent back to the user's browser in real-time.\n"
+            f"A user has connected via the website chat.\n"
+            f"Reply here \u2014 your messages appear in their browser in real-time.\n"
             f"\u200b"
         )
-        embed.set_footer(text="AbyssHub \u2022 Website Live Chat Relay")
-        await _discord_retry(channel.send, embed=embed)
+        embed.add_field(name="Opened by", value=username, inline=True)
+        embed.add_field(name="Source", value="\U0001f310\u2002Website Chat", inline=True)
+        embed.add_field(name="Status", value="\U0001f7e2\u2002Open", inline=True)
+        embed.add_field(name="Ticket ID", value=f"`{ticket_id}`", inline=True)
+        embed.set_footer(text="xShadows Shop  \u2022  Website Live Chat Relay")
+        await _discord_retry(channel.send, embed=embed, view=TicketChannelView(opener_id=0, category="website_chat"))
 
         logger.info(f'[RELAY] Web ticket {ticket_id} created → #{channel_name}')
         return ticket
