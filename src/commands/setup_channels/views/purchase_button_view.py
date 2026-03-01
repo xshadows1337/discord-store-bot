@@ -31,28 +31,8 @@ def build_store_embed():
     )
     embeds.append(header)
 
-    # ── One embed per product (with section separators) ──
-    # Products 0-4 are Abyss Hub; 5+ are other brands (Xbox, Steam)
-    _abyss_sep_added = False
-    _other_sep_added = False
-
+    # ── One embed per product ──
     for i, product in enumerate(product_list):
-        tags = product.get('tags', [])
-        is_abyss = 'abyss' in tags
-
-        # Insert section separator before Abyss Hub block
-        if is_abyss and not _abyss_sep_added:
-            sep = discord.Embed(colour=0x2B2D31)
-            sep.description = "─────────────────────────────────\n🎮  **Abyss Hub Steam Plugins**\n─────────────────────────────────"
-            embeds.append(sep)
-            _abyss_sep_added = True
-
-        # Insert section separator before non-Abyss Hub block
-        if not is_abyss and not _other_sep_added:
-            sep = discord.Embed(colour=0x2B2D31)
-            sep.description = "─────────────────────────────────\n🌐  **Other Products**\n─────────────────────────────────"
-            embeds.append(sep)
-            _other_sep_added = True
 
         stock       = linesInFile(product['product_file'])
         in_stock    = stock >= product.get('min_order_amount', 1)
@@ -117,6 +97,20 @@ class PaymentMethodDropdown(discord.ui.Select):
             )
         except Exception as e:
             logger.exception(f'PaymentMethodDropdown error: {e}')
+            try:
+                if interaction.response.is_done():
+                    await interaction.followup.send('Something went wrong. Please try again.', ephemeral=True)
+                else:
+                    await interaction.response.send_message('Something went wrong. Please try again.', ephemeral=True)
+            except Exception:
+                pass
+
+
+class PaymentMethodView(discord.ui.View):
+    """Ephemeral view shown after product selection — contains payment method dropdown."""
+    def __init__(self, productInfo):
+        super().__init__()
+        self.add_item(PaymentMethodDropdown(productInfo))
 
     async def on_error(self, interaction: discord.Interaction, error: Exception, item: discord.ui.Item):
         logger.exception(f'PaymentMethodView error on {item}: {error}')
@@ -127,13 +121,6 @@ class PaymentMethodDropdown(discord.ui.Select):
                 await interaction.response.send_message('Something went wrong. Please try again.', ephemeral=True)
         except Exception:
             pass
-
-
-class PaymentMethodView(discord.ui.View):
-    """Ephemeral view shown after product selection — contains payment method dropdown."""
-    def __init__(self, productInfo):
-        super().__init__()
-        self.add_item(PaymentMethodDropdown(productInfo))
 
 
 class ProductDropdown(discord.ui.Select):

@@ -88,7 +88,8 @@ class aclient(discord.Client):
             logger.info(f"Synced {len(synced_commands)} guild commands: {[c.name for c in synced_commands]}")
             self.synced = True
         print(f"Logged into bot account: {self.user}.")
-        self.checkPendingPayments.start()
+        if not self.checkPendingPayments.is_running():
+            self.checkPendingPayments.start()
         logger.success('All threads running.')
 
     async def on_member_remove(self, member: discord.Member):
