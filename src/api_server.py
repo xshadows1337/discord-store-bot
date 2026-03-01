@@ -289,6 +289,7 @@ async def start_api_server(secret: str, port: int = 8080):
                     'thumbnail_url':   p.get('thumbnail_url', ''),
                     'stock':           stock,
                     'new':             p.get('new', False),
+                    'tags':            p.get('tags', []),
                 })
             return safe
 

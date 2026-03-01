@@ -20,7 +20,7 @@ def build_store_embed():
     # ── Header ──
     header = discord.Embed(colour=0x5865F2)
     header.set_author(
-        name="ᴘᴏɪsᴏɴ.xʏᴢ",
+        name="ᴀʙʏss ʜᴜʙ",
         icon_url="https://cdn-icons-png.flaticon.com/512/3081/3081559.png"
     )
     header.description = (
@@ -30,8 +30,29 @@ def build_store_embed():
     )
     embeds.append(header)
 
-    # ── One embed per product ──
+    # ── One embed per product (with section separators) ──
+    # Products 0-4 are Abyss Hub; 5+ are other brands (Xbox, Steam)
+    _abyss_sep_added = False
+    _other_sep_added = False
+
     for i, product in enumerate(product_list):
+        tags = product.get('tags', [])
+        is_abyss = 'abyss' in tags
+
+        # Insert section separator before Abyss Hub block
+        if is_abyss and not _abyss_sep_added:
+            sep = discord.Embed(colour=0x2B2D31)
+            sep.description = "─────────────────────────────────\n🎮  **Abyss Hub Steam Plugins**\n─────────────────────────────────"
+            embeds.append(sep)
+            _abyss_sep_added = True
+
+        # Insert section separator before non-Abyss Hub block
+        if not is_abyss and not _other_sep_added:
+            sep = discord.Embed(colour=0x2B2D31)
+            sep.description = "─────────────────────────────────\n🌐  **Other Products**\n─────────────────────────────────"
+            embeds.append(sep)
+            _other_sep_added = True
+
         stock       = linesInFile(product['product_file'])
         in_stock    = stock >= product.get('min_order_amount', 1)
         color       = _PRODUCT_COLORS[i % len(_PRODUCT_COLORS)]
@@ -68,7 +89,7 @@ def build_store_embed():
         embeds.append(emb)
 
     # Footer + timestamp only on the last embed
-    embeds[-1].set_footer(text="ᴘᴏɪsᴏɴ.xʏᴢ  ·  Use the dropdown below to purchase")
+    embeds[-1].set_footer(text="ᴀʙʏss ʜᴜʙ  ·  Use the dropdown below to purchase")
     embeds[-1].timestamp = datetime.now()
 
     return embeds

@@ -975,6 +975,9 @@
       <a class="sidebar-link" href="#" onclick="filterCat(event,'steam');closeSidebar()">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Steam Accounts
       </a>
+      <a class="sidebar-link" href="#" onclick="filterCat(event,'abyss');closeSidebar()">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Abyss Hub Keys
+      </a>
       <a class="sidebar-link" href="#" onclick="filterCat(event,'external');closeSidebar()">
         <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>External Cheats
       </a>
@@ -1104,6 +1107,8 @@
       <span>&#8383; 100+ Crypto Coins Accepted</span>
       <span>&#128293; Xbox Gamepass Month &mdash; $10</span>
       <span>&#128421;&#65039; Steam FA Accounts &mdash; $0.20/ea</span>
+      <span>&#127894;&#65039; Abyss Hub Game Key &mdash; $2.99</span>
+      <span>&#127894;&#65039; Abyss Hub Lifetime Games Key &mdash; $49.99</span>
       <span>&#127920; Gambling Redeems In Stock</span>
       <span>24/7 Automated &mdash; No Middlemen</span>
       <span>&#9889; Instant Automated Delivery</span>
@@ -1111,6 +1116,8 @@
       <span>&#8383; 100+ Crypto Coins Accepted</span>
       <span>&#128293; Xbox Gamepass Month &mdash; $10</span>
       <span>&#128421;&#65039; Steam FA Accounts &mdash; $0.20/ea</span>
+      <span>&#127894;&#65039; Abyss Hub Game Key &mdash; $2.99</span>
+      <span>&#127894;&#65039; Abyss Hub Lifetime Games Key &mdash; $49.99</span>
       <span>&#127920; Gambling Redeems In Stock</span>
       <span>24/7 Automated &mdash; No Middlemen</span>
     </div>
@@ -1171,6 +1178,7 @@
       <a class="cat-pill" href="#" onclick="filterCat(event,'week')">&#128197; Week Pass</a>
       <a class="cat-pill" href="#" onclick="filterCat(event,'month')">&#128197; Month Pass</a>
       <a class="cat-pill" href="#" onclick="filterCat(event,'trial')">&#128226; Trial</a>
+      <a class="cat-pill" href="#" onclick="filterCat(event,'abyss')">&#127894;&#65039; Abyss Hub</a>
     </div>
     <button class="cat-arrow right" id="cat-arrow-right" onclick="catScroll(1)" aria-label="Scroll right">&#8250;</button>
   </div>
@@ -1593,6 +1601,7 @@
         <a href="#" onclick="filterCat(event,'xbox')">Xbox Keys</a>
         <a href="#" onclick="filterCat(event,'steam')">Steam Accounts</a>
         <a href="#" onclick="filterCat(event,'gambling')">Gambling Redeems</a>
+        <a href="#" onclick="filterCat(event,'abyss')">Abyss Hub Keys</a>
       </div>
       <div class="footer-col">
         <h4>Support</h4>
@@ -1621,6 +1630,7 @@
       <a href="#" onclick="filterCat(event,'external')">Cheats</a>
       <a href="#" onclick="filterCat(event,'xbox')">Xbox</a>
       <a href="#" onclick="filterCat(event,'steam')">Steam</a>
+      <a href="#" onclick="filterCat(event,'abyss')">Abyss Hub</a>
       <a href="https://discord.gg/Y69UbMUEfu" target="_blank" rel="noopener">Discord</a>
     </div>
     <div class="footer-bottom">
@@ -1758,7 +1768,7 @@
       const filtered = _all.filter(p => {
         const n = p.name.toLowerCase()+' '+(p.description||'').toLowerCase();
         if(cat==='crypto') return (p.payment_methods||[]).includes('CRYPTO')&&!(p.payment_methods||[]).includes('CREDITCARD');
-        return n.includes(cat);
+        return n.includes(cat) || (p.tags||[]).join(' ').toLowerCase().includes(cat);
       });
       _currentFiltered = filtered;
       sortProducts(document.getElementById('sort-select').value);
@@ -2508,6 +2518,7 @@
       const n = (product || '').toLowerCase();
       if(n.includes('lifetime')) return `just secured <strong>lifetime access</strong>`;
       if(n.includes('external') || n.includes('cheat')) return `just <strong>spoofed their system</strong>`;
+      if(n.includes('abyss') || n.includes('ᴀʙʏss')) return `just activated an <strong>Abyss Hub key</strong>`;
       if(n.includes('steam')) return `just claimed a <strong>Steam account</strong>`;
       if(n.includes('xbox')) return `just grabbed <strong>Xbox keys</strong>`;
       if(n.includes('week')) return `just copped a <strong>weekly key</strong>`;
@@ -2937,11 +2948,11 @@
 
       // ── WHAT IS THIS SITE ────────────────────────────────────────────────
       { keys:['what is abysshub','what is this site','what is this shop','what is xshadows','what do you do','explain the shop','tell me about this','what is this','about abysshub','about this store','about the store','who are you','what are you','describe the shop','what kind of store','what type of store','what does abysshub sell','what does this website do','purpose of this site','what is this place','how does this work','how this site works','overview','introduction','intro','describe this','tell about','information about','info about','what is abyss hub','whats abyss hub','about abyss','explain abysshub','explain this store'],
-        answer:`<strong>AbyssHub</strong> (xshadows.shop) is a fully automated digital goods store.<br><br>We sell:<br>🎮 <strong>Xbox Game Pass codes</strong><br>🖥️ <strong>Steam FA Accounts</strong><br>🛡️ <strong>External cheats</strong> (undetected, multiple games)<br>🔑 <strong>Game keys &amp; software licenses</strong> (day/week/month/lifetime)<br>🎰 <strong>Gambling redeems</strong><br><br>Everything is <strong>100% automated</strong> — you pay, you receive instantly, no human needed.`},
+        answer:`<strong>AbyssHub</strong> (xshadows.shop) is a fully automated digital goods store.<br><br>We sell:<br>🎮 <strong>Xbox Game Pass codes</strong><br>🖥️ <strong>Steam FA Accounts</strong><br>🛡️ <strong>External cheats</strong> (undetected, multiple games)<br>🔑 <strong>Game keys &amp; software licenses</strong> (day/week/month/lifetime)<br>🎰 <strong>Gambling redeems</strong><br>🔑 <strong>Abyss Hub Steam Keys</strong> (DLC, game, &amp; lifetime tiers)<br><br>Everything is <strong>100% automated</strong> — you pay, you receive instantly, no human needed.`},
 
       // ── PRODUCTS LIST ────────────────────────────────────────────────────
       { keys:['what products','list of products','all products','show products','what do you sell','products available','product catalog','catalog','what can i buy','what is for sale','whats for sale','everything you sell','full list','show me everything','what items','what goods','what merchandise','available products','your products','your catalog','everything available','what is in the store','menu','inventory','shop items','product list','browse products','see products','view products','product offerings','offerings','selection','range','assortment','product range'],
-        answer:`Here is everything we currently stock:<br><br>🎮 <strong>Xbox Gamepass Month</strong> — $10<br>🖥️ <strong>Steam FA Account Fresh</strong> — $0.20/ea (min 50)<br>🛡️ <strong>External Cheats</strong> — day/week/month/lifetime plans<br>🔑 <strong>Keys &amp; License Codes</strong> — trial, day, week, month, lifetime<br>🎰 <strong>Gambling Redeems</strong><br><br>Check the <a href="#products">products section</a> for live stock &amp; prices. New items added regularly.`},
+        answer:`Here is everything we currently stock:<br><br>🎮 <strong>Xbox Gamepass Month</strong> — $10<br>🖥️ <strong>Steam FA Account Fresh</strong> — $0.20/ea (min 50)<br>🛡️ <strong>External Cheats</strong> — day/week/month/lifetime plans<br>🔑 <strong>Keys &amp; License Codes</strong> — trial, day, week, month, lifetime<br>🎰 <strong>Gambling Redeems</strong><br>🔑 <strong>Abyss Hub DLC Key</strong> — $1.99<br>🔑 <strong>Abyss Hub Game Key</strong> — $2.99<br>🔑 <strong>Abyss Hub Lifetime DLC Key</strong> — $19.99<br>🔑 <strong>Abyss Hub Lifetime Games Key</strong> — $49.99<br>🔑 <strong>Abyss Hub Master Key</strong> — $99.99<br><br>Check the <a href="#products">products section</a> for live stock &amp; prices. New items added regularly.`},
 
       // ── XBOX GAMEPASS ─────────────────────────────────────────────────────
       { keys:['xbox','gamepass','game pass','xbox gamepass','xbox game pass','xgp','microsoft game pass','game pass month','xbox subscription','xbox monthly','xbox code','xbox key','xbox redeem','xbox voucher','redeem microsoft','microsoft redeem','redeem.microsoft','xbox pc','xbox pc gamepass','pc game pass','how to redeem xbox','xbox series','xbox one gamepass','xbox 360 gamepass','game pass ultimate','gp ultimate','xgpu','xbox live','xbox live gold','xbox gold','xbox digital','xbox gift','xbox gift card','xbox card','xbox membership','xbox trial','xbox free trial','ultimate pass','game pass core','xbox all access','xbox gamepass pc','xbox cloud','xcloud','cloud gaming xbox','game pass price','how much gamepass'],
