@@ -189,7 +189,7 @@ class aclient(discord.Client):
             
             for order in (getAllNewOrders() or []):
                 if(order[11] == 'crypto'):
-                    orderDetails = getOrderById(order[1])
+                    orderDetails = await asyncio.to_thread(getOrderById, order[1])
                     if(orderDetails['status'] == "New"):
                         continue
                     else:
@@ -252,14 +252,14 @@ class aclient(discord.Client):
                                 pass
                             sendProductToCustomer(order[9], order[2], "".join(accountsForOrder))
                             logger.success(f'Order {orderDetails["metadata"]["orderId"]} has been settled')
-                            sendOrderWebhook(f'{orderDetails["metadata"]["orderId"]}', order[8], f"${order[3]} ({order[8]} @ ${product['price']} Each)", "Crypto", order[10])
+                            asyncio.ensure_future(asyncio.to_thread(sendOrderWebhook, f'{orderDetails["metadata"]["orderId"]}', order[8], f"${order[3]} ({order[8]} @ ${product['price']} Each)", "Crypto", order[10]))
                 elif(order[11] == "creditcard"):
-                    invoices = get10LastInvoices()
+                    invoices = await asyncio.to_thread(get10LastInvoices)
                     for invoice in invoices:
                         if(invoice['payment_link'] == order[1]):
                             if(invoice['payment_status'] == 'paid'):
                                 try:
-                                    receipt = getInvoiceById(invoice['invoice'])['hosted_invoice_url']
+                                    receipt = (await asyncio.to_thread(getInvoiceById, invoice['invoice']))['hosted_invoice_url']
                                 except:
                                     logger.error(f'Failed to get invoice. Invoice was none')
                                     continue
@@ -319,7 +319,7 @@ class aclient(discord.Client):
                                     pass
                                 sendProductToCustomer(order[9], order[2], "".join(accountsForOrder))
                                 logger.success(f'Order {order[2]} has been settled')
-                                sendOrderWebhook(f'{orderId} ({plink.split("_")[1]})', order[8], f"${order[3]} ({order[8]} @ ${product['price']} Each)", "Stripe", order[10])
+                                asyncio.ensure_future(asyncio.to_thread(sendOrderWebhook, f'{orderId} ({plink.split("_")[1]})', order[8], f"${order[3]} ({order[8]} @ ${product['price']} Each)", "Stripe", order[10]))
                             else:
                                 if(int(time.time() > order[6])):
                                     logger.info(f"Invoice {order[1]} has expired.")

@@ -58,7 +58,7 @@ class PaymentModal(discord.ui.Modal, title='Payment Details'):
 
         if(self.paymentType == "Crypto"):
             try:
-                orderDetails = createOrder(self.productInfo['price'], int(self.quantity.value), self.email.value, self.productInfo['name'])
+                orderDetails = await asyncio.to_thread(createOrder, self.productInfo['price'], int(self.quantity.value), self.email.value, self.productInfo['name'])
             except Exception as e:
                 traceback.print_exc()
                 orderDetails = False
@@ -116,9 +116,9 @@ class PaymentModal(discord.ui.Modal, title='Payment Details'):
             embed.add_embed_field(name="User", value=f"<@{interaction.user.id}>", inline=False)
 
             webhook.add_embed(embed)
-            response = webhook.execute()
+            await asyncio.to_thread(webhook.execute)
         elif(self.paymentType == "CreditCard"):
-            plink, url = createPayment(int(self.quantity.value), self.productInfo['stripe_priceident'])
+            plink, url = await asyncio.to_thread(createPayment, int(self.quantity.value), self.productInfo['stripe_priceident'])
             import uuid, time
             #original_id, order_id, amount, checkoutLink, status, expirationTime, item, buyeremail, quantity, discordid, method
             orderId = str(uuid.uuid4())
@@ -163,8 +163,7 @@ class PaymentModal(discord.ui.Modal, title='Payment Details'):
             embed.add_embed_field(name="User", value=f"<@{interaction.user.id}>", inline=False)
 
             webhook.add_embed(embed)
-            response = webhook.execute()
-                        
+            await asyncio.to_thread(webhook.execute)
 
     async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
         if interaction.response.is_done():
