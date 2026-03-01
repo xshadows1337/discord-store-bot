@@ -33,11 +33,14 @@ class PaymentModal(discord.ui.Modal, title='Payment Details'):
         self.add_item(self.email)
 
     async def on_submit(self, interaction: discord.Interaction):
+        # Defer immediately so Discord doesn't time out while we talk to payment APIs
+        await interaction.response.defer(ephemeral=True, thinking=True)
+
         if(int(self.quantity.value) < self.productInfo['min_order_amount']):
             embed = discord.Embed(title="Below Minimum Quantity", description=f"Please enter a quantity greater than or equal to {self.productInfo['min_order_amount']}.",
                     colour=0xde2a2a,
                     timestamp=datetime.now())
-            return await interaction.response.send_message(embed=embed, ephemeral=True)
+            return await interaction.followup.send(embed=embed, ephemeral=True)
         totalStock = linesInFile(self.productInfo['product_file'])
         if(int(self.quantity.value) > totalStock):
             embed = discord.Embed(title="Quantity Above Stock Amount", description=f"Most you can purchase right now is {totalStock}",
@@ -45,13 +48,13 @@ class PaymentModal(discord.ui.Modal, title='Payment Details'):
                     timestamp=datetime.now())
 
 
-            return await interaction.response.send_message(embed=embed, ephemeral=True)
+            return await interaction.followup.send(embed=embed, ephemeral=True)
         if(re.findall(r"[a-z0-9]+@[a-z]+\.[a-z]+", self.email.value) == []):
             embed = discord.Embed(title="Invalid Email", description="Please enter a valid email.",
                     colour=0xde2a2a,
                     timestamp=datetime.now())
 
-            return await interaction.response.send_message(embed=embed, ephemeral=True)
+            return await interaction.followup.send(embed=embed, ephemeral=True)
 
         if(self.paymentType == "Crypto"):
             try:
@@ -67,7 +70,7 @@ class PaymentModal(discord.ui.Modal, title='Payment Details'):
                     colour=0xde2a2a,
                     timestamp=datetime.now()
                 )
-                return await interaction.response.send_message(embed=embed, ephemeral=True)
+                return await interaction.followup.send(embed=embed, ephemeral=True)
 
             insertOrder(orderDetails['id'], orderDetails['metadata']['orderId'], orderDetails['amount'], orderDetails['checkoutLink'], orderDetails['status'], orderDetails['expirationTime'], orderDetails['metadata']['itemDesc'], orderDetails['metadata']['buyerEmail'], orderDetails['metadata']['orderQuantity'], interaction.user.id, self.paymentType.lower())
 
@@ -95,7 +98,7 @@ class PaymentModal(discord.ui.Modal, title='Payment Details'):
                             value=orderDetails['checkoutLink'],
                             inline=False)
 
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+            await interaction.followup.send(embed=embed, ephemeral=True)
             try:
                 await interaction.user.send(embed=embed)
             except:
@@ -142,7 +145,7 @@ class PaymentModal(discord.ui.Modal, title='Payment Details'):
                             value=url,
                             inline=False)
 
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+            await interaction.followup.send(embed=embed, ephemeral=True)
             try:
                 await interaction.user.send(embed=embed)
             except:
@@ -164,6 +167,9 @@ class PaymentModal(discord.ui.Modal, title='Payment Details'):
                         
 
     async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
-        await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
+        if interaction.response.is_done():
+            await interaction.followup.send('Oops! Something went wrong.', ephemeral=True)
+        else:
+            await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
 
         traceback.print_exception(type(error), error, error.__traceback__)

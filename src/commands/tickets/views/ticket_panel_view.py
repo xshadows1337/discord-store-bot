@@ -70,6 +70,9 @@ class TicketCategorySelect(discord.ui.Select):
         )
 
     async def callback(self, interaction: discord.Interaction):
+        # Defer immediately so Discord doesn't time out while we create the channel
+        await interaction.response.defer(ephemeral=True, thinking=True)
+
         category = self.values[0]
         guild = interaction.guild
 
@@ -77,7 +80,7 @@ class TicketCategorySelect(discord.ui.Select):
         channel_name = f"ticket-{interaction.user.name.lower().replace(' ', '-')}-{category}"
         existing = discord.utils.get(guild.text_channels, name=channel_name)
         if existing:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 f"You already have an open ticket: {existing.mention}",
                 ephemeral=True,
             )
@@ -125,7 +128,7 @@ class TicketCategorySelect(discord.ui.Select):
                 reason=f"Ticket opened by {interaction.user} — {CATEGORY_LABELS[category]}",
             )
         except discord.Forbidden:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 "I don't have permission to create channels. Please contact an admin.",
                 ephemeral=True,
             )
@@ -158,7 +161,7 @@ class TicketCategorySelect(discord.ui.Select):
             view=TicketChannelView(opener_id=interaction.user.id, category=category),
         )
 
-        await interaction.response.send_message(
+        await interaction.followup.send(
             f"✅ Your ticket has been created: {channel.mention}",
             ephemeral=True,
         )

@@ -70,7 +70,7 @@
     "description": "ʏᴏᴜ ᴄᴀɴ ʀᴇᴅᴇᴇᴍ ᴛʜᴇ ᴄᴏᴅᴇ ᴛʜᴀᴛ ɪs sᴇɴᴛ ᴛᴏ ʏᴏᴜ ᴠɪᴀ ᴅᴍs ɪɴ ᴛʜᴇ xʙᴏx ᴀᴘᴘ ᴏʀ ᴏɴ ᴀ ʀᴇᴀʟ xʙᴏx ᴠɪᴀ https://xbox.com/redeem",
     "price": 10,
     "min_order_amount": 1,
-    "product_file": "products/xʙᴏx ɢᴀᴍᴇᴘᴀss ᴄᴏᴅᴇs.txt",
+    "product_file": "products/xbox_gamepass_codes.txt",
     "message_id": 0,
     "payment_methods": [
       "CRYPTO",
@@ -85,7 +85,7 @@
     "requirements": "ᴏɴʟʏ sᴛᴇᴀᴍ",
     "price": 0.2,
     "min_order_amount": 50,
-    "product_file": "products/sᴛᴇᴀᴍ ᴀᴄᴄᴏᴜɴᴛs.txt",
+    "product_file": "products/steam_accounts.txt",
     "message_id": 0,
     "payment_methods": [
       "CRYPTO",

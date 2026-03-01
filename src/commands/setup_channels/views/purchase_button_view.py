@@ -151,7 +151,7 @@ class ProductDropdown(discord.ui.Select):
         if stock < product['min_order_amount']:
             oos = discord.Embed(colour=0xED4245, timestamp=datetime.now())
             oos.set_author(
-                name="ᴘᴏɪsᴏɴ.xʏᴢ",
+                name="ᴀʙʏss ʜᴜʙ",
                 icon_url="https://cdn-icons-png.flaticon.com/512/3081/3081559.png"
             )
             oos.title = "Out of Stock"
@@ -160,7 +160,7 @@ class ProductDropdown(discord.ui.Select):
                 "\u200b\n"
                 "-# Check back later or wait for a restock notification."
             )
-            oos.set_footer(text="ᴘᴏɪsᴏɴ.xʏᴢ")
+            oos.set_footer(text="ᴀʙʏss ʜᴜʙ")
             return await interaction.response.send_message(embed=oos, ephemeral=True)
 
         # ── Product detail card ──
@@ -179,7 +179,7 @@ class ProductDropdown(discord.ui.Select):
 
         embed = discord.Embed(colour=color, timestamp=datetime.now())
         embed.set_author(
-            name="ᴘᴏɪsᴏɴ.xʏᴢ",
+            name="ᴀʙʏss ʜᴜʙ",
             icon_url="https://cdn-icons-png.flaticon.com/512/3081/3081559.png"
         )
         embed.title = product['name']
@@ -203,7 +203,7 @@ class ProductDropdown(discord.ui.Select):
 
         thumbnail_url = product.get('thumbnail_url', 'https://cdn-icons-png.flaticon.com/512/1170/1170678.png')
         embed.set_thumbnail(url=thumbnail_url)
-        embed.set_footer(text="ᴘᴏɪsᴏɴ.xʏᴢ  ·  Choose a payment method below ↓")
+        embed.set_footer(text="ᴀʙʏss ʜᴜʙ  ·  Choose a payment method below ↓")
 
         await interaction.response.send_message(
             embed=embed,

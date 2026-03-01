@@ -22,18 +22,23 @@ class SetupCommand:
                 return
 
             await interaction.edit_original_response(content="Setting up store …")
-            products = ReadSettings("products.json")
 
-            store_channel = interaction.guild.get_channel(config['store_channel_id'])
-            store_msg = await store_channel.send(
-                embeds=build_store_embed(),
-                view=StoreView()
-            )
-            
-            # Save the store message ID
-            products.data = products.json()
-            for index in range(len(products.data)):
-                products[index]['message_id'] = store_msg.id
-            products.save()
-            
-            await interaction.edit_original_response(content="✅ Store embed created successfully.")
+            try:
+                products = ReadSettings("products.json")
+
+                store_channel = interaction.guild.get_channel(config['store_channel_id'])
+                store_msg = await store_channel.send(
+                    embeds=build_store_embed(),
+                    view=StoreView()
+                )
+                
+                # Save the store message ID
+                products.data = products.json()
+                for index in range(len(products.data)):
+                    products[index]['message_id'] = store_msg.id
+                products.save()
+                
+                await interaction.edit_original_response(content="✅ Store embed created successfully.")
+            except Exception as e:
+                print(f"[/setup ERROR] {type(e).__name__}: {e}")
+                await interaction.edit_original_response(content=f"❌ Setup failed: {e}")
