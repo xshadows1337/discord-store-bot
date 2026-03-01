@@ -5,6 +5,7 @@ lib64/
 include/
 python3.12/
 pyvenv.cfg
+venv/
 
 # Python
 __pycache__/
@@ -20,13 +21,19 @@ build/
 
 # Logs
 *.log
+logs_*.txt
+deploy_output*.txt
 
-# Database (stored on Railway volume)
+# Database (stored on volume)
 *.db
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Secrets — never commit these
+src/.env
+src/settings.json
 
 # Delivered orders (runtime generated)
 src/delivered_orders/*.txt

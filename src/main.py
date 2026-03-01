@@ -1,6 +1,17 @@
 import asyncio
 import os
 import hashlib
+
+# Load .env early so every module-level os.environ.get() call sees the values
+try:
+    from dotenv import load_dotenv
+    from pathlib import Path
+    _env = Path(__file__).parent / '.env'
+    if _env.exists():
+        load_dotenv(_env, override=False)
+except ImportError:
+    pass
+
 import discord
 from discord import app_commands
 from readsettings import ReadSettings
