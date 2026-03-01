@@ -1230,6 +1230,7 @@ async def start_api_server(secret: str, port: int = 8080):
         shutdown_timeout=10,
     )
     await runner.setup()
-    site = web.TCPSite(runner, '0.0.0.0', port, reuse_port=True, backlog=256)
+    import sys as _sys
+    site = web.TCPSite(runner, '0.0.0.0', port, reuse_port=(_sys.platform != 'win32'), backlog=256)
     await site.start()
     logger.info(f"API server listening on :{port} — website live at /")

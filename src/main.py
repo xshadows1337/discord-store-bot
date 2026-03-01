@@ -163,7 +163,7 @@ class aclient(discord.Client):
                 if message_id:
                     try:
                         msg = store_channel.get_partial_message(message_id)
-                        await msg.edit(embeds=build_store_embed(), view=StoreView())
+                        await msg.edit(embed=build_store_embed(), view=StoreView())
                         logger.info('Store embed auto-updated.')
                     except Exception as e:
                         logger.error(f'Failed to auto-update store embed: {e}')
@@ -334,6 +334,8 @@ commandHandler = CommandHander(
     client, tree, config)
 
 async def runner():
+    global client, tree, commandHandler
+
     # Start the API server first so the website is up even if Discord 429s
     api_secret = os.environ.get('BOT_API_SECRET') or config.get('bot_api_secret', '')
     api_port = int(os.environ.get('PORT', 8080))
@@ -343,21 +345,34 @@ async def runner():
     else:
         logger.warning("BOT_API_SECRET not set — API server disabled")
 
-    # Connect to Discord with exponential backoff on rate-limit (429)
-    import discord as _discord
-    delay = 10
+    # Retry login with exponential backoff on 429.
+    # Each retry creates a *fresh* Client so the old aiohttp session
+    # is properly closed — no leaked sessions that compound the limit.
+    delay = 30
     while True:
         try:
             await client.start(config['bot_token'])
             break
-        except _discord.errors.HTTPException as e:
+        except discord.HTTPException as e:
             if e.status == 429:
-                logger.warning(f"Discord login rate-limited (429). Retrying in {delay}s...")
-                await asyncio.sleep(delay)
-                delay = min(delay * 2, 300)  # cap at 5 minutes
+                # Use Discord's retry_after if provided, otherwise use our backoff
+                wait = getattr(e, 'retry_after', None)
+                if wait and isinstance(wait, (int, float)) and wait < 120:
+                    wait = float(wait)
+                else:
+                    wait = float(delay)
+                logger.warning(f"Login rate-limited (429). Closing client, retrying in {wait:.0f}s...")
+                try:
+                    await client.close()
+                except Exception:
+                    pass
+                await asyncio.sleep(wait)
+                delay = min(delay * 2, 60)  # cap at 60s
+                # Rebuild with a fresh client to avoid stale session state
+                client = aclient()
+                tree = app_commands.CommandTree(client)
+                commandHandler = CommandHander(client, tree, config)
             else:
                 raise
-        except Exception:
-            raise
 
 asyncio.run(runner())
