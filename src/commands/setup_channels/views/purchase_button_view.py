@@ -3,6 +3,7 @@ from datetime import datetime
 from readsettings import ReadSettings
 from utils.product_manager import linesInFile
 from ..modals.payment_modal import PaymentModal
+from loguru import logger
 
 
 # ──── Shared embed builder ────────────────────────────────────────────
@@ -110,9 +111,22 @@ class PaymentMethodDropdown(discord.ui.Select):
         super().__init__(placeholder="Choose a payment method", options=options)
 
     async def callback(self, interaction: discord.Interaction):
-        await interaction.response.send_modal(
-            PaymentModal(custom_id='payment-modal', test=self.values[0], productInfo=self.productInfo)
-        )
+        try:
+            await interaction.response.send_modal(
+                PaymentModal(custom_id='payment-modal', test=self.values[0], productInfo=self.productInfo)
+            )
+        except Exception as e:
+            logger.exception(f'PaymentMethodDropdown error: {e}')
+
+    async def on_error(self, interaction: discord.Interaction, error: Exception, item: discord.ui.Item):
+        logger.exception(f'PaymentMethodView error on {item}: {error}')
+        try:
+            if interaction.response.is_done():
+                await interaction.followup.send('Something went wrong. Please try again.', ephemeral=True)
+            else:
+                await interaction.response.send_message('Something went wrong. Please try again.', ephemeral=True)
+        except Exception:
+            pass
 
 
 class PaymentMethodView(discord.ui.View):
@@ -144,6 +158,19 @@ class ProductDropdown(discord.ui.Select):
         )
 
     async def callback(self, interaction: discord.Interaction):
+        try:
+            await self._handle(interaction)
+        except Exception as e:
+            logger.exception(f'ProductDropdown error: {e}')
+            try:
+                if interaction.response.is_done():
+                    await interaction.followup.send('Something went wrong. Please try again.', ephemeral=True)
+                else:
+                    await interaction.response.send_message('Something went wrong. Please try again.', ephemeral=True)
+            except Exception:
+                pass
+
+    async def _handle(self, interaction: discord.Interaction):
         product = self.products_list[self.values[0]]
         stock = linesInFile(product['product_file'])
 
@@ -212,12 +239,33 @@ class ProductDropdown(discord.ui.Select):
         )
 
 
+    async def on_error(self, interaction: discord.Interaction, error: Exception, item: discord.ui.Item):
+        logger.exception(f'StoreView/ProductDropdown error on {item}: {error}')
+        try:
+            if interaction.response.is_done():
+                await interaction.followup.send('Something went wrong. Please try again.', ephemeral=True)
+            else:
+                await interaction.response.send_message('Something went wrong. Please try again.', ephemeral=True)
+        except Exception:
+            pass
+
+
 class StoreView(discord.ui.View):
     """Persistent view on the store embed with the product dropdown."""
     def __init__(self):
         super().__init__(timeout=None)
         products = ReadSettings('products.json')
         self.add_item(ProductDropdown(products.json()))
+
+    async def on_error(self, interaction: discord.Interaction, error: Exception, item: discord.ui.Item):
+        logger.exception(f'StoreView error on {item}: {error}')
+        try:
+            if interaction.response.is_done():
+                await interaction.followup.send('Something went wrong. Please try again.', ephemeral=True)
+            else:
+                await interaction.response.send_message('Something went wrong. Please try again.', ephemeral=True)
+        except Exception:
+            pass
 
 
 # Keep backward compat name for imports

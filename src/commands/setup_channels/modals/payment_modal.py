@@ -12,6 +12,7 @@ import asyncio
 from utils.cardpayment_utils import createPayment
 import re
 from discord_webhook import DiscordWebhook, DiscordEmbed
+from loguru import logger
 
 
 class PaymentModal(discord.ui.Modal, title='Payment Details'):
@@ -166,9 +167,11 @@ class PaymentModal(discord.ui.Modal, title='Payment Details'):
             await asyncio.to_thread(webhook.execute)
 
     async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
-        if interaction.response.is_done():
-            await interaction.followup.send('Oops! Something went wrong.', ephemeral=True)
-        else:
-            await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
-
-        traceback.print_exception(type(error), error, error.__traceback__)
+        logger.exception(f'PaymentModal error: {error}')
+        try:
+            if interaction.response.is_done():
+                await interaction.followup.send('Something went wrong. Please try again.', ephemeral=True)
+            else:
+                await interaction.response.send_message('Something went wrong. Please try again.', ephemeral=True)
+        except Exception:
+            pass

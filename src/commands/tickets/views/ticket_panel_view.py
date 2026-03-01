@@ -1,5 +1,6 @@
 import discord
 from datetime import datetime
+from loguru import logger
 
 TICKET_CATEGORIES = [
     discord.SelectOption(
@@ -171,3 +172,13 @@ class TicketPanelView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
         self.add_item(TicketCategorySelect())
+
+    async def on_error(self, interaction: discord.Interaction, error: Exception, item: discord.ui.Item):
+        logger.exception(f'TicketPanelView error on {item}: {error}')
+        try:
+            if interaction.response.is_done():
+                await interaction.followup.send('Something went wrong opening your ticket. Please try again.', ephemeral=True)
+            else:
+                await interaction.response.send_message('Something went wrong opening your ticket. Please try again.', ephemeral=True)
+        except Exception:
+            pass

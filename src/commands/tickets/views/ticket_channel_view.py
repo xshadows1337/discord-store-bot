@@ -2,6 +2,7 @@ import io
 import asyncio
 import discord
 from datetime import datetime
+from loguru import logger
 
 TRANSCRIPT_LOG_CHANNEL = 1476360741928833187
 
@@ -78,6 +79,19 @@ async def _build_and_send_transcript(channel: discord.TextChannel, opener_id: in
 class TicketChannelView(discord.ui.View):
     def __init__(self, opener_id: int = 0, category: str = "general"):
         super().__init__(timeout=None)
+        # Encode opener_id and category in the custom_ids so they survive restarts
+        self.close_btn.custom_id = f"ticket:close:{opener_id}:{category}"
+        self.claim_btn.custom_id = f"ticket:claim:{opener_id}:{category}"
+
+    async def on_error(self, interaction: discord.Interaction, error: Exception, item: discord.ui.Item):
+        logger.exception(f'TicketChannelView error on {item}: {error}')
+        try:
+            if interaction.response.is_done():
+                await interaction.followup.send('Something went wrong. Please try again.', ephemeral=True)
+            else:
+                await interaction.response.send_message('Something went wrong. Please try again.', ephemeral=True)
+        except Exception:
+            pass
         # Encode opener_id and category in the custom_ids so they survive restarts
         self.close_btn.custom_id  = f"ticket:close:{opener_id}:{category}"
         self.claim_btn.custom_id  = f"ticket:claim:{opener_id}:{category}"
