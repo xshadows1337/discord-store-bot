@@ -28,7 +28,7 @@ class SetupCommand:
 
                 store_channel = interaction.guild.get_channel(config['store_channel_id'])
                 store_msg = await store_channel.send(
-                    embeds=build_store_embed(),
+                    embed=build_store_embed(),
                     view=StoreView()
                 )
                 

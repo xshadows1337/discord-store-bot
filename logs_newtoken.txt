@@ -1,0 +1,112 @@
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/07f3ad73-59e5-42d6-ad0c-8e5739d176d0/vol_mstqtrx7qgnf1y46
+Starting Container
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/07f3ad73-59e5-42d6-ad0c-8e5739d176d0/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 18, in __init__
+KeyError: 'DISCORD_GUILD_ID'
+    self['discord_guild_id'] = int(os.environ['DISCORD_GUILD_ID'])
+                                   ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 18, in __init__
+    self['discord_guild_id'] = int(os.environ['DISCORD_GUILD_ID'])
+                                   ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'DISCORD_GUILD_ID'
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/07f3ad73-59e5-42d6-ad0c-8e5739d176d0/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 18, in __init__
+    self['discord_guild_id'] = int(os.environ['DISCORD_GUILD_ID'])
+                                   ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'DISCORD_GUILD_ID'
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/07f3ad73-59e5-42d6-ad0c-8e5739d176d0/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 18, in __init__
+    self['discord_guild_id'] = int(os.environ['DISCORD_GUILD_ID'])
+                                   ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'DISCORD_GUILD_ID'
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/07f3ad73-59e5-42d6-ad0c-8e5739d176d0/vol_mstqtrx7qgnf1y46
+    self['discord_guild_id'] = int(os.environ['DISCORD_GUILD_ID'])
+                                   ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/app/main.py", line 25, in <module>
+  File "<frozen os>", line 714, in __getitem__
+    config = Config()
+KeyError: 'DISCORD_GUILD_ID'
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 18, in __init__
+Traceback (most recent call last):
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/07f3ad73-59e5-42d6-ad0c-8e5739d176d0/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 18, in __init__
+    self['discord_guild_id'] = int(os.environ['DISCORD_GUILD_ID'])
+                                   ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'DISCORD_GUILD_ID'
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/07f3ad73-59e5-42d6-ad0c-8e5739d176d0/vol_mstqtrx7qgnf1y46
+KeyError: 'DISCORD_GUILD_ID'
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 18, in __init__
+    self['discord_guild_id'] = int(os.environ['DISCORD_GUILD_ID'])
+                                   ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/07f3ad73-59e5-42d6-ad0c-8e5739d176d0/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 18, in __init__
+    self['discord_guild_id'] = int(os.environ['DISCORD_GUILD_ID'])
+                                   ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'DISCORD_GUILD_ID'
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/07f3ad73-59e5-42d6-ad0c-8e5739d176d0/vol_mstqtrx7qgnf1y46
+  File "/app/utils/env_config.py", line 18, in __init__
+    self['discord_guild_id'] = int(os.environ['DISCORD_GUILD_ID'])
+                                   ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'DISCORD_GUILD_ID'
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/07f3ad73-59e5-42d6-ad0c-8e5739d176d0/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 18, in __init__
+    self['discord_guild_id'] = int(os.environ['DISCORD_GUILD_ID'])
+                                   ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'DISCORD_GUILD_ID'
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/07f3ad73-59e5-42d6-ad0c-8e5739d176d0/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 18, in __init__
+    self['discord_guild_id'] = int(os.environ['DISCORD_GUILD_ID'])
+                                   ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'DISCORD_GUILD_ID'
+

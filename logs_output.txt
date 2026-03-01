@@ -1,0 +1,123 @@
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/bf80a47e-41a4-4465-a8b1-9c4d24ed7e21/vol_mstqtrx7qgnf1y46
+Starting Container
+Traceback (most recent call last):
+  File "/app/main.py", line 7, in <module>
+    from command_handler import CommandHander
+  File "/app/command_handler.py", line 4, in <module>
+    from commands.setup_channels.setup_channels_command import SetupCommand
+  File "/app/commands/setup_channels/setup_channels_command.py", line 7, in <module>
+    from .views.purchase_button_view import StoreView, build_store_embed
+  File "/app/commands/setup_channels/views/purchase_button_view.py", line 222, in <module>
+    PaymentButtonV
+NameError: name 'PaymentButtonV' is not defined
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/bf80a47e-41a4-4465-a8b1-9c4d24ed7e21/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 7, in <module>
+    from command_handler import CommandHander
+  File "/app/command_handler.py", line 4, in <module>
+    from commands.setup_channels.setup_channels_command import SetupCommand
+  File "/app/commands/setup_channels/setup_channels_command.py", line 7, in <module>
+    from .views.purchase_button_view import StoreView, build_store_embed
+  File "/app/commands/setup_channels/views/purchase_button_view.py", line 222, in <module>
+    PaymentButtonV
+NameError: name 'PaymentButtonV' is not defined
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/bf80a47e-41a4-4465-a8b1-9c4d24ed7e21/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 7, in <module>
+    from command_handler import CommandHander
+  File "/app/command_handler.py", line 4, in <module>
+    from commands.setup_channels.setup_channels_command import SetupCommand
+  File "/app/commands/setup_channels/setup_channels_command.py", line 7, in <module>
+    from .views.purchase_button_view import StoreView, build_store_embed
+  File "/app/commands/setup_channels/views/purchase_button_view.py", line 222, in <module>
+    PaymentButtonV
+NameError: name 'PaymentButtonV' is not defined
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/bf80a47e-41a4-4465-a8b1-9c4d24ed7e21/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 7, in <module>
+    from command_handler import CommandHander
+  File "/app/command_handler.py", line 4, in <module>
+    from commands.setup_channels.setup_channels_command import SetupCommand
+  File "/app/commands/setup_channels/setup_channels_command.py", line 7, in <module>
+    from .views.purchase_button_view import StoreView, build_store_embed
+  File "/app/commands/setup_channels/views/purchase_button_view.py", line 222, in <module>
+    PaymentButtonV
+NameError: name 'PaymentButtonV' is not defined
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/bf80a47e-41a4-4465-a8b1-9c4d24ed7e21/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 7, in <module>
+    from command_handler import CommandHander
+  File "/app/command_handler.py", line 4, in <module>
+    from commands.setup_channels.setup_channels_command import SetupCommand
+  File "/app/commands/setup_channels/setup_channels_command.py", line 7, in <module>
+    from .views.purchase_button_view import StoreView, build_store_embed
+  File "/app/commands/setup_channels/views/purchase_button_view.py", line 222, in <module>
+    PaymentButtonV
+NameError: name 'PaymentButtonV' is not defined
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/bf80a47e-41a4-4465-a8b1-9c4d24ed7e21/vol_mstqtrx7qgnf1y46
+    PaymentButtonV
+NameError: name 'PaymentButtonV' is not defined
+Traceback (most recent call last):
+  File "/app/main.py", line 7, in <module>
+    from command_handler import CommandHander
+  File "/app/command_handler.py", line 4, in <module>
+    from commands.setup_channels.setup_channels_command import SetupCommand
+  File "/app/commands/setup_channels/setup_channels_command.py", line 7, in <module>
+    from .views.purchase_button_view import StoreView, build_store_embed
+  File "/app/commands/setup_channels/views/purchase_button_view.py", line 222, in <module>
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/bf80a47e-41a4-4465-a8b1-9c4d24ed7e21/vol_mstqtrx7qgnf1y46
+  File "/app/command_handler.py", line 4, in <module>
+    from commands.setup_channels.setup_channels_command import SetupCommand
+  File "/app/commands/setup_channels/setup_channels_command.py", line 7, in <module>
+    from .views.purchase_button_view import StoreView, build_store_embed
+  File "/app/commands/setup_channels/views/purchase_button_view.py", line 222, in <module>
+    PaymentButtonV
+NameError: name 'PaymentButtonV' is not defined
+Traceback (most recent call last):
+  File "/app/main.py", line 7, in <module>
+    from command_handler import CommandHander
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/bf80a47e-41a4-4465-a8b1-9c4d24ed7e21/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 7, in <module>
+    from command_handler import CommandHander
+  File "/app/command_handler.py", line 4, in <module>
+    from commands.setup_channels.setup_channels_command import SetupCommand
+  File "/app/commands/setup_channels/setup_channels_command.py", line 7, in <module>
+    from .views.purchase_button_view import StoreView, build_store_embed
+  File "/app/commands/setup_channels/views/purchase_button_view.py", line 222, in <module>
+    PaymentButtonV
+NameError: name 'PaymentButtonV' is not defined
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/bf80a47e-41a4-4465-a8b1-9c4d24ed7e21/vol_mstqtrx7qgnf1y46
+    PaymentButtonV
+NameError: name 'PaymentButtonV' is not defined
+    from command_handler import CommandHander
+  File "/app/command_handler.py", line 4, in <module>
+    from commands.setup_channels.setup_channels_command import SetupCommand
+  File "/app/commands/setup_channels/setup_channels_command.py", line 7, in <module>
+Traceback (most recent call last):
+    from .views.purchase_button_view import StoreView, build_store_embed
+  File "/app/main.py", line 7, in <module>
+  File "/app/commands/setup_channels/views/purchase_button_view.py", line 222, in <module>
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/bf80a47e-41a4-4465-a8b1-9c4d24ed7e21/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 7, in <module>
+    from command_handler import CommandHander
+  File "/app/command_handler.py", line 4, in <module>
+    from commands.setup_channels.setup_channels_command import SetupCommand
+  File "/app/commands/setup_channels/setup_channels_command.py", line 7, in <module>
+    from .views.purchase_button_view import StoreView, build_store_embed
+  File "/app/commands/setup_channels/views/purchase_button_view.py", line 222, in <module>
+    PaymentButtonV
+NameError: name 'PaymentButtonV' is not defined
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/bf80a47e-41a4-4465-a8b1-9c4d24ed7e21/vol_mstqtrx7qgnf1y46
+  File "/app/command_handler.py", line 4, in <module>
+    from commands.setup_channels.setup_channels_command import SetupCommand
+  File "/app/commands/setup_channels/setup_channels_command.py", line 7, in <module>
+    from .views.purchase_button_view import StoreView, build_store_embed
+  File "/app/commands/setup_channels/views/purchase_button_view.py", line 222, in <module>
+    PaymentButtonV
+NameError: name 'PaymentButtonV' is not defined
+Traceback (most recent call last):
+  File "/app/main.py", line 7, in <module>
+    from command_handler import CommandHander
+

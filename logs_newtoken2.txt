@@ -1,0 +1,112 @@
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/de12849f-20cf-44d4-b896-0c3a043d6e3b/vol_mstqtrx7qgnf1y46
+Starting Container
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 20, in __init__
+    self['log_channel_id'] = int(os.environ['LOG_CHANNEL_ID'])
+                                 ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'LOG_CHANNEL_ID'
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/de12849f-20cf-44d4-b896-0c3a043d6e3b/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 20, in __init__
+    self['log_channel_id'] = int(os.environ['LOG_CHANNEL_ID'])
+                                 ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'LOG_CHANNEL_ID'
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/de12849f-20cf-44d4-b896-0c3a043d6e3b/vol_mstqtrx7qgnf1y46
+    config = Config()
+                                 ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+             ^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+  File "/app/utils/env_config.py", line 20, in __init__
+KeyError: 'LOG_CHANNEL_ID'
+    self['log_channel_id'] = int(os.environ['LOG_CHANNEL_ID'])
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/de12849f-20cf-44d4-b896-0c3a043d6e3b/vol_mstqtrx7qgnf1y46
+KeyError: 'LOG_CHANNEL_ID'
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 20, in __init__
+    self['log_channel_id'] = int(os.environ['LOG_CHANNEL_ID'])
+                                 ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/de12849f-20cf-44d4-b896-0c3a043d6e3b/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 20, in __init__
+    self['log_channel_id'] = int(os.environ['LOG_CHANNEL_ID'])
+                                 ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'LOG_CHANNEL_ID'
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/de12849f-20cf-44d4-b896-0c3a043d6e3b/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 20, in __init__
+    self['log_channel_id'] = int(os.environ['LOG_CHANNEL_ID'])
+                                 ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'LOG_CHANNEL_ID'
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/de12849f-20cf-44d4-b896-0c3a043d6e3b/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 20, in __init__
+    self['log_channel_id'] = int(os.environ['LOG_CHANNEL_ID'])
+                                 ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'LOG_CHANNEL_ID'
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/de12849f-20cf-44d4-b896-0c3a043d6e3b/vol_mstqtrx7qgnf1y46
+                                 ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'LOG_CHANNEL_ID'
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 20, in __init__
+    self['log_channel_id'] = int(os.environ['LOG_CHANNEL_ID'])
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/de12849f-20cf-44d4-b896-0c3a043d6e3b/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 20, in __init__
+    self['log_channel_id'] = int(os.environ['LOG_CHANNEL_ID'])
+                                 ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'LOG_CHANNEL_ID'
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/de12849f-20cf-44d4-b896-0c3a043d6e3b/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+    self['log_channel_id'] = int(os.environ['LOG_CHANNEL_ID'])
+  File "/app/main.py", line 25, in <module>
+                                 ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+    config = Config()
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'LOG_CHANNEL_ID'
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 20, in __init__
+Mounting volume on: /var/lib/containers/railwayapp/bind-mounts/de12849f-20cf-44d4-b896-0c3a043d6e3b/vol_mstqtrx7qgnf1y46
+Traceback (most recent call last):
+  File "/app/main.py", line 25, in <module>
+    config = Config()
+             ^^^^^^^^
+  File "/app/utils/env_config.py", line 20, in __init__
+    self['log_channel_id'] = int(os.environ['LOG_CHANNEL_ID'])
+                                 ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'LOG_CHANNEL_ID'
+

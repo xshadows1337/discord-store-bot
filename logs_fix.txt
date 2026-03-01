@@ -1,0 +1,501 @@
+    Γöé    Γöé            Γöé    Γöö <member '_callback' of 'Handle' objects>
+    Γöé    Γöé            Γöö <Handle Task.task_wakeup(<Future finished result=None>)>
+    Γöé    Γöö <member '_context' of 'Handle' objects>
+    Γöö <Handle Task.task_wakeup(<Future finished result=None>)>
+  File "/usr/local/lib/python3.12/site-packages/discord/ui/view.py", line 435, in _scheduled_task
+    await item.callback(interaction)
+          Γöé    Γöé        Γöö <Interaction id=1477778145640841308 type=<InteractionType.component: 3> guild_id=1422906552280547373 user=<Member id=11396132...
+          Γöé    Γöö <discord.ui.view._ViewCallback object at 0x7fefa6c2dd40>
+          Γöö <Button style=<ButtonStyle.secondary: 2> url=None disabled=False label='Γû╢' emoji=None row=0 sku_id=None>
+
+> File "/app/commands/setup_channels/views/purchase_button_view.py", line 147, in next_btn
+    await interaction.response.edit_message(embed=_build_product_embed((page + 1) % total))
+          Γöé           Γöé                           Γöé                     Γöé           Γöö 7
+          Γöé           Γöé                           Γöé                     Γöö 0
+          Γöé           Γöé                           Γöö <function _build_product_embed at 0x7fefa90b27a0>
+          Γöé           Γöö <discord.utils.CachedSlotProperty object at 0x7fefa9162fc0>
+          Γöö <Interaction id=1477778145640841308 type=<InteractionType.component: 3> guild_id=1422906552280547373 user=<Member id=11396132...
+
+  File "/usr/local/lib/python3.12/site-packages/discord/interactions.py", line 1154, in edit_message
+    response = await adapter.create_interaction_response(
+                     Γöé       Γöö <function AsyncWebhookAdapter.create_interaction_response at 0x7fefa91a07c0>
+                     Γöö <discord.webhook.async_.AsyncWebhookAdapter object at 0x7fefa9190d70>
+  File "/usr/local/lib/python3.12/site-packages/discord/webhook/async_.py", line 209, in request
+    raise HTTPException(response, data)
+          Γöé             Γöé         Γöö '<!doctype html>\n<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->\n<!--[if IE 7]>    <html class="...
+    <!--<![endif]-->
+    <head>
+        <title>Access denied | discord.com used Cloudflare to restrict access | discord.com | Cloudflare</title>
+        <meta charset="UTF-8" />
+          Γöé             Γöö <ClientResponse(https://discord.com/api/v10/interactions/1477778145640841308/aW50ZXJhY3Rpb246MTQ3Nzc3ODE0NTY0MDg0MTMwODpKc3VS...
+          Γöö <class 'discord.errors.HTTPException'>
+
+discord.errors.HTTPException: 429 Too Many Requests (error code: 0): <!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en-US">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="robots" content="noindex, nofollow" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" id="cf_styles-css" href="/cdn-cgi/styles/main.css" /> <script>
+  (function(){if(document.addEventListener&&window.XMLHttpRequest&&JSON&&JSON.stringify){var e=function(a){var c=document.getElementById("error-feedback-survey"),d=document.getElementById("error-feedback-success"),b=new XMLHttpRequest;a={event:"feedback clicked",properties:{errorCode: 1015 },helpful:a,version: 1 };b.open("POST","https://sparrow.cloudflare.com/api/v1/event");b.setRequestHeader("Content-Type","application/json");b.setRequestHeader("Sparrow-Source-Key","c771f0e4b54944bebf4261d44bd79a1e");
+                >
+    <body>
+                    <h1
+        <div id="cf-wrapper">
+                        class="inline-block md:block mr-2 md:mb-2 font-light text-60 md:text-3xl text-black-dark leading-tight"
+            <div
+                class="cf-alert cf-alert-error cf-cookie-error hidden"
+                id="cookie-alert"
+                data-translate="enable_cookies"
+            >
+                Please enable cookies.
+            </div>
+            <div id="cf-error-details" class="p-0">
+                <header
+                    class="mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-15 antialiased"
+b.send(JSON.stringify(a));c.classList.add("feedback-hidden");d.classList.remove("feedback-hidden")};document.addEventListener("DOMContentLoaded",function(){var a=document.getElementById("error-feedback"),c=document.getElementById("feedback-button-yes"),d=document.getElementById("feedback-button-no");"classList"in a&&(a.classList.remove("feedback-hidden"),c.addEventListener("click",function(){e(!0)}),d.addEventListener("click",function(){e(!1)}))})}})();
+</script>
+        <script
+            defer
+            src="https://performance.radar.cloudflare.com/beacon.js"
+        ></script>
+    </head>
+                    >
+                        <span data-translate="error">Error</span>
+                        <span>1015</span>
+                    </h1>
+                    <span
+                        class="inline-block md:block heading-ray-id font-mono text-15 lg:text-sm lg:leading-relaxed"
+                        >Ray ID: 9d5b380c3afe99a0 &bull;</span
+                    >
+                    <span
+                        class="inline-block md:block heading-ray-id font-mono text-15 lg:text-sm lg:leading-relaxed"
+                        >2026-03-01 21:22:45 UTC</span
+                    >
+                    <h2
+                        class="text-gray-600 leading-1.3 text-3xl lg:text-2xl font-light"
+                    >
+                        You are being rate limited
+                    </h2>
+                </header>
+                
+                
+                <section class="w-240 lg:w-full mx-auto mb-8 lg:px-8">
+                    <div id="what-happened-section" class="w-1/2 md:w-full">
+                        <h2
+                            class="text-3xl leading-tight font-normal mb-4 text-black-dark antialiased"
+                            data-translate="what_happened"
+                                target="_blank"
+                        >
+                            What happened?
+                        </h2>
+                        
+                            <p>The owner of this website (discord.com) has banned you temporarily from accessing this website.</p>
+                                >https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1015/</a
+                    </div>
+                            for more details.
+                        
+                            >
+                                rel="noopener noreferrer"
+                        </p>
+                        
+                        
+                        <p>
+                            Please see
+                                href="https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1015/"
+                            <a
+    <div id="error-feedback-survey" class="footer-line-wrapper">
+        <button
+        Was this page helpful?
+            class="border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded"
+        <button
+        >
+            id="feedback-button-no"
+            class="border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded"
+            No
+    </div>
+            id="feedback-button-yes"
+            type="button"
+        </button>
+            type="button"
+        >
+            Yes
+        </button>
+
+                    
+                </section>
+                
+
+                <div class="feedback-hidden py-8 text-center" id="error-feedback">
+    <div class="feedback-success feedback-hidden" id="error-feedback-success">
+        Thank you for your feedback!
+    </div>
+</div> <div class="cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300">
+      
+        <button type="button" id="cf-footer-ip-reveal" class="cf-footer-ip-reveal-btn">Click to reveal</button>
+    </p>
+        <span class="hidden" id="cf-footer-ip">162.220.232.33</span>
+            <!-- /#cf-error-details -->
+        <span class="cf-footer-separator sm:hidden">&bull;</span>
+    <p class="text-13">
+      <span class="cf-footer-item sm:block sm:mb-1">Cloudflare Ray ID: <strong class="font-semibold">9d5b380c3afe99a0</strong></span>
+        </div>
+      </span>
+      <span class="cf-footer-item sm:block sm:mb-1"><span>Performance &amp; security by</span> <a rel="noopener noreferrer" href="https://www.cloudflare.com/5xx-error-landing" id="brand_link" target="_blank">Cloudflare</a></span>
+      <span class="cf-footer-separator sm:hidden">&bull;</span>
+      <span id="cf-footer-item-ip" class="cf-footer-item hidden sm:block sm:mb-1">
+    <script>(function(){function d(){var b=a.getElementById("cf-footer-item-ip"),c=a.getElementById("cf-footer-ip-reveal");b&&"classList"in b&&(b.classList.remove("hidden"),c.addEventListener("click",function(){c.classList.add("hidden");a.getElementById("cf-footer-ip").classList.remove("hidden")}))}var a=document;document.addEventListener&&a.addEventListener("DOMContentLoaded",d)})();</script>
+        Your IP:
+  </div><!-- /.error-footer -->
+            </div>
+        <!-- /#cf-wrapper -->
+
+         <script>
+    window._cf_translation = {};
+    
+    
+  </script> 
+        
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d5b380c3afe99a0',t:'MTc3MjQwMDE2NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
+2026-03-01 21:22:45.892 | INFO     | __main__:checkPendingPayments:167 - Store embed auto-updated.
+2026-03-01 21:25:25.669 | ERROR    | commands.setup_channels.views.purchase_button_view:next_btn:149 - store:next error: 429 Too Many Requests (error code: 0): <!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en-US">
+    <!--<![endif]-->
+    <head>
+        <title>Access denied | discord.com used Cloudflare to restrict access | discord.com | Cloudflare</title>
+        <meta charset="UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" id="cf_styles-css" href="/cdn-cgi/styles/main.css" /> <script>
+  (function(){if(document.addEventListener&&window.XMLHttpRequest&&JSON&&JSON.stringify){var e=function(a){var c=document.getElementById("error-feedback-survey"),d=document.getElementById("error-feedback-success"),b=new XMLHttpRequest;a={event:"feedback clicked",properties:{errorCode: 1015 },helpful:a,version: 1 };b.open("POST","https://sparrow.cloudflare.com/api/v1/event");b.setRequestHeader("Content-Type","application/json");b.setRequestHeader("Sparrow-Source-Key","c771f0e4b54944bebf4261d44bd79a1e");
+b.send(JSON.stringify(a));c.classList.add("feedback-hidden");d.classList.remove("feedback-hidden")};document.addEventListener("DOMContentLoaded",function(){var a=document.getElementById("error-feedback"),c=document.getElementById("feedback-button-yes"),d=document.getElementById("feedback-button-no");"classList"in a&&(a.classList.remove("feedback-hidden"),c.addEventListener("click",function(){e(!0)}),d.addEventListener("click",function(){e(!1)}))})}})();
+</script>
+        <script
+            defer
+            src="https://performance.radar.cloudflare.com/beacon.js"
+        ></script>
+    </head>
+    <body>
+        <div id="cf-wrapper">
+            <div
+                class="cf-alert cf-alert-error cf-cookie-error hidden"
+                id="cookie-alert"
+                data-translate="enable_cookies"
+            >
+                Please enable cookies.
+            </div>
+            <div id="cf-error-details" class="p-0">
+                <header
+                    class="mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-15 antialiased"
+                >
+                    <h1
+                        class="inline-block md:block mr-2 md:mb-2 font-light text-60 md:text-3xl text-black-dark leading-tight"
+                    >
+                        <span data-translate="error">Error</span>
+                        <span>1015</span>
+                    </h1>
+                    <span
+                        class="inline-block md:block heading-ray-id font-mono text-15 lg:text-sm lg:leading-relaxed"
+                        >Ray ID: 9d5b3bf36d3758dc &bull;</span
+                    >
+                    <span
+                        class="inline-block md:block heading-ray-id font-mono text-15 lg:text-sm lg:leading-relaxed"
+                        >2026-03-01 21:25:25 UTC</span
+                    >
+                    <h2
+                        class="text-gray-600 leading-1.3 text-3xl lg:text-2xl font-light"
+                    >
+                        You are being rate limited
+                    </h2>
+                </header>
+                
+                
+                <section class="w-240 lg:w-full mx-auto mb-8 lg:px-8">
+                    <div id="what-happened-section" class="w-1/2 md:w-full">
+                        <h2
+                            class="text-3xl leading-tight font-normal mb-4 text-black-dark antialiased"
+                            data-translate="what_happened"
+                        >
+                            What happened?
+                        </h2>
+                        
+                            <p>The owner of this website (discord.com) has banned you temporarily from accessing this website.</p>
+                        
+                        
+                        <p>
+                            Please see
+                            <a
+                                rel="noopener noreferrer"
+                                href="https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1015/"
+                                target="_blank"
+                                >https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1015/</a
+                            >
+                            for more details.
+                        </p>
+                        
+                    </div>
+
+                    
+            id="feedback-button-yes"
+    <div class="feedback-success feedback-hidden" id="error-feedback-success">
+            type="button"
+        Thank you for your feedback!
+                </section>
+        >
+        >
+            class="border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded"
+                
+        <button
+            Yes
+            No
+
+            class="border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded"
+            id="feedback-button-no"
+        </button>
+                <div class="feedback-hidden py-8 text-center" id="error-feedback">
+        </button>
+        <button
+            type="button"
+    <div id="error-feedback-survey" class="footer-line-wrapper">
+    </div>
+        Was this page helpful?
+    </div>
+</div> <div class="cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300">
+    <p class="text-13">
+      <span class="cf-footer-item sm:block sm:mb-1">Cloudflare Ray ID: <strong class="font-semibold">9d5b3bf36d3758dc</strong></span>
+      <span class="cf-footer-separator sm:hidden">&bull;</span>
+      <span id="cf-footer-item-ip" class="cf-footer-item hidden sm:block sm:mb-1">
+        Your IP:
+        <button type="button" id="cf-footer-ip-reveal" class="cf-footer-ip-reveal-btn">Click to reveal</button>
+        <span class="hidden" id="cf-footer-ip">162.220.232.33</span>
+        <span class="cf-footer-separator sm:hidden">&bull;</span>
+      </span>
+      <span class="cf-footer-item sm:block sm:mb-1"><span>Performance &amp; security by</span> <a rel="noopener noreferrer" href="https://www.cloudflare.com/5xx-error-landing" id="brand_link" target="_blank">Cloudflare</a></span>
+      
+    </p>
+    <script>(function(){function d(){var b=a.getElementById("cf-footer-item-ip"),c=a.getElementById("cf-footer-ip-reveal");b&&"classList"in b&&(b.classList.remove("hidden"),c.addEventListener("click",function(){c.classList.add("hidden");a.getElementById("cf-footer-ip").classList.remove("hidden")}))}var a=document;document.addEventListener&&a.addEventListener("DOMContentLoaded",d)})();</script>
+  </div><!-- /.error-footer -->
+            </div>
+            <!-- /#cf-error-details -->
+        </div>
+    
+         <script>
+    window._cf_translation = {};
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d5b3bf36d3758dc',t:'MTc3MjQwMDMyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+        <!-- /#cf-wrapper -->
+</html>
+  </script> 
+Traceback (most recent call last):
+    
+
+  File "/app/main.py", line 378, in <module>
+        
+
+    asyncio.run(runner())
+    Γöé       Γöö <function run at 0x7fefaae9fc40>
+    Γöé       Γöé   Γöö <function runner at 0x7fefa6e78360>
+    Γöö <module 'asyncio' from '/usr/local/lib/python3.12/asyncio/__init__.py'>
+
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           Γöé      Γöé   Γöö <coroutine object runner at 0x7fefa6e74540>
+           Γöé      Γöö <function Runner.run at 0x7fefaa1b14e0>
+           Γöö <asyncio.runners.Runner object at 0x7fefa6e3a600>
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           Γöé    Γöé     Γöé                  Γöö <Task pending name='Task-1' coro=<runner() running at /app/main.py:354> wait_for=<Future pending cb=[Task.task_wakeup()]> cb=...
+           Γöé    Γöé     Γöö <function BaseEventLoop.run_until_complete at 0x7fefaa18b060>
+           Γöé    Γöö <_UnixSelectorEventLoop running=True closed=False debug=False>
+           Γöö <asyncio.runners.Runner object at 0x7fefa6e3a600>
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 678, in run_until_complete
+    self.run_forever()
+    Γöé    Γöö <function BaseEventLoop.run_forever at 0x7fefaa18afc0>
+    Γöö <_UnixSelectorEventLoop running=True closed=False debug=False>
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 645, in run_forever
+    self._run_once()
+    Γöé    Γöö <function BaseEventLoop._run_once at 0x7fefaa1b0e00>
+    Γöö <Handle Task.task_wakeup(<Future finished result=None>)>
+  File "/usr/local/lib/python3.12/site-packages/discord/ui/view.py", line 435, in _scheduled_task
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    await item.callback(interaction)
+    Γöé    Γöé            Γöé    Γöé           Γöö <Handle Task.task_wakeup(<Future finished result=None>)>
+    self._context.run(self._callback, *self._args)
+          Γöé    Γöé        Γöö <Interaction id=1477778816154996970 type=<InteractionType.component: 3> guild_id=1422906552280547373 user=<Member id=11396132...
+    Γöé    Γöé            Γöé    Γöé           Γöé    Γöö <member '_args' of 'Handle' objects>
+    Γöé    Γöé            Γöé    Γöö <member '_callback' of 'Handle' objects>
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1999, in _run_once
+    Γöö <_UnixSelectorEventLoop running=True closed=False debug=False>
+    handle._run()
+    Γöé    Γöé            Γöö <Handle Task.task_wakeup(<Future finished result=None>)>
+    Γöé      Γöö <function Handle._run at 0x7fefaa306f20>
+    Γöé    Γöö <member '_context' of 'Handle' objects>
+    Γöö <Handle Task.task_wakeup(<Future finished result=None>)>
+          Γöé    Γöö <discord.ui.view._ViewCallback object at 0x7fefa6c0c680>
+          Γöö <Button style=<ButtonStyle.secondary: 2> url=None disabled=False label='Γû╢' emoji=None row=0 sku_id=None>
+
+> File "/app/commands/setup_channels/views/purchase_button_view.py", line 147, in next_btn
+    await interaction.response.edit_message(embed=_build_product_embed((page + 1) % total))
+          Γöé           Γöé                           Γöé                     Γöé           Γöö 7
+          Γöé           Γöé                           Γöé                     Γöö 0
+          Γöé           Γöé                           Γöö <function _build_product_embed at 0x7fefa90b27a0>
+          Γöé           Γöö <discord.utils.CachedSlotProperty object at 0x7fefa9162fc0>
+          Γöö <Interaction id=1477778816154996970 type=<InteractionType.component: 3> guild_id=1422906552280547373 user=<Member id=11396132...
+
+  File "/usr/local/lib/python3.12/site-packages/discord/interactions.py", line 1154, in edit_message
+    response = await adapter.create_interaction_response(
+                     Γöé       Γöö <function AsyncWebhookAdapter.create_interaction_response at 0x7fefa91a07c0>
+                     Γöö <discord.webhook.async_.AsyncWebhookAdapter object at 0x7fefa9190d70>
+  File "/usr/local/lib/python3.12/site-packages/discord/webhook/async_.py", line 209, in request
+    raise HTTPException(response, data)
+          Γöé             Γöé         Γöö '<!doctype html>\n<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->\n<!--[if IE 7]>    <html class="...
+          Γöé             Γöö <ClientResponse(https://discord.com/api/v10/interactions/1477778816154996970/aW50ZXJhY3Rpb246MTQ3Nzc3ODgxNjE1NDk5Njk3MDp6azZJ...
+          Γöö <class 'discord.errors.HTTPException'>
+
+discord.errors.HTTPException: 429 Too Many Requests (error code: 0): <!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en-US">
+    <!--<![endif]-->
+    <head>
+        <title>Access denied | discord.com used Cloudflare to restrict access | discord.com | Cloudflare</title>
+        <meta charset="UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" id="cf_styles-css" href="/cdn-cgi/styles/main.css" /> <script>
+  (function(){if(document.addEventListener&&window.XMLHttpRequest&&JSON&&JSON.stringify){var e=function(a){var c=document.getElementById("error-feedback-survey"),d=document.getElementById("error-feedback-success"),b=new XMLHttpRequest;a={event:"feedback clicked",properties:{errorCode: 1015 },helpful:a,version: 1 };b.open("POST","https://sparrow.cloudflare.com/api/v1/event");b.setRequestHeader("Content-Type","application/json");b.setRequestHeader("Sparrow-Source-Key","c771f0e4b54944bebf4261d44bd79a1e");
+                data-translate="enable_cookies"
+            </div>
+            >
+            <div id="cf-error-details" class="p-0">
+                Please enable cookies.
+                <header
+                    class="mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-15 antialiased"
+                >
+                    <h1
+                        class="inline-block md:block mr-2 md:mb-2 font-light text-60 md:text-3xl text-black-dark leading-tight"
+b.send(JSON.stringify(a));c.classList.add("feedback-hidden");d.classList.remove("feedback-hidden")};document.addEventListener("DOMContentLoaded",function(){var a=document.getElementById("error-feedback"),c=document.getElementById("feedback-button-yes"),d=document.getElementById("feedback-button-no");"classList"in a&&(a.classList.remove("feedback-hidden"),c.addEventListener("click",function(){e(!0)}),d.addEventListener("click",function(){e(!1)}))})}})();
+</script>
+        <script
+            defer
+            src="https://performance.radar.cloudflare.com/beacon.js"
+        ></script>
+    </head>
+    <body>
+        <div id="cf-wrapper">
+            <div
+                class="cf-alert cf-alert-error cf-cookie-error hidden"
+                id="cookie-alert"
+                    >
+                        <span data-translate="error">Error</span>
+                        <span>1015</span>
+                    </h1>
+                    <span
+                        class="inline-block md:block heading-ray-id font-mono text-15 lg:text-sm lg:leading-relaxed"
+                        >Ray ID: 9d5b3bf36d3758dc &bull;</span
+                    >
+                    <span
+                        class="inline-block md:block heading-ray-id font-mono text-15 lg:text-sm lg:leading-relaxed"
+                        >2026-03-01 21:25:25 UTC</span
+                    >
+                    <h2
+                        class="text-gray-600 leading-1.3 text-3xl lg:text-2xl font-light"
+                    >
+                        You are being rate limited
+                    </h2>
+                </header>
+                
+                
+                <section class="w-240 lg:w-full mx-auto mb-8 lg:px-8">
+                    <div id="what-happened-section" class="w-1/2 md:w-full">
+                        <h2
+                            class="text-3xl leading-tight font-normal mb-4 text-black-dark antialiased"
+                                rel="noopener noreferrer"
+                            Please see
+                            data-translate="what_happened"
+                            <a
+                        >
+                            What happened?
+                        </h2>
+                        
+                                href="https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1015/"
+                                target="_blank"
+                            <p>The owner of this website (discord.com) has banned you temporarily from accessing this website.</p>
+                                >https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1015/</a
+                            >
+                        
+                            for more details.
+                        </p>
+                        
+                        
+                    </div>
+                        <p>
+        Was this page helpful?
+        <button
+            class="border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded"
+            id="feedback-button-yes"
+            type="button"
+
+                    
+                </section>
+                
+
+                <div class="feedback-hidden py-8 text-center" id="error-feedback">
+    <div id="error-feedback-survey" class="footer-line-wrapper">
+        >
+            Yes
+        </button>
+        <button
+            class="border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded"
+            id="feedback-button-no"
+            type="button"
+        >
+            No
+        </button>
+    </div>
+    <div class="feedback-success feedback-hidden" id="error-feedback-success">
+        Thank you for your feedback!
+    </div>
+</div> <div class="cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300">
+        Your IP:
+        <button type="button" id="cf-footer-ip-reveal" class="cf-footer-ip-reveal-btn">Click to reveal</button>
+        <span class="hidden" id="cf-footer-ip">162.220.232.33</span>
+  </div><!-- /.error-footer -->
+        <span class="cf-footer-separator sm:hidden">&bull;</span>
+            </div>
+      </span>
+            <!-- /#cf-error-details -->
+      <span class="cf-footer-item sm:block sm:mb-1"><span>Performance &amp; security by</span> <a rel="noopener noreferrer" href="https://www.cloudflare.com/5xx-error-landing" id="brand_link" target="_blank">Cloudflare</a></span>
+      
+        </div>
+    </p>
+    <script>(function(){function d(){var b=a.getElementById("cf-footer-item-ip"),c=a.getElementById("cf-footer-ip-reveal");b&&"classList"in b&&(b.classList.remove("hidden"),c.addEventListener("click",function(){c.classList.add("hidden");a.getElementById("cf-footer-ip").classList.remove("hidden")}))}var a=document;document.addEventListener&&a.addEventListener("DOMContentLoaded",d)})();</script>
+    <p class="text-13">
+      <span class="cf-footer-item sm:block sm:mb-1">Cloudflare Ray ID: <strong class="font-semibold">9d5b3bf36d3758dc</strong></span>
+      <span class="cf-footer-separator sm:hidden">&bull;</span>
+      <span id="cf-footer-item-ip" class="cf-footer-item hidden sm:block sm:mb-1">
+
+         <script>
+    window._cf_translation = {};
+    
+    
+        
+  </script> 
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d5b3bf36d3758dc',t:'MTc3MjQwMDMyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
+        <!-- /#cf-wrapper -->
+
