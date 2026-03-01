@@ -126,10 +126,6 @@ class aclient(discord.Client):
         self.add_view(TicketPanelView())
         self.add_view(TicketChannelView())
 
-    async def on_interaction(self, interaction: discord.Interaction):
-        """Global safety net — log every interaction so we can debug failures."""
-        logger.debug(f"Interaction received: type={interaction.type} custom_id={getattr(interaction.data, 'custom_id', interaction.data.get('custom_id', 'N/A') if isinstance(interaction.data, dict) else 'N/A')}")
-
     async def on_message(self, message: discord.Message):
         """Forward staff replies in web-ticket channels to the support relay."""
         if message.author.bot:
