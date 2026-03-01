@@ -366,10 +366,11 @@ async def runner():
             break
         except discord.HTTPException as e:
             if e.status == 429:
-                # Use Discord's retry_after if provided, otherwise use our backoff
-                wait = getattr(e, 'retry_after', None)
-                if wait and isinstance(wait, (int, float)) and wait < 120:
-                    wait = float(wait)
+                # Prefer Discord's retry_after header; fall back to our own backoff.
+                # Do NOT cap retry_after — if Discord says wait 600s, respect it.
+                retry_after = getattr(e, 'retry_after', None)
+                if retry_after and isinstance(retry_after, (int, float)) and retry_after > 0:
+                    wait = float(retry_after)
                 else:
                     wait = float(delay)
                 logger.warning(f"Login rate-limited (429). Closing client, retrying in {wait:.0f}s...")
@@ -378,7 +379,7 @@ async def runner():
                 except Exception:
                     pass
                 await asyncio.sleep(wait)
-                delay = min(delay * 2, 60)  # cap at 60s
+                delay = min(delay * 2, 300)  # cap at 5 min — gives Railway's IP time to recover
                 # Rebuild with a fresh client to avoid stale session state
                 client = aclient()
                 tree = app_commands.CommandTree(client)
