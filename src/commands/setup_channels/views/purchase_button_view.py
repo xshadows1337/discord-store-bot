@@ -107,7 +107,10 @@ class PaymentMethodDropdown(discord.ui.Select):
             )
         except Exception as e:
             logger.exception(f'PaymentMethodDropdown error: {e}')
-            await _safe_reply(interaction, 'Something went wrong. Please try again.')
+            try:
+                await _safe_reply(interaction, 'Something went wrong. Please try again.')
+            except Exception:
+                pass
 
 
 class PaymentMethodView(discord.ui.View):
@@ -117,7 +120,10 @@ class PaymentMethodView(discord.ui.View):
 
     async def on_error(self, interaction: discord.Interaction, error: Exception, item: discord.ui.Item):
         logger.exception(f'PaymentMethodView error on {item}: {error}')
-        await _safe_reply(interaction, 'Something went wrong. Please try again.')
+        try:
+            await _safe_reply(interaction, 'Something went wrong. Please try again.')
+        except Exception:
+            pass
 
 
 # ──── Paginated store view ─────────────────────────────────────────────────────
@@ -140,7 +146,10 @@ class StoreView(discord.ui.View):
             await interaction.edit_original_response(embed=emb)
         except Exception as e:
             logger.exception(f'store:prev error: {e}')
-            await _safe_reply(interaction, 'Something went wrong. Please try again.')
+            try:
+                await _safe_reply(interaction, 'Something went wrong. Please try again.')
+            except Exception:
+                pass
 
     @discord.ui.button(label="·", style=discord.ButtonStyle.secondary,
                        custom_id="store:page", disabled=True, row=0)
@@ -157,7 +166,10 @@ class StoreView(discord.ui.View):
             await interaction.edit_original_response(embed=emb)
         except Exception as e:
             logger.exception(f'store:next error: {e}')
-            await _safe_reply(interaction, 'Something went wrong. Please try again.')
+            try:
+                await _safe_reply(interaction, 'Something went wrong. Please try again.')
+            except Exception:
+                pass
 
     @discord.ui.button(label="🛒  Buy", style=discord.ButtonStyle.success,
                        custom_id="store:buy", row=0)
@@ -189,11 +201,17 @@ class StoreView(discord.ui.View):
             )
         except Exception as e:
             logger.exception(f'store:buy error: {e}')
-            await _safe_reply(interaction, 'Something went wrong. Please try again.')
+            try:
+                await _safe_reply(interaction, 'Something went wrong. Please try again.')
+            except Exception:
+                pass
 
     async def on_error(self, interaction: discord.Interaction, error: Exception, item: discord.ui.Item):
         logger.exception(f'StoreView error on {item}: {error}')
-        await _safe_reply(interaction, 'Something went wrong. Please try again.')
+        try:
+            await _safe_reply(interaction, 'Something went wrong. Please try again.')
+        except Exception:
+            pass
 
 
 def _build_detail_embed(product: dict, page: int) -> discord.Embed:
