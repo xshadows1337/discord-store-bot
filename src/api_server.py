@@ -337,7 +337,12 @@ async def start_api_server(secret: str, port: int = 8080):
         if quantity < min_qty:
             return web.json_response({'error': f'Minimum order quantity is {min_qty}'}, status=422)
 
-        stock = product.get('stock', 0)
+        stock = 0
+        try:
+            with open(product['product_file'], 'r', encoding='utf-8') as _f:
+                stock = sum(1 for _ in _f)
+        except (FileNotFoundError, OSError):
+            pass
         if quantity > stock:
             return web.json_response({'error': f'Only {stock} in stock. Please lower your quantity.'}, status=422)
 
