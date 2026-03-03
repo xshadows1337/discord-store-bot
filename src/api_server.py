@@ -1228,6 +1228,199 @@ async def start_api_server(secret: str, port: int = 8080):
     app.router.add_get('/health',        health)
     app.router.add_put('/api/products',  update_products)
 
+    # ── Key Storage (Railway volume at /data) ─────────────────────────────────
+    _STORAGE_SECRET = os.environ.get('STORAGE_SECRET', '') or os.environ.get('ABYSS_ADMIN_SECRET', '')
+    _keys_dir = _DATA_DIR / 'key_storage'
+    _keys_dir.mkdir(parents=True, exist_ok=True)
+
+    def _check_storage_secret(request):
+        if not _STORAGE_SECRET:
+            return True
+        provided = request.headers.get('X-Storage-Secret', '')
+        return provided == _STORAGE_SECRET
+
+    def _safe_steam_id(steam_id: str) -> str:
+        return re.sub(r'[^a-zA-Z0-9_-]', '', steam_id or 'unknown')
+
+    async def key_storage_save(request):
+        if not _check_storage_secret(request):
+            return web.json_response({'error': 'Invalid storage secret'}, status=403)
+        try:
+            body = await request.json()
+        except Exception:
+            return web.json_response({'error': 'Invalid JSON'}, status=400)
+        steam_id = _safe_steam_id(body.get('steam_id', ''))
+        data = body.get('data')
+        if not steam_id or data is None:
+            return web.json_response({'error': 'steam_id and data required'}, status=400)
+        fp = _keys_dir / f'keys_{steam_id}.json'
+        tmp = _keys_dir / f'keys_{steam_id}.tmp'
+        try:
+            tmp.write_text(json.dumps(data, indent=2), encoding='utf-8')
+            tmp.replace(fp)
+        except Exception as exc:
+            logger.error(f"key-storage save error: {exc}")
+            return web.json_response({'error': 'Failed to save'}, status=500)
+        return web.json_response({'success': True})
+
+    async def key_storage_load(request):
+        if not _check_storage_secret(request):
+            return web.json_response({'error': 'Invalid storage secret'}, status=403)
+        steam_id = _safe_steam_id(request.query.get('steam_id', ''))
+        if not steam_id:
+            return web.json_response({'error': 'steam_id required'}, status=400)
+        fp = _keys_dir / f'keys_{steam_id}.json'
+        if not fp.exists():
+            return web.json_response({'error': 'No stored keys found'}, status=404)
+        try:
+            data = json.loads(fp.read_text(encoding='utf-8'))
+            return web.json_response({'success': True, 'data': data})
+        except Exception as exc:
+            logger.error(f"key-storage load error: {exc}")
+            return web.json_response({'error': 'Failed to load'}, status=500)
+
+    async def key_storage_delete(request):
+        if not _check_storage_secret(request):
+            return web.json_response({'error': 'Invalid storage secret'}, status=403)
+        try:
+            body = await request.json()
+        except Exception:
+            return web.json_response({'error': 'Invalid JSON'}, status=400)
+        steam_id = _safe_steam_id(body.get('steam_id', ''))
+        if not steam_id:
+            return web.json_response({'error': 'steam_id required'}, status=400)
+        fp = _keys_dir / f'keys_{steam_id}.json'
+        try:
+            fp.unlink(missing_ok=True)
+        except Exception as exc:
+            logger.error(f"key-storage delete error: {exc}")
+            return web.json_response({'error': 'Failed to delete'}, status=500)
+        return web.json_response({'success': True})
+
+    app.router.add_post('/api/key-storage/save',   key_storage_save)
+    app.router.add_get('/api/key-storage/load',    key_storage_load)
+    app.router.add_post('/api/key-storage/delete',  key_storage_delete)
+
+    # ── Plugin Push-Update (immediate update push to all clients) ─────────────
+    _UPDATE_SECRET = os.environ.get('UPDATE_SECRET', '') or os.environ.get('ABYSS_ADMIN_SECRET', '')
+    _update_file = _DATA_DIR / 'plugin_update.json'
+
+    async def plugin_update_push(request):
+        """Admin pushes a new version. All polling clients will pick it up."""
+        auth_hdr = request.headers.get('X-Update-Secret', '')
+        if not _UPDATE_SECRET or auth_hdr != _UPDATE_SECRET:
+            return web.json_response({'error': 'Unauthorized'}, status=403)
+        try:
+            body = await request.json()
+        except Exception:
+            return web.json_response({'error': 'Invalid JSON'}, status=400)
+        version = str(body.get('version', '')).strip()
+        zip_url = str(body.get('zip_url', '')).strip()
+        if not version or not zip_url:
+            return web.json_response({'error': 'version and zip_url required'}, status=400)
+        update_info = {
+            'version': version,
+            'zip_url': zip_url,
+            'pushed_at': int(time.time()),
+        }
+        try:
+            _update_file.write_text(json.dumps(update_info, indent=2), encoding='utf-8')
+        except Exception as exc:
+            logger.error(f"plugin-update push error: {exc}")
+            return web.json_response({'error': 'Failed to save update info'}, status=500)
+        logger.info(f"Plugin update pushed: v{version} -> {zip_url}")
+        return web.json_response({'success': True, 'update': update_info})
+
+    async def plugin_update_check(request):
+        """Clients poll this to see if a new version is available."""
+        if not _update_file.exists():
+            return web.json_response({'available': False})
+        try:
+            info = json.loads(_update_file.read_text(encoding='utf-8'))
+            return web.json_response({'available': True, 'version': info.get('version', ''), 'zip_url': info.get('zip_url', ''), 'pushed_at': info.get('pushed_at', 0)})
+        except Exception as exc:
+            logger.error(f"plugin-update check error: {exc}")
+            return web.json_response({'available': False})
+
+    async def plugin_update_clear(request):
+        """Admin clears the pushed update (e.g. after rollback)."""
+        auth_hdr = request.headers.get('X-Update-Secret', '')
+        if not _UPDATE_SECRET or auth_hdr != _UPDATE_SECRET:
+            return web.json_response({'error': 'Unauthorized'}, status=403)
+        try:
+            _update_file.unlink(missing_ok=True)
+        except Exception:
+            pass
+        return web.json_response({'success': True})
+
+    app.router.add_post('/api/plugin-update/push',   plugin_update_push)
+    app.router.add_get('/api/plugin-update/check',    plugin_update_check)
+    app.router.add_post('/api/plugin-update/clear',   plugin_update_clear)
+
+    # ── Live Users (real-time plugin user tracking) ───────────────────────────
+    _LIVE_SECRET = os.environ.get('LIVE_SECRET', '') or os.environ.get('ABYSS_ADMIN_SECRET', '')
+    _live_users: dict[str, dict] = {}   # steam_id -> {username, version, last_seen, ...}
+    _LIVE_TTL = 90                       # consider user offline after 90s without heartbeat
+
+    async def live_users_heartbeat(request):
+        """Plugin pings this every ~30s with SteamID64 + username."""
+        try:
+            body = await request.json()
+        except Exception:
+            return web.json_response({'error': 'Invalid JSON'}, status=400)
+        steam_id = str(body.get('steam_id', '')).strip()
+        username = str(body.get('username', '')).strip()
+        version = str(body.get('version', '')).strip()
+        if not steam_id:
+            return web.json_response({'error': 'steam_id required'}, status=400)
+        _live_users[steam_id] = {
+            'username': username or 'Unknown',
+            'version': version,
+            'last_seen': int(time.time()),
+        }
+        return web.json_response({'success': True})
+
+    async def live_users_list(request):
+        """Dev-only: returns all currently active users. Requires admin secret."""
+        auth_hdr = request.headers.get('X-Live-Secret', '')
+        if not _LIVE_SECRET or auth_hdr != _LIVE_SECRET:
+            return web.json_response({'error': 'Unauthorized'}, status=403)
+        now = int(time.time())
+        # Prune stale entries
+        stale = [sid for sid, info in _live_users.items() if (now - info['last_seen']) > _LIVE_TTL]
+        for sid in stale:
+            del _live_users[sid]
+        # Build response
+        users = []
+        for sid, info in _live_users.items():
+            users.append({
+                'steam_id': sid,
+                'username': info['username'],
+                'version': info['version'],
+                'last_seen': info['last_seen'],
+                'ago_seconds': now - info['last_seen'],
+            })
+        users.sort(key=lambda u: u['last_seen'], reverse=True)
+        return web.json_response({'success': True, 'count': len(users), 'users': users})
+
+    async def live_users_kick(request):
+        """Dev-only: remove a user from the live list."""
+        auth_hdr = request.headers.get('X-Live-Secret', '')
+        if not _LIVE_SECRET or auth_hdr != _LIVE_SECRET:
+            return web.json_response({'error': 'Unauthorized'}, status=403)
+        try:
+            body = await request.json()
+        except Exception:
+            return web.json_response({'error': 'Invalid JSON'}, status=400)
+        steam_id = str(body.get('steam_id', '')).strip()
+        if steam_id in _live_users:
+            del _live_users[steam_id]
+        return web.json_response({'success': True})
+
+    app.router.add_post('/api/live-users/heartbeat', live_users_heartbeat)
+    app.router.add_get('/api/live-users/list',       live_users_list)
+    app.router.add_post('/api/live-users/kick',      live_users_kick)
+
     runner = web.AppRunner(
         app,
         handle_signals=False,
