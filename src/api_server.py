@@ -1357,10 +1357,11 @@ async def start_api_server(secret: str, port: int = 8080):
     app.router.add_get('/api/plugin-update/check',    plugin_update_check)
     app.router.add_post('/api/plugin-update/clear',   plugin_update_clear)
 
-    # ── Free Usage Tracking (server-side daily limits per SteamID) ───────────
+    # ── Free Usage Tracking (server-side limits per SteamID, 3-day cooldown) ──
     _FREE_USAGE_SECRET = os.environ.get('FREE_USAGE_SECRET', '') or os.environ.get('ABYSS_ADMIN_SECRET', '')
     _free_usage_file = _DATA_DIR / 'free_usage.json'
-    _FREE_DAILY_LIMIT = 3
+    _FREE_LIMIT = 3           # max free adds per cooldown period
+    _FREE_COOLDOWN_DAYS = 3   # cooldown resets after this many days
 
     def _load_free_usage() -> dict:
         """Load the free_usage.json from disk."""
@@ -1377,8 +1378,31 @@ async def start_api_server(secret: str, port: int = 8080):
         tmp.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding='utf-8')
         tmp.replace(_free_usage_file)
 
+    def _free_usage_expired(user_data: dict) -> bool:
+        """Return True if the user's cooldown period has expired (3+ days since start)."""
+        from datetime import date, timedelta
+        start = user_data.get('start_date', '')
+        if not start:
+            return True
+        try:
+            start_d = date.fromisoformat(start)
+            return (date.today() - start_d).days >= _FREE_COOLDOWN_DAYS
+        except Exception:
+            return True
+
+    def _free_usage_expires_on(user_data: dict) -> str:
+        """Return the ISO date string when the cooldown expires."""
+        from datetime import date, timedelta
+        start = user_data.get('start_date', '')
+        if not start:
+            return ''
+        try:
+            return str(date.fromisoformat(start) + timedelta(days=_FREE_COOLDOWN_DAYS))
+        except Exception:
+            return ''
+
     async def free_usage_status(request):
-        """Client checks remaining free uses for the day. Requires steam_id + hwid."""
+        """Client checks remaining free uses. 3-day cooldown period. Requires steam_id + hwid."""
         try:
             body = await request.json()
         except Exception:
@@ -1393,20 +1417,24 @@ async def start_api_server(secret: str, port: int = 8080):
         usage_key = f"{steam_id}_{hwid}"
         data = _load_free_usage()
         user_data = data.get(usage_key, {})
-        if user_data.get('date') != today:
-            user_data = {'date': today, 'count': 0}
+        if _free_usage_expired(user_data):
+            user_data = {'start_date': today, 'count': 0}
         count = user_data.get('count', 0)
+        expires = _free_usage_expires_on(user_data)
         return web.json_response({
             'success': True,
             'steam_id': steam_id,
+            'start_date': user_data.get('start_date', today),
+            'expires': expires,
             'date': today,
             'count': count,
-            'limit': _FREE_DAILY_LIMIT,
-            'remaining': max(0, _FREE_DAILY_LIMIT - count),
+            'limit': _FREE_LIMIT,
+            'cooldown_days': _FREE_COOLDOWN_DAYS,
+            'remaining': max(0, _FREE_LIMIT - count),
         })
 
     async def free_usage_consume(request):
-        """Client consumes one free daily slot. Requires steam_id + hwid."""
+        """Client consumes one free slot. 3-day cooldown period. Requires steam_id + hwid."""
         try:
             body = await request.json()
         except Exception:
@@ -1421,15 +1449,18 @@ async def start_api_server(secret: str, port: int = 8080):
         usage_key = f"{steam_id}_{hwid}"
         data = _load_free_usage()
         user_data = data.get(usage_key, {})
-        if user_data.get('date') != today:
-            user_data = {'date': today, 'count': 0}
+        if _free_usage_expired(user_data):
+            user_data = {'start_date': today, 'count': 0}
 
-        if user_data['count'] >= _FREE_DAILY_LIMIT:
+        if user_data['count'] >= _FREE_LIMIT:
+            expires = _free_usage_expires_on(user_data)
             return web.json_response({
                 'success': False,
-                'error': 'Daily free limit reached.',
+                'error': f'Free limit reached. Resets on {expires}.',
                 'count': user_data['count'],
-                'limit': _FREE_DAILY_LIMIT,
+                'limit': _FREE_LIMIT,
+                'cooldown_days': _FREE_COOLDOWN_DAYS,
+                'expires': expires,
                 'remaining': 0,
             })
 
@@ -1437,11 +1468,14 @@ async def start_api_server(secret: str, port: int = 8080):
         data[usage_key] = user_data
         _save_free_usage(data)
 
+        expires = _free_usage_expires_on(user_data)
         return web.json_response({
             'success': True,
             'count': user_data['count'],
-            'limit': _FREE_DAILY_LIMIT,
-            'remaining': max(0, _FREE_DAILY_LIMIT - user_data['count']),
+            'limit': _FREE_LIMIT,
+            'cooldown_days': _FREE_COOLDOWN_DAYS,
+            'expires': expires,
+            'remaining': max(0, _FREE_LIMIT - user_data['count']),
         })
 
     async def free_usage_list(request):
@@ -1458,19 +1492,25 @@ async def start_api_server(secret: str, port: int = 8080):
             parts = usage_key.rsplit('_', 1)
             steam_id = parts[0] if len(parts) == 2 else usage_key
             hwid = parts[1] if len(parts) == 2 else ''
-            is_today = user_data.get('date') == today
+            expired = _free_usage_expired(user_data)
+            expires = _free_usage_expires_on(user_data)
+            count = user_data.get('count', 0)
+            remaining = 0 if expired else max(0, _FREE_LIMIT - count)
             users.append({
                 'usage_key': usage_key,
                 'steam_id': steam_id,
                 'hwid': hwid,
-                'date': user_data.get('date', ''),
-                'count': user_data.get('count', 0),
-                'limit': _FREE_DAILY_LIMIT,
-                'remaining': max(0, _FREE_DAILY_LIMIT - user_data.get('count', 0)) if is_today else _FREE_DAILY_LIMIT,
-                'active_today': is_today,
+                'start_date': user_data.get('start_date', user_data.get('date', '')),
+                'expires': expires,
+                'count': count,
+                'limit': _FREE_LIMIT,
+                'cooldown_days': _FREE_COOLDOWN_DAYS,
+                'remaining': remaining,
+                'expired': expired,
+                'active': not expired,
             })
-        users.sort(key=lambda u: (not u['active_today'], u['date']), reverse=False)
-        return web.json_response({'success': True, 'count': len(users), 'users': users, 'today': today})
+        users.sort(key=lambda u: (not u['active'], u.get('start_date', '')), reverse=False)
+        return web.json_response({'success': True, 'count': len(users), 'users': users, 'today': today, 'cooldown_days': _FREE_COOLDOWN_DAYS})
 
     async def free_usage_reset(request):
         """Admin: reset a specific user's free usage counter. Requires admin secret."""
