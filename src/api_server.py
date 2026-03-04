@@ -1357,6 +1357,154 @@ async def start_api_server(secret: str, port: int = 8080):
     app.router.add_get('/api/plugin-update/check',    plugin_update_check)
     app.router.add_post('/api/plugin-update/clear',   plugin_update_clear)
 
+    # ── Free Usage Tracking (server-side daily limits per SteamID) ───────────
+    _FREE_USAGE_SECRET = os.environ.get('FREE_USAGE_SECRET', '') or os.environ.get('ABYSS_ADMIN_SECRET', '')
+    _free_usage_file = _DATA_DIR / 'free_usage.json'
+    _FREE_DAILY_LIMIT = 3
+
+    def _load_free_usage() -> dict:
+        """Load the free_usage.json from disk."""
+        if not _free_usage_file.exists():
+            return {}
+        try:
+            return json.loads(_free_usage_file.read_text(encoding='utf-8'))
+        except Exception:
+            return {}
+
+    def _save_free_usage(data: dict):
+        """Persist the free_usage.json to disk."""
+        tmp = _free_usage_file.with_suffix('.tmp')
+        tmp.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding='utf-8')
+        tmp.replace(_free_usage_file)
+
+    async def free_usage_status(request):
+        """Client checks remaining free uses for the day. Requires steam_id + hwid."""
+        try:
+            body = await request.json()
+        except Exception:
+            return web.json_response({'error': 'Invalid JSON'}, status=400)
+        steam_id = str(body.get('steam_id', '')).strip()
+        hwid = str(body.get('hwid', '')).strip()
+        if not steam_id or not hwid:
+            return web.json_response({'error': 'steam_id and hwid required'}, status=400)
+
+        from datetime import date
+        today = str(date.today())
+        usage_key = f"{steam_id}_{hwid}"
+        data = _load_free_usage()
+        user_data = data.get(usage_key, {})
+        if user_data.get('date') != today:
+            user_data = {'date': today, 'count': 0}
+        count = user_data.get('count', 0)
+        return web.json_response({
+            'success': True,
+            'steam_id': steam_id,
+            'date': today,
+            'count': count,
+            'limit': _FREE_DAILY_LIMIT,
+            'remaining': max(0, _FREE_DAILY_LIMIT - count),
+        })
+
+    async def free_usage_consume(request):
+        """Client consumes one free daily slot. Requires steam_id + hwid."""
+        try:
+            body = await request.json()
+        except Exception:
+            return web.json_response({'error': 'Invalid JSON'}, status=400)
+        steam_id = str(body.get('steam_id', '')).strip()
+        hwid = str(body.get('hwid', '')).strip()
+        if not steam_id or not hwid:
+            return web.json_response({'error': 'steam_id and hwid required'}, status=400)
+
+        from datetime import date
+        today = str(date.today())
+        usage_key = f"{steam_id}_{hwid}"
+        data = _load_free_usage()
+        user_data = data.get(usage_key, {})
+        if user_data.get('date') != today:
+            user_data = {'date': today, 'count': 0}
+
+        if user_data['count'] >= _FREE_DAILY_LIMIT:
+            return web.json_response({
+                'success': False,
+                'error': 'Daily free limit reached.',
+                'count': user_data['count'],
+                'limit': _FREE_DAILY_LIMIT,
+                'remaining': 0,
+            })
+
+        user_data['count'] += 1
+        data[usage_key] = user_data
+        _save_free_usage(data)
+
+        return web.json_response({
+            'success': True,
+            'count': user_data['count'],
+            'limit': _FREE_DAILY_LIMIT,
+            'remaining': max(0, _FREE_DAILY_LIMIT - user_data['count']),
+        })
+
+    async def free_usage_list(request):
+        """Admin: list all users with free usage data. Requires admin secret."""
+        auth_hdr = request.headers.get('X-Free-Usage-Secret', '') or request.headers.get('X-Live-Secret', '')
+        if not _FREE_USAGE_SECRET or auth_hdr != _FREE_USAGE_SECRET:
+            return web.json_response({'error': 'Unauthorized'}, status=403)
+
+        from datetime import date
+        today = str(date.today())
+        data = _load_free_usage()
+        users = []
+        for usage_key, user_data in data.items():
+            parts = usage_key.rsplit('_', 1)
+            steam_id = parts[0] if len(parts) == 2 else usage_key
+            hwid = parts[1] if len(parts) == 2 else ''
+            is_today = user_data.get('date') == today
+            users.append({
+                'usage_key': usage_key,
+                'steam_id': steam_id,
+                'hwid': hwid,
+                'date': user_data.get('date', ''),
+                'count': user_data.get('count', 0),
+                'limit': _FREE_DAILY_LIMIT,
+                'remaining': max(0, _FREE_DAILY_LIMIT - user_data.get('count', 0)) if is_today else _FREE_DAILY_LIMIT,
+                'active_today': is_today,
+            })
+        users.sort(key=lambda u: (not u['active_today'], u['date']), reverse=False)
+        return web.json_response({'success': True, 'count': len(users), 'users': users, 'today': today})
+
+    async def free_usage_reset(request):
+        """Admin: reset a specific user's free usage counter. Requires admin secret."""
+        auth_hdr = request.headers.get('X-Free-Usage-Secret', '') or request.headers.get('X-Live-Secret', '')
+        if not _FREE_USAGE_SECRET or auth_hdr != _FREE_USAGE_SECRET:
+            return web.json_response({'error': 'Unauthorized'}, status=403)
+        try:
+            body = await request.json()
+        except Exception:
+            return web.json_response({'error': 'Invalid JSON'}, status=400)
+        usage_key = str(body.get('usage_key', '')).strip()
+        if not usage_key:
+            return web.json_response({'error': 'usage_key required'}, status=400)
+        data = _load_free_usage()
+        if usage_key in data:
+            del data[usage_key]
+            _save_free_usage(data)
+            return web.json_response({'success': True, 'message': f'Reset usage for {usage_key}'})
+        return web.json_response({'success': False, 'error': 'User not found in free usage data'})
+
+    async def free_usage_reset_all(request):
+        """Admin: reset ALL free usage counters. Requires admin secret."""
+        auth_hdr = request.headers.get('X-Free-Usage-Secret', '') or request.headers.get('X-Live-Secret', '')
+        if not _FREE_USAGE_SECRET or auth_hdr != _FREE_USAGE_SECRET:
+            return web.json_response({'error': 'Unauthorized'}, status=403)
+        _save_free_usage({})
+        return web.json_response({'success': True, 'message': 'All free usage counters reset.'})
+
+    app.router.add_post('/api/free-usage/status',     free_usage_status)
+    app.router.add_post('/api/free-usage/consume',    free_usage_consume)
+    app.router.add_get('/api/free-usage/list',        free_usage_list)
+    app.router.add_post('/api/free-usage/reset',      free_usage_reset)
+    app.router.add_post('/api/free-usage/reset-all',  free_usage_reset_all)
+
     # ── Live Users (real-time plugin user tracking) ───────────────────────────
     _LIVE_SECRET = os.environ.get('LIVE_SECRET', '') or os.environ.get('ABYSS_ADMIN_SECRET', '')
     _live_users: dict[str, dict] = {}   # steam_id -> {username, version, last_seen, ...}
