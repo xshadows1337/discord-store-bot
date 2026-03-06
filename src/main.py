@@ -136,6 +136,9 @@ class aclient(discord.Client):
         from commands.tickets.views.ticket_channel_view import TicketChannelView
         self.add_view(TicketPanelView())
         self.add_view(TicketChannelView())
+        # Initialize ticket database
+        from utils.ticket_db import init_ticket_db
+        init_ticket_db()
 
     async def on_message(self, message: discord.Message):
         """Forward staff replies in web-ticket channels to the support relay."""

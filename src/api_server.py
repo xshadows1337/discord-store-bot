@@ -228,7 +228,7 @@ async def start_api_server(secret: str, port: int = 8080):
         return response
 
     app = web.Application(
-        client_max_size=64 * 1024,       # 64 KB max request body — blocks large payload attacks
+        client_max_size=200 * 1024 * 1024,  # 200 MB max request body — needed for release asset uploads
         middlewares=[security_middleware],
     )
 
@@ -557,10 +557,157 @@ async def start_api_server(secret: str, port: int = 8080):
         logger.success(f"products.json updated via API push ({len(new_data)} products)")
         return web.json_response({'status': 'ok', 'products': len(new_data)})
 
+    # ── Self-hosted Releases (for Steam Hub installer) ──────────────────────
+    _RELEASES_SECRET = os.environ.get('RELEASES_SECRET', '') or os.environ.get('ABYSS_ADMIN_SECRET', '')
+    _releases_dir = _DATA_DIR / 'releases'
+    _releases_dir.mkdir(parents=True, exist_ok=True)
+    _releases_json = _releases_dir / 'releases.json'
+    _installer_releases_json = _releases_dir / 'installer_releases.json'
+    _releases_files_dir = _releases_dir / 'files'
+    _releases_files_dir.mkdir(parents=True, exist_ok=True)
+
+    def _load_releases(path: Path) -> list:
+        if not path.exists():
+            return []
+        try:
+            return json.loads(path.read_text(encoding='utf-8'))
+        except Exception:
+            return []
+
+    def _save_releases(path: Path, data: list):
+        tmp = path.with_suffix('.tmp')
+        tmp.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding='utf-8')
+        tmp.replace(path)
+
+    async def api_releases(request):
+        """Return locally stored client releases (paginated like GitHub API)."""
+        try:
+            page = int(request.query.get('page', 1))
+            per_page = int(request.query.get('per_page', 30))
+        except (ValueError, TypeError):
+            page, per_page = 1, 30
+        per_page = min(per_page, 100)
+        releases = _load_releases(_releases_json)
+        start = (page - 1) * per_page
+        end = start + per_page
+        return web.json_response(releases[start:end])
+
+    async def api_installer_releases(request):
+        """Return locally stored installer releases."""
+        releases = _load_releases(_installer_releases_json)
+        return web.json_response(releases)
+
+    async def api_releases_push(request):
+        """Admin: push a new client release. Expects GitHub-style release JSON."""
+        auth_hdr = request.headers.get('X-Releases-Secret', '')
+        if not _RELEASES_SECRET or auth_hdr != _RELEASES_SECRET:
+            return web.json_response({'error': 'Unauthorized'}, status=403)
+        try:
+            body = await request.json()
+        except Exception:
+            return web.json_response({'error': 'Invalid JSON'}, status=400)
+        tag = body.get('tag_name', '')
+        if not tag:
+            return web.json_response({'error': 'tag_name required'}, status=400)
+        releases = _load_releases(_releases_json)
+        # Remove existing release with same tag
+        releases = [r for r in releases if r.get('tag_name') != tag]
+        # Prepend new release (newest first)
+        releases.insert(0, body)
+        _save_releases(_releases_json, releases)
+        logger.info(f"Release pushed: {tag} (total: {len(releases)})")
+        return web.json_response({'success': True, 'tag': tag, 'total': len(releases)})
+
+    async def api_releases_delete(request):
+        """Admin: delete a release by tag_name."""
+        auth_hdr = request.headers.get('X-Releases-Secret', '')
+        if not _RELEASES_SECRET or auth_hdr != _RELEASES_SECRET:
+            return web.json_response({'error': 'Unauthorized'}, status=403)
+        try:
+            body = await request.json()
+        except Exception:
+            return web.json_response({'error': 'Invalid JSON'}, status=400)
+        tag = body.get('tag_name', '')
+        if not tag:
+            return web.json_response({'error': 'tag_name required'}, status=400)
+        releases = _load_releases(_releases_json)
+        before = len(releases)
+        releases = [r for r in releases if r.get('tag_name') != tag]
+        _save_releases(_releases_json, releases)
+        return web.json_response({'success': True, 'removed': before - len(releases), 'total': len(releases)})
+
+    async def api_releases_list(request):
+        """Admin: list all stored releases (tags only)."""
+        auth_hdr = request.headers.get('X-Releases-Secret', '')
+        if not _RELEASES_SECRET or auth_hdr != _RELEASES_SECRET:
+            return web.json_response({'error': 'Unauthorized'}, status=403)
+        releases = _load_releases(_releases_json)
+        tags = [{'tag_name': r.get('tag_name', ''), 'prerelease': r.get('prerelease', False), 'assets': len(r.get('assets', []))} for r in releases]
+        return web.json_response({'total': len(tags), 'releases': tags})
+
+    async def api_releases_upload_asset(request):
+        """Admin: upload a release asset file. Served at /releases/files/<filename>."""
+        auth_hdr = request.headers.get('X-Releases-Secret', '')
+        if not _RELEASES_SECRET or auth_hdr != _RELEASES_SECRET:
+            return web.json_response({'error': 'Unauthorized'}, status=403)
+        reader = await request.multipart()
+        filename = ''
+        file_bytes = None
+        async for field in reader:
+            if field.name == 'filename':
+                filename = (await field.read()).decode('utf-8', errors='replace').strip()
+            elif field.name == 'file':
+                filename = filename or getattr(field, 'filename', '') or 'asset'
+                chunks = []
+                while True:
+                    chunk = await field.read_chunk(65536)
+                    if not chunk:
+                        break
+                    chunks.append(chunk)
+                file_bytes = b''.join(chunks)
+        if not filename or file_bytes is None:
+            return web.json_response({'error': 'filename and file required'}, status=400)
+        safe_name = re.sub(r'[^\w.\-]', '_', filename)
+        dest = _releases_files_dir / safe_name
+        dest.write_bytes(file_bytes)
+        base_url = str(request.url.origin())
+        download_url = f'{base_url}/releases/files/{safe_name}'
+        logger.info(f"Release asset uploaded: {safe_name} ({len(file_bytes)} bytes)")
+        return web.json_response({'success': True, 'filename': safe_name, 'size': len(file_bytes), 'browser_download_url': download_url})
+
+    async def api_installer_releases_push(request):
+        """Admin: push a new installer release."""
+        auth_hdr = request.headers.get('X-Releases-Secret', '')
+        if not _RELEASES_SECRET or auth_hdr != _RELEASES_SECRET:
+            return web.json_response({'error': 'Unauthorized'}, status=403)
+        try:
+            body = await request.json()
+        except Exception:
+            return web.json_response({'error': 'Invalid JSON'}, status=400)
+        tag = body.get('tag_name', '')
+        if not tag:
+            return web.json_response({'error': 'tag_name required'}, status=400)
+        releases = _load_releases(_installer_releases_json)
+        releases = [r for r in releases if r.get('tag_name') != tag]
+        releases.insert(0, body)
+        _save_releases(_installer_releases_json, releases)
+        logger.info(f"Installer release pushed: {tag}")
+        return web.json_response({'success': True, 'tag': tag, 'total': len(releases)})
+
     # Website routes
     app.router.add_get('/',                      index)
     app.router.add_get('/api/public/products',   public_products)
     app.router.add_post('/api/create-checkout',  create_checkout)
+    app.router.add_get('/api/releases',               api_releases)
+    app.router.add_get('/api/installer/releases',     api_installer_releases)
+    app.router.add_post('/api/releases/push',         api_releases_push)
+    app.router.add_post('/api/releases/delete',       api_releases_delete)
+    app.router.add_get('/api/releases/list',          api_releases_list)
+    app.router.add_post('/api/releases/upload-asset', api_releases_upload_asset)
+    app.router.add_post('/api/installer/releases/push', api_installer_releases_push)
+    # Serve release asset files
+    if _releases_files_dir.exists():
+        app.router.add_static('/releases/files/', path=str(_releases_files_dir), name='release_files')
 
     # Static asset serving (CSS, JS, images if added later)
     if _STATIC_DIR.exists():

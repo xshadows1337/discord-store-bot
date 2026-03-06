@@ -133,7 +133,7 @@ async def create_web_ticket(username: str = 'Guest') -> WebTicket | None:
         embed.add_field(name="Status", value="\U0001f7e2\u2002Open", inline=True)
         embed.add_field(name="Ticket ID", value=f"`{ticket_id}`", inline=True)
         embed.set_footer(text="xShadows Shop  \u2022  Website Live Chat Relay")
-        await _discord_retry(channel.send, embed=embed, view=TicketChannelView(opener_id=0, category="website_chat"))
+        await _discord_retry(channel.send, embed=embed, view=TicketChannelView(opener_id=0, category="website_chat", ticket_number=0))
 
         logger.info(f'[RELAY] Web ticket {ticket_id} created → #{channel_name}')
         return ticket

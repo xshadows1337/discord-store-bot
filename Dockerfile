@@ -18,4 +18,3 @@ ENV DATA_DIR=/data
 
 # Run the bot
 CMD ["python", "main.py"]
-CMD ["python", "main.py"]
