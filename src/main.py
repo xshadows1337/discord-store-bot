@@ -369,10 +369,8 @@ async def runner():
             break
         except discord.LoginFailure as e:
             logger.error(f"Discord login failed (bad token): {e}")
-            logger.info("API server will keep running. Bot is disabled until token is fixed.")
-            # Keep the event loop alive so the API server stays up
-            while True:
-                await asyncio.sleep(3600)
+            logger.error("Set a valid BOT_TOKEN environment variable and redeploy.")
+            import sys; sys.exit(1)
         except discord.HTTPException as e:
             if e.status == 429:
                 # Prefer Discord's retry_after header; fall back to our own backoff.
